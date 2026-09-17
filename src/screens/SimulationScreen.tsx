@@ -325,7 +325,11 @@ function CaseEndCard({ summary, caseDef, caseNumber, totalCases, isLast, onNext 
         })}
       </div>
       <div className="case-end-block">
-        <b>Ana bulgu: {findingShort(caseDef.primaryFinding)}</b>
+        <b>
+          {caseDef.mappingValidation === 'validated'
+            ? `Ana bulgu: ${findingShort(caseDef.primaryFinding)}`
+            : `Rapor etiketi (doğrulanmamış): ${findingShort(caseDef.primaryFinding)}`}
+        </b>
         <p>{caseDef.feedback.summary}</p>
       </div>
       {caseDef.feedback.differential && (

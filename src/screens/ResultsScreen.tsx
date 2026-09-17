@@ -21,10 +21,10 @@ export function ResultsScreen() {
   const { state, dispatch, runtime } = useStore()
   const isAssessment = state.mode === 'assessment'
   const agg = aggregateResults(state.caseResults)
-  const last = state.caseResults[state.caseResults.length - 1]
-  const total = isAssessment ? agg.total : last?.total ?? 0
-  const passed = isAssessment ? agg.mastery : last?.mastery ?? false
-  const domains = isAssessment ? agg.domains : last?.domains ?? null
+  // uygulama ve değerlendirme: oturumdaki tüm vakaların toplamı (alan ağırlıklarıyla)
+  const total = agg.total
+  const passed = agg.mastery
+  const domains = state.caseResults.length ? agg.domains : null
   const [expanded, setExpanded] = useState<string | null>(null)
 
   const domainRows: { key: keyof ScoringWeights; label: string; icon: React.ReactNode }[] = [

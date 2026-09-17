@@ -1,110 +1,120 @@
-/** Ekran görüntüsü doğrulaması: masaüstü 16:9, tablet, mobil. */
+/** Ekran görüntüsü duman testi: masaüstü ve mobil akışlar. `npm run dev` açıkken çalıştırın.
+ *  CHROMIUM_PATH ile tarayıcı yolu verilebilir. Konsol hatası varsa çıkış kodu 1. */
 import { chromium } from 'playwright-core'
 import fs from 'node:fs'
 
-const BASE = process.env.BASE_URL || 'http://localhost:5173'
-const OUT = '/tmp/ausculta-shots'
+const BASE = process.env.BASE_URL || 'http://localhost:5173/'
+const OUT = process.env.SHOTS_DIR || '/tmp/opaca-shots'
 fs.mkdirSync(OUT, { recursive: true })
 
 function findChromium() {
-  const p = `${process.env.HOME}/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`
-  if (fs.existsSync(p)) return p
-  throw new Error('chromium bulunamadı')
+  const candidates = [
+    process.env.CHROMIUM_PATH,
+    '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
+    `${process.env.HOME}/Library/Caches/ms-playwright/chromium-1243/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing`,
+  ].filter(Boolean)
+  const found = candidates.find((p) => fs.existsSync(p))
+  if (!found) throw new Error('Chromium bulunamadı (CHROMIUM_PATH verin)')
+  return found
 }
 
 const errors = []
+const snap = (page, name) => page.screenshot({ path: `${OUT}/${name}.png` })
 
-async function shot(browser, name, vp, flow) {
-  const page = await browser.newPage({ viewport: vp })
+async function open(browser, name, viewport) {
+  const page = await browser.newPage({ viewport })
   page.on('console', (m) => { if (m.type() === 'error') errors.push(`[${name}] ${m.text()}`) })
   page.on('pageerror', (e) => errors.push(`[${name}] ${e}`))
   await page.goto(`${BASE}?fresh=1`, { waitUntil: 'networkidle' })
-  await page.waitForTimeout(400)
-  await flow(page)
-  await page.screenshot({ path: `${OUT}/${name}.png` })
+  await page.waitForTimeout(300)
   return page
 }
 
-const toModes = async (page) => {
+async function tutorial(page, prefix) {
   await page.getByRole('button', { name: /Simülatörü başlat/ }).click()
-  await page.waitForTimeout(500)
-  await page.locator('input[type=checkbox]').first().check()
-  await page.getByRole('button', { name: /Atla/ }).click()
-  await page.waitForTimeout(500)
+  await page.waitForTimeout(600)
+  const plus = page.getByRole('button', { name: 'Yakınlaştır', exact: true })
+  await plus.click()
+  await page.locator('.film-select select').selectOption('bone')
+  const stage = await page.locator('.film-stage').boundingBox()
+  await page.mouse.click(stage.x + stage.width * 0.4, stage.y + stage.height * 0.45)
+  await page.waitForTimeout(1300)
+  await snap(page, `${prefix}-02-tutorial`)
+  await page.getByRole('button', { name: /Modlara geç/ }).click()
+  await page.waitForTimeout(400)
+}
+
+async function answerAll(page, prefix) {
+  for (let i = 0; i < 12; i++) {
+    const end = page.locator('.case-end-card')
+    if (await end.count()) break
+    const opt = page.locator('.opt-list .opt').first()
+    if (await opt.count()) await opt.click()
+    else {
+      const stage = await page.locator('.film-stage').boundingBox()
+      await page.mouse.click(stage.x + stage.width * 0.5, stage.y + stage.height * 0.5)
+    }
+    await page.getByRole('button', { name: /Yanıtla/ }).click()
+    await page.waitForTimeout(250)
+    if (i === 0) await snap(page, `${prefix}-05-feedback`)
+    const next = page.getByRole('button', { name: /Devam et|Vakayı tamamla/ })
+    if (await next.count()) await next.click()
+    await page.waitForTimeout(250)
+  }
 }
 
 const run = async () => {
   const browser = await chromium.launch({ executablePath: findChromium(), headless: true })
 
-  // Masaüstü 16:9
-  const p1 = await shot(browser, 'desktop-01-start', { width: 1600, height: 900 }, async () => {})
-  await p1.getByRole('button', { name: /Simülatörü başlat/ }).click()
-  await p1.waitForTimeout(500)
-  await p1.screenshot({ path: `${OUT}/desktop-02-tutorial.png` })
-  await p1.locator('input[type=checkbox]').first().check()
-  await p1.getByRole('button', { name: /Atla/ }).click()
-  await p1.waitForTimeout(500)
-  await p1.screenshot({ path: `${OUT}/desktop-03-modes.png` })
-  await p1.getByRole('button', { name: /Vakaları çöz/ }).click()
-  await p1.waitForTimeout(800)
-  await p1.screenshot({ path: `${OUT}/desktop-04-practice.png` })
-  // stetoskopu apekse sürükle (mitral 0.632, 0.515)
-  const stage = await p1.locator('.stage-fit').first().boundingBox()
-  const wrap = await p1.locator('.body-wrap').first().boundingBox()
-  const chest = await p1.locator('.steth').first().boundingBox()
-  if (wrap && chest) {
-    const tx = wrap.x + wrap.width * 0.632 - chest.x - chest.width / 2
-    const ty = wrap.y + wrap.height * 0.515 - chest.y - chest.height / 2
-    await p1.mouse.move(chest.x + chest.width / 2, chest.y + chest.height / 2)
-    await p1.mouse.down()
-    for (let i = 1; i <= 14; i++) {
-      await p1.mouse.move(chest.x + chest.width / 2 + (tx * i) / 14, chest.y + chest.height / 2 + (ty * i) / 14)
-      await p1.waitForTimeout(25)
-    }
-    await p1.mouse.up()
-    await p1.waitForTimeout(1600)
-    await p1.screenshot({ path: `${OUT}/desktop-05-practice-playing.png` })
+  const d = await open(browser, 'desktop', { width: 1600, height: 900 })
+  await snap(d, 'desktop-01-start')
+  await tutorial(d, 'desktop')
+  await snap(d, 'desktop-03-modes')
+  await d.getByRole('button', { name: /Vakaları çöz/ }).click()
+  await d.waitForTimeout(1400)
+  // sistematik okuma: imleci bölgelerde gezdir
+  const st = await d.locator('.film-stage').boundingBox()
+  const layer = await d.locator('.film-layer').boundingBox()
+  for (const [x, y] of [[0.5, 0.15], [0.25, 0.2], [0.75, 0.2], [0.25, 0.6], [0.75, 0.6], [0.55, 0.55], [0.2, 0.72], [0.8, 0.72], [0.04, 0.4]]) {
+    await d.mouse.move(layer.x + layer.width * x, layer.y + layer.height * y)
+    await d.waitForTimeout(700)
   }
-  void stage
+  await d.mouse.move(st.x + 5, st.y + 5)
+  await snap(d, 'desktop-04-practice')
+  await answerAll(d, 'desktop')
+  await snap(d, 'desktop-06-case-end')
+  await d.getByRole('button', { name: /Sonraki vaka|Sonuçları gör/ }).click()
+  await d.waitForTimeout(500)
+  await answerAll(d, 'desktop-b')
+  const res = d.getByRole('button', { name: /Sonuçları gör/ })
+  if (await res.count()) await res.click()
+  await d.waitForTimeout(600)
+  await snap(d, 'desktop-07-results')
+  await d.getByRole('button', { name: /Öğrenme modunda çalış/ }).click()
+  await d.waitForTimeout(900)
+  await snap(d, 'desktop-08-learn')
+  await d.getByRole('button', { name: /Kardiyomegali/ }).first().click()
+  await d.waitForTimeout(600)
+  await d.getByRole('tab', { name: /Film bilgisi/ }).click()
+  await d.waitForTimeout(900)
+  await snap(d, 'desktop-09-learn-film')
+  await d.getByRole('button', { name: 'Hakkında' }).click()
+  await d.waitForTimeout(500)
+  await d.screenshot({ path: `${OUT}/desktop-10-sources.png`, fullPage: true })
 
-  // Öğrenme + arka görünüm
-  const p2 = await browser.newPage({ viewport: { width: 1600, height: 900 } })
-  p2.on('console', (m) => { if (m.type() === 'error') errors.push(`[learn] ${m.text()}`) })
-  await p2.goto(`${BASE}?fresh=1`, { waitUntil: 'networkidle' })
-  await toModes(p2)
-  await p2.getByRole('button', { name: /Öğrenmeye başla/ }).click()
-  await p2.waitForTimeout(900)
-  await p2.screenshot({ path: `${OUT}/desktop-06-learn-heart.png` })
-  // akciğer kütüphanesi + arka görünüm
-  await p2.getByRole('button', { name: /Wheezing/ }).first().click()
-  await p2.waitForTimeout(400)
-  await p2.getByRole('button', { name: /^Arka$/ }).first().click()
-  await p2.waitForTimeout(700)
-  await p2.screenshot({ path: `${OUT}/desktop-07-learn-back.png` })
+  const m = await open(browser, 'mobile', { width: 390, height: 844 })
+  await snap(m, 'mobile-01-start')
+  await tutorial(m, 'mobile')
+  await m.getByRole('button', { name: /Vakaları çöz/ }).click()
+  await m.waitForTimeout(1400)
+  await snap(m, 'mobile-04-practice')
 
-  // Tablet yatay
-  const p3 = await browser.newPage({ viewport: { width: 1024, height: 768 } })
-  p3.on('pageerror', (e) => errors.push(`[tablet] ${e}`))
-  await p3.goto(`${BASE}?fresh=1`, { waitUntil: 'networkidle' })
-  await toModes(p3)
-  await p3.getByRole('button', { name: /Vakaları çöz/ }).click()
-  await p3.waitForTimeout(800)
-  await p3.screenshot({ path: `${OUT}/tablet-04-practice.png`, fullPage: true })
-
-  // Mobil
-  const p4 = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })
-  p4.on('pageerror', (e) => errors.push(`[mobile] ${e}`))
-  await p4.goto(`${BASE}?fresh=1`, { waitUntil: 'networkidle' })
-  await p4.waitForTimeout(400)
-  await p4.screenshot({ path: `${OUT}/mobile-01-start.png` })
-  await toModes(p4)
-  await p4.screenshot({ path: `${OUT}/mobile-03-modes.png` })
-  await p4.getByRole('button', { name: /Vakaları çöz/ }).click()
-  await p4.waitForTimeout(800)
-  await p4.screenshot({ path: `${OUT}/mobile-04-practice.png`, fullPage: true })
-
-  console.log('console hataları:', errors.length ? errors : 'yok')
   await browser.close()
+  if (errors.length) {
+    console.error('Konsol hataları:\n' + errors.join('\n'))
+    process.exit(1)
+  }
+  console.log(`Ekran görüntüleri: ${OUT}`)
 }
 
 run().catch((e) => {
