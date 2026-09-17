@@ -1115,6 +1115,8 @@ a.credit-person:hover, a.credit-person:focus-visible { border-color: var(--blue-
 /* soru ve olgu kartları */
 .mark-status { border: 1px dashed rgba(255, 255, 255, .35); border-radius: var(--r-md); padding: 10px 12px; font-size: var(--fs-md); line-height: 1.45; display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
 .mark-status.has-mark { border-style: solid; border-color: #fb7185; }
+.q-card-dark .mark-status { color: var(--bg-grad-a); }
+.q-card-dark .mark-status .link-btn { color: var(--blue-300); }
 .case-line { margin-top: 0; line-height: 1.5; }
 .case-timer { display: inline-flex; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
 .good-text { color: var(--green-600); }
