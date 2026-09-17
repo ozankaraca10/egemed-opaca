@@ -1,0 +1,188 @@
+{
+  "version": 1,
+  "module": {
+    "product": "EGEMED Ausculta",
+    "subtitle": "Kardiyopulmoner Oskültasyon Simülatörü",
+    "trademark": "EGEMED Ausculta™",
+    "developedBy": "Ege Üniversitesi Tıp Fakültesi Dekanlığı",
+    "copyright": "Tüm hakları saklıdır © 2026",
+    "logoSource": "https://egelogo.ege.edu.tr/ (Ege Üniversitesi Kurumsal Kimlik — Tıp Fakültesi amblemi)",
+    "evidence": {
+      "statement": "Simülasyon tabanlı eğitimin kardiyak oskültasyon becerilerini geliştirdiği sistematik derleme ve meta-analizle gösterilmiştir.",
+      "citation": "McKinney J, Cook DA, Wood D, Hatala R. Simulation-based training for cardiac auscultation skills: systematic review and meta-analysis. J Gen Intern Med. 2013;28(2):283–291.",
+      "doi": "10.1007/s11606-012-2198-y",
+      "url": "https://doi.org/10.1007/s11606-012-2198-y"
+    }
+  },
+  "credits": [
+    {
+      "role": "Yazılım geliştirme, öğretim ve ölçme-değerlendirme tasarımı",
+      "people": [
+        {
+          "name": "Doç. Dr. Ozan KARACA",
+          "url": "https://unisis.ege.edu.tr/researcher=ozan.karaca"
+        }
+      ]
+    },
+    {
+      "role": "Öğretim tasarımı ve tıbbi validasyon",
+      "people": [
+        {
+          "name": "Prof. Dr. Hatice ŞAHİN",
+          "url": "https://unisis.ege.edu.tr/researcher=hatice.sahin"
+        },
+        {
+          "name": "Prof. Dr. Burcu BARUTÇUOĞLU",
+          "url": "https://unisis.ege.edu.tr/researcher=burcu.barutcuoglu"
+        },
+        {
+          "name": "Prof. Dr. İpek KAPLAN BULUT",
+          "url": "https://unisis.ege.edu.tr/researcher=ipek.kaplan.bulut"
+        }
+      ]
+    },
+    {
+      "role": "Kullanıcı kabul testleri",
+      "people": [
+        {
+          "name": "Öğrenci 1"
+        },
+        {
+          "name": "Öğrenci 2"
+        },
+        {
+          "name": "Öğrenci 3"
+        }
+      ]
+    }
+  ],
+  "datasets": [
+    {
+      "id": "hls-cmds-v3",
+      "title": "HLS-CMDS: Heart and Lung Sounds Dataset Recorded from a Clinical Manikin using Digital Stethoscope",
+      "authors": [
+        "Yasaman Torabi",
+        "Shahram Shirani",
+        "James P. Reilly"
+      ],
+      "datasetDoi": "10.17632/8972jxbpmp.3",
+      "articleDoi": "10.1109/IEEEDATA.2025.3566012",
+      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "usage": "Kayıtlar klinik manikin üzerinden dijital stetoskop ile alınmıştır; bu modülde eğitim amaçlı olarak kullanılmıştır.",
+      "attributionText": "Torabi, Y., Shirani, S., & Reilly, J. P. HLS-CMDS: Heart and Lung Sounds Dataset Recorded from a Clinical Manikin using Digital Stethoscope (Version 3). Mendeley Data. DOI: 10.17632/8972jxbpmp.3 — CC BY 4.0"
+    },
+    {
+      "id": "physionet-circor",
+      "title": "The CirCor DigiScope Phonocardiogram Dataset",
+      "authors": [
+        "Jorge Oliveira",
+        "Francesco Renna",
+        "Paulo Costa",
+        "Marcelo Nogueira",
+        "Ana Cristina Oliveira",
+        "Andoni Elola",
+        "Carlos Ferreira",
+        "Alipio Jorge",
+        "Ali Bahrami Rad",
+        "Matthew Reyna",
+        "Reza Sameni",
+        "Gari D. Clifford",
+        "Miguel T. Coimbra"
+      ],
+      "datasetDoi": "https://physionet.org/content/circor-heart-sound/1.0.3/",
+      "license": "ODC-BY 1.0 (Open Data Commons Attribution)",
+      "licenseUrl": "https://physionet.org/content/circor-heart-sound/view-license/1.0.3/",
+      "attributionText": "Oliveira, J., et al. (2022). The CirCor DigiScope Phonocardiogram Dataset (v1.0.3). PhysioNet. https://doi.org/10.13026/cy60-yn18 — ODC-BY 1.0",
+      "note": "Pediatrik gerçek hasta kayıtları (4 örnek vaka havuzunda kullanılıyor)."
+    }
+  ],
+  "assets": [
+    {
+      "id": "body-front-back",
+      "title": "İnsan gövdesi anterior/posterior görselleri (retouched)",
+      "authors": [
+        "Mikael Häggström, M.D."
+      ],
+      "source": "Wikimedia Commons",
+      "license": "Creative Commons Zero (CC0 1.0 — kamu malı benzeri)",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "usage": "Modülde hasta ön/arka gövde görseli olarak kullanılmıştır; yalnız gövde bölgesi kırpılmıştır.",
+      "attributionText": "Häggström, M. Anterior/Posterior view of human male (retouched). Wikimedia Commons, CC0 1.0"
+    }
+  ],
+  "inventory": [
+    {
+      "id": "hls-cmds-v3",
+      "title": "HLS-CMDS: Heart and Lung Sounds Dataset (Clinical Manikin, Digital Stethoscope)",
+      "authors": [
+        "Yasaman Torabi",
+        "Shahram Shirani",
+        "James P. Reilly"
+      ],
+      "organization": "Mendeley Data",
+      "type": "both",
+      "population": "Klinik manikin (yetişkin)",
+      "classes": "10 kalp + 6 akciğer + 145 kombine (mixed)",
+      "recordings": 535,
+      "sampleRateHz": 4000,
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "licenseVerified": true,
+      "status": "bundled",
+      "accessUrl": "https://data.mendeley.com/datasets/8972jxbpmp/3",
+      "downloadSizeMb": 38,
+      "importScript": "npm run import:hls-cmds",
+      "notes": "Birincil veri seti. Tüm modların (kütüphane/uygulama/değerlendirme) temeli; pakete dahildir.",
+      "attributionText": "Torabi, Y., Shirani, S., & Reilly, J. P. HLS-CMDS (Version 3). Mendeley Data. DOI: 10.17632/8972jxbpmp.3 — CC BY 4.0",
+      "labelTypes": [
+        "akustik sınıf",
+        "kayıt konumu",
+        "cinsiyet"
+      ]
+    },
+    {
+      "id": "physionet-circor",
+      "title": "The CirCor DigiScope Phonocardiogram Dataset",
+      "authors": [
+        "Jorge Oliveira",
+        "Francesco Renna",
+        "Paulo Costa",
+        "Marcelo Nogueira",
+        "Ana Cristina Oliveira",
+        "Andoni Elola",
+        "Carlos Ferreira",
+        "Alipio Jorge",
+        "Ali Bahrami Rad",
+        "Matthew Reyna",
+        "Reza Sameni",
+        "Gari D. Clifford",
+        "Miguel T. Coimbra"
+      ],
+      "organization": "PhysioNet (MIT-LCP) / CirCor",
+      "type": "heart",
+      "population": "Pediatrik (0-30 yaş)",
+      "classes": "Murmur zamanlaması (Erken/Orta/Geç/Holosistolik), normal; S1/S2 segmentasyonu",
+      "recordings": 5282,
+      "sampleRateHz": 4000,
+      "license": "ODC-BY 1.0 (Open Data Commons Attribution)",
+      "licenseUrl": "https://physionet.org/content/circor-heart-sound/view-license/1.0.3/",
+      "licenseVerified": true,
+      "status": "samples_included",
+      "accessUrl": "https://physionet.org/content/circor-heart-sound/1.0.3/",
+      "downloadSizeMb": 449,
+      "importScript": "node scripts/import-circor.mjs <dizin>",
+      "notes": "Gerçek hastalardan (pediatrik) üfürüm kayıtları — manikin kayıtlarını tamamlar. 4 örnek kayıt envantere aktarılmıştır (paket dışı, ayrı manifest). Erken/Orta/Geç sistolik eşlemeleri doğrulanmış; holosistolik eğitim eşlemesidir.",
+      "attributionText": "Oliveira, J., et al. (2022). The CirCor DigiScope Phonocardiogram Dataset (v1.0.3). PhysioNet. https://doi.org/10.13026/cy60-yn18 — ODC-BY 1.0",
+      "labelTypes": [
+        "üfürüm zamanlaması",
+        "üfürüm şekli",
+        "gradyan",
+        "odağı",
+        "S1/S2 segmentasyonu",
+        "yaş/cinsiyet"
+      ]
+    }
+  ],
+  "disclaimer": "Ses kayıtlarının büyük bölümü klinik manikinden alınmıştır; CirCor kaynaklı az sayıdaki gerçek pediatrik hasta kaydı ilgili vakalarda açıkça belirtilir. Simülasyon eğitim amaçlıdır; tek başına klinik tanı koymak için kullanılamaz."
+}

@@ -1,0 +1,3962 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "case_normal_heart",
+      "title": "Normal Kardiyak Oskültasyon",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 34,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Rutin kontrol muayenesi",
+      "history": "Hasta rutin sağlık kontrolü için başvuruyor. Kardiyak ve pulmoner yakınması yok. Sigara kullanmıyor, ilaç kullanmıyor.",
+      "vitalSigns": {
+        "hr": 72,
+        "rr": 14,
+        "bp": "118/76",
+        "spo2": 99,
+        "temp": "36.7 °C"
+      },
+      "objectives": [
+        "Beş klasik kardiyak odak noktasını tanımak",
+        "Normal S1–S2 ritmini tanımak",
+        "Sistematik kardiyak oskültasyon sırasını uygulamak"
+      ],
+      "tasks": [
+        "Uygun bölgeleri dinleyin.",
+        "Duyduğunuz bulguyu tanımlayın.",
+        "En iyi duyulduğu alanı seçin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "cardiac_aortic",
+          "category": "heart",
+          "acousticFinding": "normal",
+          "recordedLocation": "RUSB"
+        },
+        {
+          "pointId": "cardiac_pulmonary",
+          "category": "heart",
+          "acousticFinding": "normal",
+          "recordedLocation": "LUSB"
+        },
+        {
+          "pointId": "cardiac_tricuspid",
+          "category": "heart",
+          "acousticFinding": "normal",
+          "recordedLocation": "LLSB"
+        },
+        {
+          "pointId": "cardiac_mitral",
+          "category": "heart",
+          "acousticFinding": "normal",
+          "recordedLocation": "Apex"
+        }
+      ],
+      "primaryAcousticFinding": "normal",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "technique": {
+        "requiredPoints": [
+          "cardiac_aortic",
+          "cardiac_pulmonary",
+          "cardiac_tricuspid",
+          "cardiac_mitral"
+        ],
+        "minPointsVisited": 4,
+        "minDwellMs": 1800,
+        "minListenMsPerPoint": 2500,
+        "systematicOrder": true
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz ses hangisidir?",
+          "help": "Stetoskopla dinlediğiniz kalp sesini dikkatle analiz edin.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Normal kalp sesleri"
+            },
+            {
+              "id": "b",
+              "label": "S3 (üçüncü kalp sesi)"
+            },
+            {
+              "id": "c",
+              "label": "S4 (dördüncü kalp sesi)"
+            },
+            {
+              "id": "d",
+              "label": "Sistolik üfürüm"
+            },
+            {
+              "id": "e",
+              "label": "Diyastolik üfürüm"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. S1 ve S2 net, ritim düzenli; S1 mitral ve triküspit, S2 aort ve pulmoner kapakçıkların kapanmasıyla oluşur.",
+          "feedbackIncorrect": "Sesler net S1–S2 ritmi gösterir; S3/S4 gibi ek sesler veya üfürüm yoktur. S1'i sistol başında, S2'yi diyastol başında tanımlamayı deneyin.",
+          "hint": "Ritmi sayın: iki temel sesin dışında ek ses var mı?"
+        },
+        {
+          "id": "q2",
+          "type": "sequence",
+          "domain": "interpretation",
+          "prompt": "Sistematik kardiyak oskültasyon için en uygun sıra hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Aort → Pulmoner → Triküspit → Mitral"
+            },
+            {
+              "id": "b",
+              "label": "Mitral → Pulmoner → Aort → Triküspit"
+            },
+            {
+              "id": "c",
+              "label": "Triküspit → Aort → Mitral → Pulmoner"
+            },
+            {
+              "id": "d",
+              "label": "Pulmoner → Mitral → Aort → Triküspit"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Klasik sıra sağdan sola, üstten alta doğru ilerler: aort (sağ üst sternal kenar) → pulmoner (sol üst sternal kenar) → triküspit (sol alt sternal kenar) → mitral (apeks). Erb noktası ara karşılaştırma için kullanılır.",
+          "feedbackIncorrect": "Önerilen sıra: aort → pulmoner → triküspit → mitral. Bu sıra odak noktalarını karıştırmadan, üstten alta ve sağdan sola ilerlemenizi sağlar."
+        },
+        {
+          "id": "q4",
+          "type": "bell_diaphragm",
+          "domain": "interpretation",
+          "prompt": "Bu oskültasyon için Bell mi, Diyafram mı daha uygundur?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Bell"
+            },
+            {
+              "id": "b",
+              "label": "Diyafram"
+            }
+          ],
+          "correct": [
+            "b"
+          ],
+          "feedbackCorrect": "Doğru. S1–S2 gibi yüksek frekanslı kapak sesleri için diyafram uygundur; bell düşük frekanslı sesleri (S3, S4) öne çıkarmada tercih edilir.",
+          "feedbackIncorrect": "Normal S1–S2 değerlendirmesi için diyafram tercih edilir. Bell, S3/S4 gibi düşük frekanslı ek sesleri öne çıkarmak için kullanılır."
+        }
+      ],
+      "feedback": {
+        "summary": "Normal kalp sesleri: S1 sistol başında, uzun ve düşük frekanslı; S2 diyastol başında, kısa ve daha yüksek frekanslıdır. Ritim düzenlidir, ek ses ve üfürüm yoktur.",
+        "techniqueNotes": "Kardiyak oskültasyonda dört klasik odak (aort, pulmoner, triküspit, mitral) sistemik olarak dinlenmeli; apekte S1 en belirgindir."
+      },
+      "references": [
+        "HLS-CMDS v3 — Normal kalp sesi kayıtları (DOI 10.17632/8972jxbpmp.3)"
+      ],
+      "masteryThreshold": 80,
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 0,
+        "recognition": 40,
+        "interpretation": 35,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_s3",
+      "title": "Üçüncü Kalp Sesi (S3)",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 24,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Eforla hafif nefes darlığı öyküsü",
+      "history": "Genç hasta eforla nefes darlığı şikâyeti ile başvuruyor. Kalp sesi değerlendirmesi isteniyor.",
+      "vitalSigns": {
+        "hr": 84,
+        "rr": 16,
+        "bp": "112/70",
+        "spo2": 98,
+        "temp": "36.6 °C"
+      },
+      "objectives": [
+        "S3'ü tanımak",
+        "S3'ün siklus içindeki zamanlamasını kavramak",
+        "S1–S2–S3 üçlü ritmini ayırt etmek"
+      ],
+      "tasks": [
+        "Uygun bölgeleri dinleyin.",
+        "Ek sesi tanımlayın.",
+        "Zamanlamasını seçin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "cardiac_mitral",
+          "category": "heart",
+          "acousticFinding": "s3",
+          "recordedLocation": "Apex"
+        },
+        {
+          "pointId": "cardiac_tricuspid",
+          "category": "heart",
+          "acousticFinding": "s3",
+          "recordedLocation": "LLSB"
+        },
+        {
+          "pointId": "cardiac_pulmonary",
+          "category": "heart",
+          "acousticFinding": "s3",
+          "recordedLocation": "LUSB"
+        }
+      ],
+      "primaryAcousticFinding": "s3",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "mappingNote": "Kayıtlar klinik manikinde S3 sesi üreterek alınmıştır; ses sınıfı doğrulanmıştır. Hastalık tanımı içermez.",
+      "technique": {
+        "requiredPoints": [
+          "cardiac_mitral",
+          "cardiac_tricuspid",
+          "cardiac_pulmonary"
+        ],
+        "minPointsVisited": 3,
+        "minDwellMs": 1800,
+        "minListenMsPerPoint": 2500,
+        "systematicOrder": true
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz ek ses hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "S3 (üçüncü kalp sesi)"
+            },
+            {
+              "id": "b",
+              "label": "S4 (dördüncü kalp sesi)"
+            },
+            {
+              "id": "c",
+              "label": "Sistolik klik"
+            },
+            {
+              "id": "d",
+              "label": "Ek ses yok — normal S1–S2"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. S3, S2'den kısa süre sonra duyulan düşük frekanslı ek sestir; 'ken-ta' ritmi oluşturur.",
+          "feedbackIncorrect": "Dinlenen ses, S2'den hemen sonra gelen düşük frekanslı ek ses (S3) ile uyumludur. S4 ise S1'den hemen önce gelir; karşılaştırınız."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "Bu ses, kalp siklusunun hangi bölümünde belirgindir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erken diyastol (S2'den hemen sonra)"
+            },
+            {
+              "id": "b",
+              "label": "Geç diyastol / presistol (S1'den hemen önce)"
+            },
+            {
+              "id": "c",
+              "label": "Erken sistol (S1'den hemen sonra)"
+            },
+            {
+              "id": "d",
+              "label": "Orta sistol"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. S3 erken diyastolde, hızlı ventriküler dolum fazında oluşur.",
+          "feedbackIncorrect": "S3 erken diyastolde duyulur. S1'den hemen önce duyulan ses S4'tür."
+        },
+        {
+          "id": "q3",
+          "type": "localization",
+          "domain": "localization",
+          "prompt": "Bu bulgunun en belirgin duyulduğu alan hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Aort odağı (sağ üst sternal kenar)"
+            },
+            {
+              "id": "b",
+              "label": "Pulmoner odak (sol üst sternal kenar)"
+            },
+            {
+              "id": "c",
+              "label": "Triküspit odak (sol alt sternal kenar)"
+            },
+            {
+              "id": "d",
+              "label": "Mitral odak (apeks)"
+            }
+          ],
+          "correct": [
+            "d"
+          ],
+          "feedbackCorrect": "Doğru. S3 apekste en belirgin duyulur; klinikte hastayı sol lateral pozisyona alarak dinlemek bulgunun netleşmesini sağlar.",
+          "feedbackIncorrect": "Bu kayıtta S3 apeks (mitral odak) kaydından alınmıştır; en belirgin alan apekstir. O odakta tekrar dinleyin."
+        },
+        {
+          "id": "q4",
+          "type": "bell_diaphragm",
+          "domain": "interpretation",
+          "prompt": "Bu bulgu için Bell mi, Diyafram mı daha uygundur?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Bell"
+            },
+            {
+              "id": "b",
+              "label": "Diyafram"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. S3 düşük frekanslı olduğu için bell ile daha iyi duyulur; hafif temas yeterlidir.",
+          "feedbackIncorrect": "S3 düşük frekanslı bir sestir; bell (hafif temas) tercih edilir. Diyafram yüksek frekanslı sesleri öne çıkarır."
+        }
+      ],
+      "feedback": {
+        "summary": "S3: S2'den hemen sonra, erken diyastolde hızlı dolum fazında duyulan düşük frekanslı ek sestir. Gençlerde fizyolojik olabilir; 'ken-ta' ritmi karakteristiktir. Bu kayıtta en belirgin alan apekstir.",
+        "differential": "Fizyolojik S3 (genç, gebelik), ventriküler disfonksiyonla ilişkili S3. Tek akustik bulgudan hastalık tanısı çıkarılmaz."
+      },
+      "references": [
+        "HLS-CMDS v3 — S3 kayıtları (Apex, LLSB, LUSB)"
+      ],
+      "masteryThreshold": 80,
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 20,
+        "recognition": 30,
+        "interpretation": 25,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_s4",
+      "title": "Dördüncü Kalp Sesi (S4)",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 66,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Kontrol muayenesi; hipertansiyon öyküsü",
+      "history": "Hipertansiyon nedeniyle takip edilen hastada kalp seslerinin değerlendirilmesi isteniyor.",
+      "vitalSigns": {
+        "hr": 76,
+        "rr": 16,
+        "bp": "146/88",
+        "spo2": 97,
+        "temp": "36.5 °C"
+      },
+      "objectives": [
+        "S4'ü tanımak",
+        "S3 ile S4'ü ayırt etmek"
+      ],
+      "tasks": [
+        "Uygun bölgeleri dinleyin.",
+        "Ek sesi tanımlayın.",
+        "S3'ten ayırt edin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "cardiac_pulmonary",
+          "category": "heart",
+          "acousticFinding": "s4",
+          "recordedLocation": "LUSB"
+        }
+      ],
+      "primaryAcousticFinding": "s4",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "mappingNote": "S4 kaydı veri setinde sol üst sternal kenar (LUSB) ve sağ hemitorakstan alınmıştır; apeks kaydı bu sürümde mevcut değildir.",
+      "technique": {
+        "requiredPoints": [
+          "cardiac_pulmonary"
+        ],
+        "minPointsVisited": 1,
+        "minDwellMs": 1800,
+        "minListenMsPerPoint": 3000
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz ek ses hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "S3 (üçüncü kalp sesi)"
+            },
+            {
+              "id": "b",
+              "label": "S4 (dördüncü kalp sesi)"
+            },
+            {
+              "id": "c",
+              "label": "Perikardiyal frotman"
+            },
+            {
+              "id": "d",
+              "label": "Ek ses yok — normal S1–S2"
+            }
+          ],
+          "correct": [
+            "b"
+          ],
+          "feedbackCorrect": "Doğru. S4, S1'den hemen önce duyulan düşük frekanslı presistolik ek sestir; atriyal kontraksiyona bağlıdır.",
+          "feedbackIncorrect": "Ses S1'den hemen önce gelmektedir — bu zamanlama S4 ile uyumludur. S3, S2'den sonra gelir."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "S3 ve S4 ayrımı için zamanlama hangi kriterle yapılır?",
+          "options": [
+            {
+              "id": "a",
+              "label": "S3 S2'den hemen sonra, S4 S1'den hemen önce duyulur"
+            },
+            {
+              "id": "b",
+              "label": "S3 S1'den önce, S4 S2'den önce duyulur"
+            },
+            {
+              "id": "c",
+              "label": "Her ikisi de sistol başında duyulur"
+            },
+            {
+              "id": "d",
+              "label": "Her ikisi de her zaman birlikte duyulur"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. S3 erken diyastolik, S4 presistoliktir; palpe edilebilen bir atriyal 'kick' S4'ü destekler.",
+          "feedbackIncorrect": "Zamanlama anahtarıdır: S3 erken diyastolde (S2 sonrası), S4 presistoldedir (S1 öncesi)."
+        },
+        {
+          "id": "q4",
+          "type": "bell_diaphragm",
+          "domain": "interpretation",
+          "prompt": "Bu bulgu için Bell mi, Diyafram mı daha uygundur?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Bell"
+            },
+            {
+              "id": "b",
+              "label": "Diyafram"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. S4 düşük frekanslıdır; bell ile hafif temas tercih edilir.",
+          "feedbackIncorrect": "Düşük frekanslı S4 için bell uygundur; diyafram bu sesi bastırabilir."
+        }
+      ],
+      "feedback": {
+        "summary": "S4: presistolik, düşük frekanslı ek ses. S1'den hemen önce duyulur; sert ventrikül ve kuvvetli atriyal kontraksiyonla ilişkilidir. Atriyal fibrilasyonda duyulmaz (organize atriyal kontraksiyon yoktur).",
+        "differential": "İleri yaş, hipertansiyon, aort darlığı, hipertrofik kardiyomiyopati gibi ventrikül sertleşmesi durumlarıyla ilişkilendirilir; bu sesi duymak tek başına tanı koydurmaz."
+      },
+      "references": [
+        "HLS-CMDS v3 — S4 kayıtları (RC, LUSB)"
+      ],
+      "masteryThreshold": 80,
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 0,
+        "recognition": 40,
+        "interpretation": 35,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_systolic_murmur",
+      "title": "Sistolik Üfürüm",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 58,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Eforla nefes darlığı",
+      "history": "58 yaşında erkek hasta, eforla nefes darlığı şikâyeti ile başvuruyor. Fizik muayenede kalp sesleri değerlendirmeniz isteniyor.",
+      "vitalSigns": {
+        "hr": 80,
+        "rr": 18,
+        "bp": "132/84",
+        "spo2": 98,
+        "temp": "36.8 °C"
+      },
+      "objectives": [
+        "Sistolik üfürümü tanımak",
+        "Üfürümün en belirgin alanını belirlemek",
+        "Sistol/diyastol ayrımı yapmak"
+      ],
+      "tasks": [
+        "Uygun bölgeleri dinleyin.",
+        "Duyduğunuz bulguyu tanımlayın.",
+        "En iyi duyulduğu alanı seçin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "cardiac_mitral",
+          "category": "heart",
+          "acousticFinding": "mid_systolic_murmur",
+          "recordedLocation": "Apex"
+        },
+        {
+          "pointId": "cardiac_aortic",
+          "category": "heart",
+          "acousticFinding": "mid_systolic_murmur",
+          "recordedLocation": "RUSB"
+        },
+        {
+          "pointId": "cardiac_pulmonary",
+          "category": "heart",
+          "acousticFinding": "mid_systolic_murmur",
+          "recordedLocation": "LUSB"
+        },
+        {
+          "pointId": "cardiac_tricuspid",
+          "category": "heart",
+          "acousticFinding": "mid_systolic_murmur",
+          "recordedLocation": "LLSB"
+        }
+      ],
+      "primaryAcousticFinding": "mid_systolic_murmur",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "mappingNote": "Akustik bulgu (orta sistolik üfürüm) veri seti sınıfı olarak doğrulanmıştır. Üfürüm → kapak lezyonu eşlemesi bu içerikte yapılmaz.",
+      "technique": {
+        "requiredPoints": [
+          "cardiac_mitral",
+          "cardiac_aortic",
+          "cardiac_pulmonary",
+          "cardiac_tricuspid"
+        ],
+        "minPointsVisited": 4,
+        "minDwellMs": 1800,
+        "minListenMsPerPoint": 2500,
+        "systematicOrder": true
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz üfürümün zamanlaması hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Sistolik"
+            },
+            {
+              "id": "b",
+              "label": "Diyastolik"
+            },
+            {
+              "id": "c",
+              "label": "Sürekli (sistol + diyastol)"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Üfürüm S1 ile S2 arasındaki sistol evresinde duyulmaktadır.",
+          "feedbackIncorrect": "Üfürüm S1–S2 aralığında, yani sistolde duyulmaktadır. S2'den sonraki diyastol bölümünü tekrar dinleyin."
+        },
+        {
+          "id": "q3",
+          "type": "multi_choice",
+          "domain": "interpretation",
+          "prompt": "Sistolik üfürüm tanımlamasında hangi özellikler önemlidir? (birden fazla seçebilirsiniz)",
+          "options": [
+            {
+              "id": "a",
+              "label": "Siklusa göre zamanlama (S1–S2 arası)"
+            },
+            {
+              "id": "b",
+              "label": "En belirgin duyulduğu odak"
+            },
+            {
+              "id": "c",
+              "label": "Solunumla ilişki"
+            },
+            {
+              "id": "d",
+              "label": "Şiddeti ve karakteri"
+            }
+          ],
+          "correct": [
+            "a",
+            "b",
+            "c",
+            "d"
+          ],
+          "feedbackCorrect": "Doğru. Zamanlama, lokasyon, şiddet/karakter temel özelliklerdir; solunumla ilişki de değerlidir (Carvallo bulgusu: sağ kalp kaynaklı üfürümler inspirasyonla artar, sol kalp kaynaklılar değişmez veya azalır).",
+          "feedbackIncorrect": "Zamanlama, odak ve şiddet/karakter yanında solunumla ilişki de önemlidir: sağ kalp kaynaklı üfürümler inspirasyonla artar (Carvallo bulgusu); bu özellik ayırıcı değerlendirmede kullanılır."
+        },
+        {
+          "id": "q4",
+          "type": "bell_diaphragm",
+          "domain": "interpretation",
+          "prompt": "Üfürüm karakterini değerlendirmek için Bell mi, Diyafram mı daha uygundur?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Bell"
+            },
+            {
+              "id": "b",
+              "label": "Diyafram"
+            }
+          ],
+          "correct": [
+            "b"
+          ],
+          "feedbackCorrect": "Doğru. Üfürümün genellikle orta-yüksek frekanslı bileşenleri diyaframla daha iyi değerlendirilir.",
+          "feedbackIncorrect": "Üfürüm karakteri için diyafram tercih edilir; bell düşük frekanslı seslerde (S3/S4) öne çıkar."
+        }
+      ],
+      "feedback": {
+        "summary": "Orta sistolik üfürüm: S1 ile S2 arasında duyulan üfürüm. Bu içerikte akustik bulgu ('orta sistolik üfürüm') ile kapak lezyonu tanısı ayrı tutulur; ses sınıfı manikinden doğrulanmış kayıttır.",
+        "differential": "Sistolik üfürümlerin ayırıcı listesi (akut/nonpatolojik üfürümler, kapak akım üfürümleri vb.) ancak ek klinik verilerle değerlendirilir."
+      },
+      "references": [
+        "HLS-CMDS v3 — Mid Systolic Murmur kayıtları"
+      ],
+      "masteryThreshold": 80,
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 0,
+        "recognition": 40,
+        "interpretation": 35,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_atrial_fibrillation",
+      "title": "Atriyal Fibrilasyon",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 71,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Çarpıntı ve efor intoleransı",
+      "history": "71 yaşında erkek hasta, birkaç gündür süren çarpıntı şikâyeti ile başvuruyor. Nabız düzensiz algılanmış.",
+      "vitalSigns": {
+        "hr": 96,
+        "rr": 18,
+        "bp": "128/78",
+        "spo2": 97,
+        "temp": "36.6 °C"
+      },
+      "objectives": [
+        "Düzensiz düzensiz ritmi akustik olarak tanımak",
+        "Düzenli ritim ile karşılaştırmak"
+      ],
+      "tasks": [
+        "Ritmi dinleyin.",
+        "Ritmin düzenliliğini değerlendirin.",
+        "Uygun tanımı seçin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "cardiac_mitral",
+          "category": "heart",
+          "acousticFinding": "atrial_fibrillation",
+          "recordedLocation": "Apex"
+        },
+        {
+          "pointId": "cardiac_pulmonary",
+          "category": "heart",
+          "acousticFinding": "atrial_fibrillation",
+          "recordedLocation": "LUSB"
+        },
+        {
+          "pointId": "cardiac_aortic",
+          "category": "heart",
+          "acousticFinding": "atrial_fibrillation",
+          "recordedLocation": "RUSB"
+        }
+      ],
+      "primaryAcousticFinding": "atrial_fibrillation",
+      "clinicalDiagnosis": "Atriyal fibrilasyon",
+      "mappingValidation": "validated",
+      "mappingNote": "Manikin kaydı atriyal fibrilasyon ritmi simüle etmiştir; akustik sınıf ile tanı eşlemesi doğrulanmıştır.",
+      "technique": {
+        "requiredPoints": [
+          "cardiac_mitral",
+          "cardiac_pulmonary",
+          "cardiac_aortic"
+        ],
+        "minPointsVisited": 3,
+        "minDwellMs": 1800,
+        "minListenMsPerPoint": 3000,
+        "systematicOrder": true
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "domain": "recognition",
+          "prompt": "Dinlediğiniz ritmi en iyi tanımlayan seçenek hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Düzenli ritim"
+            },
+            {
+              "id": "b",
+              "label": "Düzensiz düzensiz ritim"
+            },
+            {
+              "id": "c",
+              "label": "Düzenli hızlı ritim"
+            },
+            {
+              "id": "d",
+              "label": "Tek aralıklı ekstra atışlar"
+            }
+          ],
+          "correct": [
+            "b"
+          ],
+          "feedbackCorrect": "Doğru. S1–S2 aralıkları tamamen değişkendir; 'tamamen düzensiz' ritim atriyal fibrilasyonun akustik karşılığıdır.",
+          "feedbackIncorrect": "Ritim düzenli değildir; sistol aralıkları belirgin biçimde değişmektedir. Bu desen tamamen düzensiz ritimle uyumludur."
+        },
+        {
+          "id": "q2",
+          "type": "diagnosis",
+          "domain": "diagnosis",
+          "prompt": "Bu oskültasyon bulgusu aşağıdakilerden hangisiyle en uyumludur?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Atriyal fibrilasyon"
+            },
+            {
+              "id": "b",
+              "label": "Sinüs taşikardisi"
+            },
+            {
+              "id": "c",
+              "label": "Atriyoventriküler blok"
+            },
+            {
+              "id": "d",
+              "label": "Normal sinüs ritmi"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Düzensiz düzensiz ritim, atriyal fibrilasyon ile uyumludur (manikin kaydı bu ritmi simüle etmektedir).",
+          "feedbackIncorrect": "Düzensiz düzensiz ritim kalıbı atriyal fibrilasyonu işaret eder. Sinüs taşikardisi düzenli ve hızlıdır; AV blokta ritim düzenli veya (2. derecede) düzensiz olabilir, ancak 'tamamen düzensiz' desen atriyal fibrilasyona özgüdür."
+        },
+        {
+          "id": "q3",
+          "type": "localization",
+          "domain": "localization",
+          "prompt": "Ritim değerlendirmesi için en uygun odak hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Mitral odak (apeks)"
+            },
+            {
+              "id": "b",
+              "label": "Aort odağı (sağ üst sternal kenar)"
+            },
+            {
+              "id": "c",
+              "label": "Pulmoner odak (sol üst sternal kenar)"
+            },
+            {
+              "id": "d",
+              "label": "Triküspit odak (sol alt sternal kenar)"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. S1'in en net duyulduğu apeks, ritim ve düzensizlik değerlendirmesi için ideal odaktır.",
+          "feedbackIncorrect": "Ritim analizi için S1'in en belirgin olduğu apeks tercih edilir."
+        }
+      ],
+      "feedback": {
+        "summary": "Atriyal fibrilasyonda S1 şiddeti değişkendir ve ritim tamamen düzensizdir. Apeks ve arter nabzı arasındaki uyumsuzluk (nabız defisiti) ek bulgudur.",
+        "differential": "Düzensiz ritimde EKG doğrulaması esastır; simülasyon tek başına tanı aracı değildir."
+      },
+      "references": [
+        "HLS-CMDS v3 — Atrial Fibrillation kayıtları (Apex, LUSB, RUSB)"
+      ],
+      "masteryThreshold": 80,
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_normal_lung",
+      "title": "Normal Solunum Sesleri",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 28,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Spor hekimliği muayenesi",
+      "history": "Sağlıklı genç erkek, spor kulübü rutin muayenesi. Solunum yakınması yok.",
+      "vitalSigns": {
+        "hr": 66,
+        "rr": 14,
+        "bp": "118/74",
+        "spo2": 99,
+        "temp": "36.4 °C"
+      },
+      "objectives": [
+        "Sistematik bilateral pulmoner oskültasyon yapmak",
+        "Normal veziküler solunum sesini tanımak"
+      ],
+      "tasks": [
+        "Bilateral olarak üst-orta-alt bölgeleri dinleyin.",
+        "Solunum fazlarını değerlendirin.",
+        "Asimetri var mı bakın."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "lung_right_upper_anterior",
+          "category": "lung",
+          "acousticFinding": "normal",
+          "recordedLocation": "RUA"
+        },
+        {
+          "pointId": "lung_left_upper_anterior",
+          "category": "lung",
+          "acousticFinding": "normal",
+          "recordedLocation": "LUA"
+        },
+        {
+          "pointId": "lung_right_middle_anterior",
+          "category": "lung",
+          "acousticFinding": "normal",
+          "recordedLocation": "RMA"
+        },
+        {
+          "pointId": "lung_left_middle_anterior",
+          "category": "lung",
+          "acousticFinding": "normal",
+          "recordedLocation": "LMA"
+        },
+        {
+          "pointId": "lung_right_lower_anterior",
+          "category": "lung",
+          "acousticFinding": "normal",
+          "recordedLocation": "RLA"
+        },
+        {
+          "pointId": "lung_left_lower_anterior",
+          "category": "lung",
+          "acousticFinding": "normal",
+          "recordedLocation": "LLA"
+        },
+        {
+          "pointId": "lung_right_upper_posterior",
+          "category": "lung",
+          "acousticFinding": "normal",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_left_upper_posterior",
+          "category": "lung",
+          "acousticFinding": "normal",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_right_middle_posterior",
+          "category": "lung",
+          "acousticFinding": "normal",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_left_middle_posterior",
+          "category": "lung",
+          "acousticFinding": "normal",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_right_lower_posterior",
+          "category": "lung",
+          "acousticFinding": "normal",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_left_lower_posterior",
+          "category": "lung",
+          "acousticFinding": "normal",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        }
+      ],
+      "primaryAcousticFinding": "normal",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "technique": {
+        "requiredPoints": [
+          "lung_right_upper_anterior",
+          "lung_right_middle_anterior",
+          "lung_right_lower_anterior",
+          "lung_left_upper_anterior",
+          "lung_left_middle_anterior",
+          "lung_left_lower_anterior"
+        ],
+        "minPointsVisited": 6,
+        "minDwellMs": 1500,
+        "minListenMsPerPoint": 2000,
+        "systematicOrder": true
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Dinlediğiniz solunum sesi hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Normal veziküler solunum sesleri"
+            },
+            {
+              "id": "b",
+              "label": "Wheezing"
+            },
+            {
+              "id": "c",
+              "label": "İnce raller"
+            },
+            {
+              "id": "d",
+              "label": "Plevral frotman"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Veziküler solunum sesi yumuşaktır; inspirasyon ekspirasyondan uzun ve süreklidir.",
+          "feedbackIncorrect": "Dinlenen ses kesintili ya da müzikal değil; yumuşak ve süreklidir — normal veziküler solunum sesi."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "Normal veziküler solunum sesinde inspirasyon–ekspirasyon ilişkisi nasıldır?",
+          "options": [
+            {
+              "id": "a",
+              "label": "İnspirasyon ekspirasyondan uzun, ses yumuşak"
+            },
+            {
+              "id": "b",
+              "label": "Ekspirasyon inspirasyondan uzun ve kaba"
+            },
+            {
+              "id": "c",
+              "label": "Her iki faz eşit ve yüksek"
+            },
+            {
+              "id": "d",
+              "label": "İnspirasyonda müzikal hışıltı duyulur"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Veziküler seste inspirasyon > ekspirasyon, ses yumuşak ve düşük frekanslıdır.",
+          "feedbackIncorrect": "Normal veziküler seste inspirasyon fazı ekspirasyondan uzundur ve ses yumuşaktır."
+        },
+        {
+          "id": "q3",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "Karşılaştırmalı (bilateral) pulmoner oskültasyonun amacı nedir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Sağ ve sol bölgeler arasında asimetri veya yoğunluk farkı saptamak"
+            },
+            {
+              "id": "b",
+              "label": "Yalnızca en yüksek sesli noktayı bulmak"
+            },
+            {
+              "id": "c",
+              "label": "Kalp seslerini akciğer seslerinden ayırmak"
+            },
+            {
+              "id": "d",
+              "label": "Belirli bir noktayı seçip orada bitirmek"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Sistematik bilateral karşılaştırma asimetri, ral veya solunum azlığı saptamanın ana yoludur.",
+          "feedbackIncorrect": "Bilateral karşılaştırmanın amacı bölgeler arası asimetrileri saptamaktır; tek noktaya odaklanmak yeterli değildir."
+        }
+      ],
+      "feedback": {
+        "summary": "Normal veziküler solunum: yumuşak, düşük frekanslı; inspirasyon ekspirasyondan uzundur ve ekspirasyonda ses hızla söner. Bilateral simetriktir.",
+        "techniqueNotes": "Anterior oskültasyonda üst-orta-alt sırayla önce sağ sonra sol (veya simetrik ardışık) karşılaştırma önerilir. Posterior oskültasyon eklenmeli; bu veri setinde posterior kayıt bulunmadığından simülasyon anterior bölgelerle sınırlıdır."
+      },
+      "references": [
+        "HLS-CMDS v3 — Normal solunum kayıtları (6 anterior bölge)"
+      ],
+      "masteryThreshold": 80,
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 20,
+        "recognition": 30,
+        "interpretation": 25,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_wheezing",
+      "title": "Wheezing",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 45,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Nefes darlığı ve hışıltı",
+      "history": "45 yaşında erkek hasta, eforla artan nefes darlığı ve hışıltı şikâyeti ile başvuruyor.",
+      "vitalSigns": {
+        "hr": 92,
+        "rr": 22,
+        "bp": "126/80",
+        "spo2": 95,
+        "temp": "36.7 °C"
+      },
+      "objectives": [
+        "Wheezing'i tanımak",
+        "Ekspirasyon ile ilişkisini kavramak"
+      ],
+      "tasks": [
+        "Bölgeleri dinleyin.",
+        "Sesi tanımlayın.",
+        "Solunum fazını belirleyin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "lung_right_upper_anterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "recordedLocation": "RUA"
+        },
+        {
+          "pointId": "lung_left_upper_anterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "recordedLocation": "LUA"
+        },
+        {
+          "pointId": "lung_right_middle_anterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "recordedLocation": "RMA"
+        },
+        {
+          "pointId": "lung_left_middle_anterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "recordedLocation": "LMA"
+        },
+        {
+          "pointId": "lung_right_lower_anterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "recordedLocation": "RLA"
+        },
+        {
+          "pointId": "lung_left_lower_anterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "recordedLocation": "LLA"
+        },
+        {
+          "pointId": "lung_right_upper_posterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_left_upper_posterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_right_middle_posterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_left_middle_posterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_right_lower_posterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_left_lower_posterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        }
+      ],
+      "primaryAcousticFinding": "wheezing",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "mappingNote": "Akustik sınıf (wheezing) doğrulanmıştır; hastalık tanısı (astım/KOAH) eşlemesi içerikte kullanılmaz.",
+      "technique": {
+        "requiredPoints": [
+          "lung_right_upper_anterior",
+          "lung_left_upper_anterior",
+          "lung_right_lower_anterior",
+          "lung_left_lower_anterior"
+        ],
+        "minPointsVisited": 4,
+        "minDwellMs": 1500,
+        "minListenMsPerPoint": 2000,
+        "systematicOrder": true
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz ses hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Wheezing"
+            },
+            {
+              "id": "b",
+              "label": "Ronküs"
+            },
+            {
+              "id": "c",
+              "label": "İnce raller"
+            },
+            {
+              "id": "d",
+              "label": "Kaba raller"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Wheezing yüksek frekanslı, süreklilik arz eden, müzikal nitelikte hışıltıdır.",
+          "feedbackIncorrect": "Dinlenen ses kesintili patlamalar değil; sürekli, müzikal ve yüksek frekanslıdır — wheezing."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "Wheezing solunum siklusunun hangi bölümünde daha belirgindir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Ekspirasyonda"
+            },
+            {
+              "id": "b",
+              "label": "Yalnızca inspirasyon başında"
+            },
+            {
+              "id": "c",
+              "label": "Nefes tutma sırasında"
+            },
+            {
+              "id": "d",
+              "label": "Konumdan bağımsız, yalnızca öksürükte"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Wheezing tipik olarak ekspirasyonda belirgindir; ileri daralmada inspirasyona da yayılır.",
+          "feedbackIncorrect": "Wheezing ekspirasyonda belirgindir; geniş yaygın daralmada iki faza yayılabilir."
+        },
+        {
+          "id": "q3",
+          "type": "interpretation",
+          "domain": "interpretation",
+          "prompt": "Wheezing'in oluşum mekanizması nedir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Daralmış küçük hava yollarında türbülan akım"
+            },
+            {
+              "id": "b",
+              "label": "Plevral boşlukta sürtünme"
+            },
+            {
+              "id": "c",
+              "label": "Alveollerin açılıp kapanması"
+            },
+            {
+              "id": "d",
+              "label": "Büyük damar duvarında akım"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Hava yolu darlığı (bronkospazm, ödem, sekresyon) türbülan akım ve müzikal ses üretir.",
+          "feedbackIncorrect": "Wheezing hava yolu daralmasına bağlı türbülan akımdan doğar; alveolar açılma sesleri ralleri, plevral sürtünme frotmanı oluşturur."
+        }
+      ],
+      "feedback": {
+        "summary": "Wheezing: yüksek frekanslı, müzikal, ekspirasyonda belirgin sürekli ses; küçük hava yollarında daralma ile ilişkilidir. Yaygın bilateral wheezing obstrüktif paternle uyumludur ancak tanı için klinik bağlantı gerekir.",
+        "differential": "Astım, KOAH, bronşiolit gibi obstrüktif durumlarda görülür; tek bulgu ile hastalık tanısı konmaz."
+      },
+      "references": [
+        "HLS-CMDS v3 — Wheezing kayıtları (anterior bölgeler)"
+      ],
+      "masteryThreshold": 80,
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 20,
+        "recognition": 30,
+        "interpretation": 25,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_fine_crackles",
+      "title": "İnce Raller (Fine Crackles)",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 63,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Nefes darlığı (ilerleyici)",
+      "history": "63 yaşında erkek hasta, son haftalarda artan nefes darlığı nedeniyle başvuruyor.",
+      "vitalSigns": {
+        "hr": 88,
+        "rr": 24,
+        "bp": "138/86",
+        "spo2": 94,
+        "temp": "36.9 °C"
+      },
+      "objectives": [
+        "İnce ralleri tanımak",
+        "İnspirasyon sonu zamanlamasını kavramak",
+        "Kaba rallerden ayırt etmek"
+      ],
+      "tasks": [
+        "Bölgeleri dinleyin.",
+        "Sesin tipini tanımlayın.",
+        "Zamanlamayı belirleyin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "lung_left_upper_anterior",
+          "category": "lung",
+          "acousticFinding": "fine_crackles",
+          "recordedLocation": "LUA"
+        },
+        {
+          "pointId": "lung_right_lower_anterior",
+          "category": "lung",
+          "acousticFinding": "fine_crackles",
+          "recordedLocation": "RLA"
+        },
+        {
+          "pointId": "lung_right_upper_anterior",
+          "category": "lung",
+          "acousticFinding": "fine_crackles",
+          "recordedLocation": "RUA"
+        },
+        {
+          "pointId": "lung_left_upper_posterior",
+          "category": "lung",
+          "acousticFinding": "fine_crackles",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_right_lower_posterior",
+          "category": "lung",
+          "acousticFinding": "fine_crackles",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_right_upper_posterior",
+          "category": "lung",
+          "acousticFinding": "fine_crackles",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        }
+      ],
+      "primaryAcousticFinding": "fine_crackles",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "mappingNote": "Akustik sınıf (fine crackles) doğrulanmıştır; hastalık eşlemesi içerikte tanımlanmamıştır.",
+      "technique": {
+        "requiredPoints": [
+          "lung_left_upper_anterior",
+          "lung_right_lower_anterior",
+          "lung_right_upper_anterior"
+        ],
+        "minPointsVisited": 3,
+        "minDwellMs": 1500,
+        "minListenMsPerPoint": 2000
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz ses hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "İnce raller (fine crackles)"
+            },
+            {
+              "id": "b",
+              "label": "Kaba raller (coarse crackles)"
+            },
+            {
+              "id": "c",
+              "label": "Wheezing"
+            },
+            {
+              "id": "d",
+              "label": "Plevral frotman"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. İnce raller kısa, yüksek frekanslı, inspirasyon sonunda belirgin kesintili seslerdir.",
+          "feedbackIncorrect": "Dinlenen ses kısa, ince ve kesintilidir; daha kaba/derin sesler kaba rallerdir."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "İnce raller tipik olarak solunumun hangi bölümünde duyulur?",
+          "options": [
+            {
+              "id": "a",
+              "label": "İnspirasyon sonu"
+            },
+            {
+              "id": "b",
+              "label": "Ekspirasyon başında"
+            },
+            {
+              "id": "c",
+              "label": "Orta ekspirasyonda"
+            },
+            {
+              "id": "d",
+              "label": "Zamanlamadan bağımsız"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. İnce raller inspirasyon sonunda, alveollerin açılmasıyla duyulur; öksürükle genellikle değişmez.",
+          "feedbackIncorrect": "İnce raller inspirasyon sonunda belirgindir; ekspirasyona uzanmaz."
+        },
+        {
+          "id": "q3",
+          "type": "multi_choice",
+          "domain": "interpretation",
+          "prompt": "İnce raller için doğru olanlar hangileridir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Kısa ve yüksek frekanslıdır"
+            },
+            {
+              "id": "b",
+              "label": "İnspirasyon sonunda yoğunlaşır"
+            },
+            {
+              "id": "c",
+              "label": "Öksürükle belirgin değişmez"
+            },
+            {
+              "id": "d",
+              "label": "Yalnızca ekspirasyonda duyulur"
+            }
+          ],
+          "correct": [
+            "a",
+            "b",
+            "c"
+          ],
+          "feedbackCorrect": "Doğru. İnce raller yüksek frekanslı, kısa; inspirasyon sonunda öne çıkar ve öksürükle değişmez.",
+          "feedbackIncorrect": "Kaba raller öksürükle değişebilir ve daha kaba tonludur; ince raller inspirasyon sonundadır."
+        }
+      ],
+      "feedback": {
+        "summary": "İnce raller: inspirasyon sonunda duyulan kısa, yüksek frekanslı, kesintili sesler. Alveollerin açılmasına bağlıdır; interstisyel süreçlerde klasik bulgudur.",
+        "differential": "Kalp yetmezliği, interstisyel hastalık, pnömoni gibi durumlarla ilişkili olabilir — ancak hastalık eşlemesi ancak klinik bağlamla yapılır."
+      },
+      "references": [
+        "HLS-CMDS v3 — Fine Crackles kayıtları (LUA, RLA, RUA)"
+      ],
+      "masteryThreshold": 80,
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 20,
+        "recognition": 30,
+        "interpretation": 25,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_coarse_crackles",
+      "title": "Kaba Raller (Coarse Crackles)",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 69,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Öksürük ve balgam",
+      "history": "69 yaşında erkek hasta, üretken öksürük ve ateş yakınmasıyla başvuruyor.",
+      "vitalSigns": {
+        "hr": 94,
+        "rr": 26,
+        "bp": "134/82",
+        "spo2": 92,
+        "temp": "38.1 °C"
+      },
+      "objectives": [
+        "Kaba ralleri tanımak",
+        "İnce rallerden ayırt etmek"
+      ],
+      "tasks": [
+        "Bölgeleri dinleyin.",
+        "Ses tipini tanımlayın.",
+        "İnce ralle karşılaştırın."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "lung_right_lower_anterior",
+          "category": "lung",
+          "acousticFinding": "coarse_crackles",
+          "recordedLocation": "RLA"
+        },
+        {
+          "pointId": "lung_left_lower_anterior",
+          "category": "lung",
+          "acousticFinding": "coarse_crackles",
+          "recordedLocation": "LLA"
+        },
+        {
+          "pointId": "lung_left_middle_anterior",
+          "category": "lung",
+          "acousticFinding": "coarse_crackles",
+          "recordedLocation": "LMA"
+        },
+        {
+          "pointId": "lung_right_lower_posterior",
+          "category": "lung",
+          "acousticFinding": "coarse_crackles",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_left_lower_posterior",
+          "category": "lung",
+          "acousticFinding": "coarse_crackles",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_left_middle_posterior",
+          "category": "lung",
+          "acousticFinding": "coarse_crackles",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        }
+      ],
+      "primaryAcousticFinding": "coarse_crackles",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "technique": {
+        "requiredPoints": [
+          "lung_right_lower_anterior",
+          "lung_left_lower_anterior",
+          "lung_left_middle_anterior"
+        ],
+        "minPointsVisited": 3,
+        "minDwellMs": 1500,
+        "minListenMsPerPoint": 2000
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz ses hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Kaba raller (coarse crackles)"
+            },
+            {
+              "id": "b",
+              "label": "İnce raller (fine crackles)"
+            },
+            {
+              "id": "c",
+              "label": "Wheezing"
+            },
+            {
+              "id": "d",
+              "label": "Plevral frotman"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Kaba raller daha kaba, düşük frekanslı ve 'nemli' nitelikte seslerdir.",
+          "feedbackIncorrect": "Ses daha kaba ve düşük frekanslıdır; ince raller daha tiz ve keskindir."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "İnce ve kaba rallerin en önemli ayırt edici özelliği nedir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Frekans ve kabalık; kaba raller öksürükle değişebilir"
+            },
+            {
+              "id": "b",
+              "label": "Yalnızca lokalizasyon"
+            },
+            {
+              "id": "c",
+              "label": "Yalnızca hasta yaşı"
+            },
+            {
+              "id": "d",
+              "label": "Yalnızca duyulma süresi"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Kaba raller daha düşük frekanslı ve kabadır; sekresyonla ilişkilidir ve öksürükle değişebilir.",
+          "feedbackIncorrect": "Ayırt edici özellik frekans/karakter farkı ve öksürük tepkisidir; lokalizasyon tek başına ayırt etmez."
+        }
+      ],
+      "feedback": {
+        "summary": "Kaba raller: düşük frekanslı, kaba, kaynama fokurtusuna benzer nemli sesler; büyük hava yollarındaki sekresyonla ilişkilidir ve öksürükle değişebilir.",
+        "differential": "Bronşektazi, ağır pnömoni, sekresyon birikimi gibi durumlarda duyulabilir; tek akustik bulgu hastalık tanısı vermez."
+      },
+      "references": [
+        "HLS-CMDS v3 — Coarse Crackles kayıtları (RLA, LLA, LMA)"
+      ],
+      "masteryThreshold": 80,
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 20,
+        "recognition": 35,
+        "interpretation": 20,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_rhonchi",
+      "title": "Ronküs",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 55,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Öksürükle değişen hırıltılı sesler",
+      "history": "55 yaşında erkek, sigara içicisi; aralıklı hırıltı ve öksürük tarif ediyor.",
+      "vitalSigns": {
+        "hr": 86,
+        "rr": 20,
+        "bp": "134/86",
+        "spo2": 95,
+        "temp": "37.0 °C"
+      },
+      "objectives": [
+        "Ronküsü tanımak",
+        "Wheezing ile karşılaştırmak"
+      ],
+      "tasks": [
+        "Bölgeleri dinleyin.",
+        "Sesi tanımlayın.",
+        "Wheezing ile karşılaştırın."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "lung_left_upper_anterior",
+          "category": "lung",
+          "acousticFinding": "rhonchi",
+          "recordedLocation": "LUA"
+        },
+        {
+          "pointId": "lung_right_lower_anterior",
+          "category": "lung",
+          "acousticFinding": "rhonchi",
+          "recordedLocation": "RLA"
+        },
+        {
+          "pointId": "lung_left_lower_anterior",
+          "category": "lung",
+          "acousticFinding": "rhonchi",
+          "recordedLocation": "LLA"
+        },
+        {
+          "pointId": "lung_left_upper_posterior",
+          "category": "lung",
+          "acousticFinding": "rhonchi",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_right_lower_posterior",
+          "category": "lung",
+          "acousticFinding": "rhonchi",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_left_lower_posterior",
+          "category": "lung",
+          "acousticFinding": "rhonchi",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        }
+      ],
+      "primaryAcousticFinding": "rhonchi",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "technique": {
+        "requiredPoints": [
+          "lung_left_upper_anterior",
+          "lung_right_lower_anterior",
+          "lung_left_lower_anterior"
+        ],
+        "minPointsVisited": 3,
+        "minDwellMs": 1500,
+        "minListenMsPerPoint": 2000
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz ses hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Ronküs"
+            },
+            {
+              "id": "b",
+              "label": "İnce raller"
+            },
+            {
+              "id": "c",
+              "label": "Plevral frotman"
+            },
+            {
+              "id": "d",
+              "label": "Normal veziküler solunum"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Ronküs düşük frekanslı, kaba ve sürekli nitelikte bir sestir; öksürükle değişebilir.",
+          "feedbackIncorrect": "Ses kesintili değil; kaba ve sürekli niteliktedir — ronküs."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "Ronküs ile wheezing arasındaki temel fark nedir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Ronküs daha düşük frekanslı ve kabadır"
+            },
+            {
+              "id": "b",
+              "label": "Ronküs yalnızca inspirasyonda duyulur"
+            },
+            {
+              "id": "c",
+              "label": "Ronküs plevradan kaynaklanır"
+            },
+            {
+              "id": "d",
+              "label": "Wheezing öksürükle geçer, ronküs geçmez"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Ronküs düşük frekanslı (yaklaşık <300 Hz) kaba sürekli ses; wheezing daha yüksek frekanslı ve müzikaldir.",
+          "feedbackIncorrect": "Frekans farkı temel ayrımdır: ronküs kaba ve düşük frekanslı, wheezing ince ve yüksek frekanslıdır."
+        }
+      ],
+      "feedback": {
+        "summary": "Ronküs: düşük frekanslı (<300 Hz civarı), kaba, sürekli ses. Öksürükle değişebilir; büyük hava yolu sekresyonu/daralmasıyla ilişkilidir.",
+        "differential": "Bronşit, sekresyon artışı, hava yolu daralması gibi durumlar düşünülür; tek başına tanı vermez."
+      },
+      "references": [
+        "HLS-CMDS v3 — Rhonchi kayıtları (anterior bölgeler)"
+      ],
+      "masteryThreshold": 80,
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 20,
+        "recognition": 35,
+        "interpretation": 20,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_pleural_rub",
+      "title": "Plevral Frotman",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 48,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Batan göğüs ağrısı",
+      "history": "48 yaşında erkek; derin nefesle artan, batıcı tarzda göğüs ağrısı tarif ediyor.",
+      "vitalSigns": {
+        "hr": 90,
+        "rr": 22,
+        "bp": "126/82",
+        "spo2": 96,
+        "temp": "37.4 °C"
+      },
+      "objectives": [
+        "Plevral frotmanı tanımak",
+        "İki fazlı karakterini kavramak"
+      ],
+      "tasks": [
+        "Bölgeleri dinleyin.",
+        "Sesi tanımlayın.",
+        "İki fazlı karakteri değerlendirin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "lung_left_middle_anterior",
+          "category": "lung",
+          "acousticFinding": "pleural_rub",
+          "recordedLocation": "LMA"
+        },
+        {
+          "pointId": "lung_right_middle_anterior",
+          "category": "lung",
+          "acousticFinding": "pleural_rub",
+          "recordedLocation": "RMA"
+        },
+        {
+          "pointId": "lung_left_upper_anterior",
+          "category": "lung",
+          "acousticFinding": "pleural_rub",
+          "recordedLocation": "LUA"
+        },
+        {
+          "pointId": "lung_left_middle_posterior",
+          "category": "lung",
+          "acousticFinding": "pleural_rub",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_right_middle_posterior",
+          "category": "lung",
+          "acousticFinding": "pleural_rub",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        },
+        {
+          "pointId": "lung_left_upper_posterior",
+          "category": "lung",
+          "acousticFinding": "pleural_rub",
+          "simulationNote": "eğitim eşlemesi: kayıt anterior bölgeden alınmıştır"
+        }
+      ],
+      "primaryAcousticFinding": "pleural_rub",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "technique": {
+        "requiredPoints": [
+          "lung_left_middle_anterior",
+          "lung_right_middle_anterior",
+          "lung_left_upper_anterior"
+        ],
+        "minPointsVisited": 3,
+        "minDwellMs": 1500,
+        "minListenMsPerPoint": 2000
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz ses hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Plevral frotman"
+            },
+            {
+              "id": "b",
+              "label": "Kaba raller"
+            },
+            {
+              "id": "c",
+              "label": "Wheezing"
+            },
+            {
+              "id": "d",
+              "label": "Ronküs"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Plevral frotman, sürtünen iki plevral yüzeyin kaba, gıcırtılı sürtünme sesidir.",
+          "feedbackIncorrect": "Ses sürekli sürtünme karakterindedir; kesintili rallerden veya müzikal wheezing'den farklıdır."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "Plevral frotmanın en ayırt edici özelliği nedir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "İnspirasyon ve ekspirasyonun her ikisinde duyulması"
+            },
+            {
+              "id": "b",
+              "label": "Yalnızca ekspirasyon sonunda duyulması"
+            },
+            {
+              "id": "c",
+              "label": "Öksürükle tamamen geçmesi"
+            },
+            {
+              "id": "d",
+              "label": "Yalnızca supin pozisyonda duyulması"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Frotman iki fazda (inspirasyon + ekspirasyon) duyulur; 'deri sürtünmesi / kar gıcırtısı' benzeri bir sestir.",
+          "feedbackIncorrect": "Frotman iki fazlıdır; bu özelliği ral ve wheezing'den ayırır."
+        }
+      ],
+      "feedback": {
+        "summary": "Plevral frotman: plevral yüzeylerin enflamasyonla sürtünmesinden doğan, iki fazlı, kaba sürtünme sesi. Hastanın tuttuğu yerde lokalize duyulur.",
+        "differential": "Plevral enflamasyon, pnömoni, pulmoner emboli bağlamında düşünülür; tek başına tanı vermez."
+      },
+      "references": [
+        "HLS-CMDS v3 — Pleural Rub kayıtları (anterior bölgeler)"
+      ],
+      "masteryThreshold": 80,
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 20,
+        "recognition": 35,
+        "interpretation": 20,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_tachycardia",
+      "title": "Taşikardi",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 39,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Hızlı kalp atışı hissi",
+      "history": "39 yaşında erkek hasta, yakın zamandır hızlı kalp atışı hissediyor.",
+      "vitalSigns": {
+        "hr": 118,
+        "rr": 18,
+        "bp": "122/78",
+        "spo2": 98,
+        "temp": "36.8 °C"
+      },
+      "objectives": [
+        "Hızlı kalp hızını akustik olarak tanımak",
+        "Diyastolün kısalmasını değerlendirmek"
+      ],
+      "tasks": [
+        "Ritmi dinleyin.",
+        "Kalp hızını tahmin edin.",
+        "Diyastol süresini değerlendirin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "cardiac_mitral",
+          "category": "heart",
+          "acousticFinding": "tachycardia",
+          "recordedLocation": "Apex"
+        },
+        {
+          "pointId": "cardiac_pulmonary",
+          "category": "heart",
+          "acousticFinding": "tachycardia",
+          "recordedLocation": "LUSB"
+        }
+      ],
+      "primaryAcousticFinding": "tachycardia",
+      "clinicalDiagnosis": "Taşikardi",
+      "mappingValidation": "validated",
+      "mappingNote": "Manikin kaydı hızlı ritim sınıfıdır; ritim düzenli taşikardi olarak tanımlanmıştır.",
+      "technique": {
+        "requiredPoints": [
+          "cardiac_mitral",
+          "cardiac_pulmonary"
+        ],
+        "minPointsVisited": 2,
+        "minDwellMs": 1800,
+        "minListenMsPerPoint": 3000
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "domain": "recognition",
+          "prompt": "Dinlediğiniz ritmi en iyi tanımlayan seçenek hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Düzenli ve hızlı ritim"
+            },
+            {
+              "id": "b",
+              "label": "Düzensiz düzensiz ritim"
+            },
+            {
+              "id": "c",
+              "label": "Yavaş ve düzenli ritim"
+            },
+            {
+              "id": "d",
+              "label": "Ritim değerlendirilemiyor"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Ritim düzenli fakat hızlıdır; diyastolik aralıklar kısalır.",
+          "feedbackIncorrect": "Aralıklar düzenlidir fakat hız belirgin biçimde artmıştır — düzenli taşikardik ritim."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "Kalp hızı arttığında kalp siklusunun hangi bölümü önce kısalır?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Diyastol"
+            },
+            {
+              "id": "b",
+              "label": "Sistol"
+            },
+            {
+              "id": "c",
+              "label": "Sistol ve diyastol eşit kısalır"
+            },
+            {
+              "id": "d",
+              "label": "Hiçbiri kısalmaz"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Hız arttıkça diyastol kısalır; bu, dolum ve ek ses zamanlamasını değiştirebilir.",
+          "feedbackIncorrect": "Taşikardide diyastol erken kısalır; dolum süresi azalır."
+        }
+      ],
+      "feedback": {
+        "summary": "Taşikardik ritim: düzenli ama hızlıdır; diyastolik dolum süresi kısalır. Nedeni (ateş, anemi, ağrı, hipovolemi, aritmi) ayrıca değerlendirilmelidir.",
+        "differential": "Sinüs taşikardisi, supraventriküler taşikardi vb. — EKG ile ayırt edilir."
+      },
+      "references": [
+        "HLS-CMDS v3 — Tachycardia kayıtları (Apex, LUSB, RC)"
+      ],
+      "masteryThreshold": 80,
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 20,
+        "recognition": 35,
+        "interpretation": 20,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_av_block",
+      "title": "Atriyoventriküler Blok",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 74,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Baş dönmesi ve düzensiz kalp ritmi hissi",
+      "history": "74 yaşında erkek, ara sıra baş dönmesi tarif ediyor; EKG'de iletim bozukluğu önceden tanımlanmış.",
+      "vitalSigns": {
+        "hr": 58,
+        "rr": 16,
+        "bp": "128/76",
+        "spo2": 97,
+        "temp": "36.5 °C"
+      },
+      "objectives": [
+        "İletim bozukluğu sırasında kalp seslerinin değişkenliğini kavramak",
+        "Ek ses/aralık değişkenliğini fark etmek"
+      ],
+      "tasks": [
+        "Ritmi dinleyin.",
+        "Aralık değişkenliğini değerlendirin.",
+        "Bulgu tanımını seçin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "cardiac_tricuspid",
+          "category": "heart",
+          "acousticFinding": "av_block",
+          "recordedLocation": "LLSB"
+        },
+        {
+          "pointId": "cardiac_mitral",
+          "category": "heart",
+          "acousticFinding": "av_block",
+          "recordedLocation": "Apex"
+        }
+      ],
+      "primaryAcousticFinding": "av_block",
+      "clinicalDiagnosis": "Atriyoventriküler blok",
+      "mappingValidation": "validated",
+      "mappingNote": "Manikin kaydı AV blok sınıfı olarak etiketlenmiştir; kesin blok derecesi EKG ile saptanır.",
+      "technique": {
+        "requiredPoints": [
+          "cardiac_tricuspid",
+          "cardiac_mitral"
+        ],
+        "minPointsVisited": 2,
+        "minDwellMs": 1800,
+        "minListenMsPerPoint": 3000
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "single_choice",
+          "domain": "recognition",
+          "prompt": "Dinlediğiniz bulgu hangisiyle en uyumludur?",
+          "options": [
+            {
+              "id": "a",
+              "label": "İletim bozukluğu ile uyumlu kalp sesleri (AV blok)"
+            },
+            {
+              "id": "b",
+              "label": "Düzensiz düzensiz ritim"
+            },
+            {
+              "id": "c",
+              "label": "Sistolik üfürüm"
+            },
+            {
+              "id": "d",
+              "label": "Normal S1–S2"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Kayıt AV blok sınıfı olarak etiketlenmiştir; kesin derece EKG ile saptanır.",
+          "feedbackIncorrect": "Bu kayıt veri setinde 'AV Block' sınıfına aittir; üfürüm veya AF bulgusu ile uyumsuzdur."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "İletim bozukluğunda kesin derecelendirme hangi yöntemle yapılır?",
+          "options": [
+            {
+              "id": "a",
+              "label": "EKG ile"
+            },
+            {
+              "id": "b",
+              "label": "Yalnız oskültasyonla"
+            },
+            {
+              "id": "c",
+              "label": "Kan basıncı ölçümüyle"
+            },
+            {
+              "id": "d",
+              "label": "Solunum sayısıyla"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Blok derecesi yalnız EKG ile kesinleştirilir; oskültasyon destekleyici bulgu verir.",
+          "feedbackIncorrect": "AV bloğun derecesi EKG ile saptanır; oskültasyon tek başına yeterli değildir."
+        }
+      ],
+      "feedback": {
+        "summary": "AV blokta P–QRS ilişkisi bozulur; oskültasyonda S1 şiddet değişkenliği ve aralık değişkenliği duyulabilir. Kesin tanı ve derecelendirme EKG ile yapılır.",
+        "differential": "Blok dereceleri (1./2./3. derece) EKG dışında akustikle kesinleştirilemez."
+      },
+      "references": [
+        "HLS-CMDS v3 — AV Block kayıtları (LLSB, Apex, RC)"
+      ],
+      "masteryThreshold": 80,
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 20,
+        "recognition": 35,
+        "interpretation": 20,
+        "diagnosis": 5,
+        "systematic": 0
+      },
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_early_systolic_murmur",
+      "title": "Erken Sistolik Üfürüm",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 27,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Spor öncesi kontrol muayenesi",
+      "history": "Genç hasta spor öncesi değerlendirme için başvuruyor; kalp seslerinin incelenmesi isteniyor.",
+      "vitalSigns": {
+        "hr": 74,
+        "rr": 14,
+        "bp": "110/68",
+        "spo2": 99,
+        "temp": "36.5 °C"
+      },
+      "objectives": [
+        "Erken sistolik üfürümü tanımak",
+        "Üfürümün zamanlamasını belirlemek",
+        "Erken/geç sistolik ayrımını yapmak"
+      ],
+      "tasks": [
+        "Odakları dinleyin.",
+        "Üfürümün başlangıcını belirleyin.",
+        "Süresini değerlendirin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "cardiac_pulmonary",
+          "category": "heart",
+          "acousticFinding": "early_systolic_murmur",
+          "recordedLocation": "LUSB"
+        },
+        {
+          "pointId": "cardiac_aortic",
+          "category": "heart",
+          "acousticFinding": "early_systolic_murmur",
+          "recordedLocation": "RUSB"
+        },
+        {
+          "pointId": "cardiac_tricuspid",
+          "category": "heart",
+          "acousticFinding": "early_systolic_murmur",
+          "recordedLocation": "LLSB"
+        },
+        {
+          "pointId": "cardiac_mitral",
+          "category": "heart",
+          "acousticFinding": "early_systolic_murmur",
+          "recordedLocation": "Apex"
+        }
+      ],
+      "primaryAcousticFinding": "early_systolic_murmur",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "mappingNote": "Akustik sınıf (erken sistolik üfürüm) veri seti etiketiyle doğrulanmıştır; kapak lezyonu eşlemesi yapılmaz.",
+      "technique": {
+        "requiredPoints": [
+          "cardiac_pulmonary",
+          "cardiac_aortic",
+          "cardiac_tricuspid",
+          "cardiac_mitral"
+        ],
+        "minPointsVisited": 4,
+        "minDwellMs": 1800,
+        "minListenMsPerPoint": 2500,
+        "systematicOrder": true
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz akustik bulgu hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erken sistolik üfürüm"
+            },
+            {
+              "id": "b",
+              "label": "Orta sistolik üfürüm"
+            },
+            {
+              "id": "c",
+              "label": "Geç sistolik üfürüm"
+            },
+            {
+              "id": "d",
+              "label": "Geç diyastolik üfürüm"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Üfürüm S1 ile birlikte başlar ve sistolün ilk yarısında söner — erken sistolik üfürüm.",
+          "feedbackIncorrect": "Üfürüm S1'i hemen izleyip kısa sürede sönüyor; geç sistolik üfürüm ise S2'ye doğru belirginleşir.",
+          "hint": "Erken sistolik üfürüm, S1'i izleyen kısa bir 'fışş' sesi gibi çabuk söner."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "Üfürüm hangi zaman aralığında duyulur?",
+          "options": [
+            {
+              "id": "a",
+              "label": "S1'den hemen sonra, S2'ye ulaşmadan"
+            },
+            {
+              "id": "b",
+              "label": "S2'den hemen sonra"
+            },
+            {
+              "id": "c",
+              "label": "S1'den hemen önce"
+            },
+            {
+              "id": "d",
+              "label": "S2'den S1'e kadar tüm diyastol boyunca"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Erken sistolik üfürüm S1 ile başlar ve S2'den önce biter; S2 normaldir.",
+          "feedbackIncorrect": "S2'den önce sönen bir üfürüm erken sistoliktir; S2 sonrası sesler diyastolik zamanlıdır."
+        },
+        {
+          "id": "q4",
+          "type": "bell_diaphragm",
+          "domain": "interpretation",
+          "prompt": "Üfürümü değerlendirmek için Bell mi, Diyafram mı daha uygundur?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Bell"
+            },
+            {
+              "id": "b",
+              "label": "Diyafram"
+            }
+          ],
+          "correct": [
+            "b"
+          ],
+          "feedbackCorrect": "Doğru. Üfürümün orta-yüksek frekanslı bileşenleri diyaframla daha iyi duyulur.",
+          "feedbackIncorrect": "Üfürüm değerlendirmesinde diyafram tercih edilir; bell düşük frekanslı S3/S4 için uygundur."
+        }
+      ],
+      "feedback": {
+        "summary": "Erken sistolik üfürüm: S1 ile başlar, sistolün ilk yarısında söner. Zamanlama ve süre karakteristiktir.",
+        "differential": "Bu içerikte akustik bulgu ile kapak lezyonu tanısı ayrı tutulur; nedeni klinik bağlamla değerlendirilir."
+      },
+      "references": [
+        "HLS-CMDS v3 — Early Systolic Murmur kayıtları (RUSB, LUSB, LLSB, Apex)"
+      ],
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 0,
+        "recognition": 40,
+        "interpretation": 35,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "masteryThreshold": 80,
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_late_systolic_murmur",
+      "title": "Geç Sistolik Üfürüm",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 41,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Çarpıntı hissi",
+      "history": "Hasta çarpıntı ve hafif halsizlik tarif ediyor; kalp sesleri değerlendirmesi isteniyor.",
+      "vitalSigns": {
+        "hr": 82,
+        "rr": 15,
+        "bp": "118/74",
+        "spo2": 98,
+        "temp": "36.6 °C"
+      },
+      "objectives": [
+        "Geç sistolik üfürümü tanımak",
+        "Erken/geç sistolik ayrımını yapmak"
+      ],
+      "tasks": [
+        "Odakları dinleyin.",
+        "Üfürümün yoğunlaştığı zamanı belirleyin.",
+        "En belirgin odağı seçin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "cardiac_mitral",
+          "category": "heart",
+          "acousticFinding": "late_systolic_murmur",
+          "recordedLocation": "Apex"
+        },
+        {
+          "pointId": "cardiac_pulmonary",
+          "category": "heart",
+          "acousticFinding": "late_systolic_murmur",
+          "recordedLocation": "LUSB"
+        },
+        {
+          "pointId": "cardiac_aortic",
+          "category": "heart",
+          "acousticFinding": "late_systolic_murmur",
+          "recordedLocation": "RUSB"
+        },
+        {
+          "pointId": "cardiac_tricuspid",
+          "category": "heart",
+          "acousticFinding": "late_systolic_murmur",
+          "recordedLocation": "LLSB"
+        }
+      ],
+      "primaryAcousticFinding": "late_systolic_murmur",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "mappingNote": "Akustik sınıf (geç sistolik üfürüm) veri seti etiketiyle doğrulanmıştır; kapak lezyonu eşlemesi yapılmaz.",
+      "technique": {
+        "requiredPoints": [
+          "cardiac_mitral",
+          "cardiac_pulmonary",
+          "cardiac_aortic",
+          "cardiac_tricuspid"
+        ],
+        "minPointsVisited": 4,
+        "minDwellMs": 1800,
+        "minListenMsPerPoint": 2500,
+        "systematicOrder": true
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz akustik bulgu hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erken sistolik üfürüm"
+            },
+            {
+              "id": "b",
+              "label": "Orta sistolik üfürüm"
+            },
+            {
+              "id": "c",
+              "label": "Geç sistolik üfürüm"
+            },
+            {
+              "id": "d",
+              "label": "Geç diyastolik üfürüm"
+            }
+          ],
+          "correct": [
+            "c"
+          ],
+          "feedbackCorrect": "Doğru. Üfürüm sistolün ikinci yarısında belirginleşir ve S2'ye doğru ilerler.",
+          "feedbackIncorrect": "S2'ye doğru güçlenen üfürüm geç sistoliktir; erken sistolik olan S1'i izler ve erken söner.",
+          "hint": "Yaklaşan tren sesi gibi S2'ye doğru güçlenen bir üfürüm arayın."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "Geç sistolik üfürümün zamanlaması nasıldır?",
+          "options": [
+            {
+              "id": "a",
+              "label": "S1'den sonra başlar, S2'ye doğru belirginleşir"
+            },
+            {
+              "id": "b",
+              "label": "S1 ile başlar, erken söner"
+            },
+            {
+              "id": "c",
+              "label": "S2'den sonra başlar"
+            },
+            {
+              "id": "d",
+              "label": "S1'den hemen önce duyulur"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Geç sistolik üfürüm sistolün ikinci yarısında, S2'ye yakın dönemde belirgindir.",
+          "feedbackIncorrect": "S1 ile başlayıp erken sönen üfürüm erken sistoliktir; S2 öncesi beliren üfürüm geç sistoliktir."
+        },
+        {
+          "id": "q4",
+          "type": "bell_diaphragm",
+          "domain": "interpretation",
+          "prompt": "Bu oskültasyon için Bell mi, Diyafram mı daha uygundur?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Bell"
+            },
+            {
+              "id": "b",
+              "label": "Diyafram"
+            }
+          ],
+          "correct": [
+            "b"
+          ],
+          "feedbackCorrect": "Doğru. Üfürümün orta-yüksek frekanslı bileşenleri diyaframla daha iyi duyulur.",
+          "feedbackIncorrect": "Üfürüm için diyafram tercih edilir; bell düşük frekanslı ek sesler içindir."
+        }
+      ],
+      "feedback": {
+        "summary": "Geç sistolik üfürüm: S1'den sonra başlar, S2'ye doğru belirginleşir. Klik varlığı ayrıca değerlendirilir.",
+        "differential": "Akustik bulgu ile kapak lezyonu eşlemesi ayrı tutulur."
+      },
+      "references": [
+        "HLS-CMDS v3 — Late Systolic Murmur kayıtları (Apex, LUSB, RUSB, LLSB)"
+      ],
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 0,
+        "recognition": 40,
+        "interpretation": 35,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "masteryThreshold": 80,
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_late_diastolic_murmur",
+      "title": "Geç Diyastolik (Presistolik) Üfürüm",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "patient": {
+        "age": 52,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Eforla nefes darlığı",
+      "history": "Hasta eforla nefes darlığı ve çarpıntı tarif ediyor; diyastolik seslerin değerlendirilmesi isteniyor.",
+      "vitalSigns": {
+        "hr": 78,
+        "rr": 16,
+        "bp": "124/78",
+        "spo2": 98,
+        "temp": "36.6 °C"
+      },
+      "objectives": [
+        "Geç diyastolik (presistolik) üfürümü tanımak",
+        "Diyastolik sesleri S1/S2 zamanlamasıyla konumlandırmak"
+      ],
+      "tasks": [
+        "Odakları dinleyin.",
+        "Üfürümün S1 ile ilişkisini belirleyin.",
+        "Uygun stetoskop kafasını seçin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "cardiac_mitral",
+          "category": "heart",
+          "acousticFinding": "late_diastolic_murmur",
+          "recordedLocation": "Apex"
+        },
+        {
+          "pointId": "cardiac_pulmonary",
+          "category": "heart",
+          "acousticFinding": "late_diastolic_murmur",
+          "recordedLocation": "LUSB"
+        },
+        {
+          "pointId": "cardiac_tricuspid",
+          "category": "heart",
+          "acousticFinding": "late_diastolic_murmur",
+          "recordedLocation": "LLSB"
+        }
+      ],
+      "primaryAcousticFinding": "late_diastolic_murmur",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "mappingNote": "Akustik sınıf (geç diyastolik üfürüm) doğrulanmıştır; hastalık eşlemesi yapılmaz. Aort odağı için bu sınıfta kayıt yoktur (dürüst eşleme).",
+      "technique": {
+        "requiredPoints": [
+          "cardiac_mitral",
+          "cardiac_pulmonary",
+          "cardiac_tricuspid"
+        ],
+        "minPointsVisited": 3,
+        "minDwellMs": 1800,
+        "minListenMsPerPoint": 3000
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz akustik bulgu hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erken sistolik üfürüm"
+            },
+            {
+              "id": "b",
+              "label": "Geç sistolik üfürüm"
+            },
+            {
+              "id": "c",
+              "label": "Geç diyastolik (presistolik) üfürüm"
+            },
+            {
+              "id": "d",
+              "label": "Normal S1–S2"
+            }
+          ],
+          "correct": [
+            "c"
+          ],
+          "feedbackCorrect": "Doğru. Üfürüm geç diyastolde, S1'den hemen önce duyulur ve S1 ile kesilir.",
+          "feedbackIncorrect": "Bu ses S1 öncesi döneme aittir; geç diyastolik (presistolik) üfürüm ile uyumludur.",
+          "hint": "Uzaktan yaklaşan düdük gibi S1 öncesi duyulan alçak üfleme sesine odaklanın."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "Bu üfürüm kalp siklusunun hangi bölümünde duyulur?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Geç diyastol / presistol (S1'den hemen önce)"
+            },
+            {
+              "id": "b",
+              "label": "Erken diyastol (S2'den hemen sonra)"
+            },
+            {
+              "id": "c",
+              "label": "Erken sistol (S1'den hemen sonra)"
+            },
+            {
+              "id": "d",
+              "label": "Orta sistol"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Presistolik üfürüm geç diyastolde duyulur; atriyal fibrilasyonda duyulmaz.",
+          "feedbackIncorrect": "S2'den hemen sonra başlayan ses erken diyastoliktir; S1 öncesi beliren ses geç diyastoliktir."
+        },
+        {
+          "id": "q4",
+          "type": "bell_diaphragm",
+          "domain": "interpretation",
+          "prompt": "Düşük frekanslı presistolik üfürüm için hangi kafa daha uygundur?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Bell"
+            },
+            {
+              "id": "b",
+              "label": "Diyafram"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Presistolik üfürüm alçak frekanslıdır; bell ile hafif temas tercih edilir.",
+          "feedbackIncorrect": "Alçak frekanslı presistolik seslerde bell daha uygundur; diyafram bu bileşenleri bastırır."
+        }
+      ],
+      "feedback": {
+        "summary": "Geç diyastolik (presistolik) üfürüm: S1'den hemen önce duyulur, S1 ile kesilir; düşük frekanslıdır ve bell ile daha iyi duyulur.",
+        "differential": "Organize atriyal kontraksiyon gerektirir; atriyal fibrilasyonda duyulmaz."
+      },
+      "references": [
+        "HLS-CMDS v3 — Late Diastolic Murmur kayıtları (Apex, LUSB, LLSB)"
+      ],
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 0,
+        "recognition": 40,
+        "interpretation": 35,
+        "diagnosis": 0,
+        "systematic": 5
+      },
+      "masteryThreshold": 80,
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_mixed_msm_wheezing",
+      "title": "Kombine: Üfürüm + Wheezing",
+      "modes": [
+        "practice"
+      ],
+      "patient": {
+        "age": 63,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Nefes darlığı ve eforla çarpıntı",
+      "history": "Kalp ve akciğer seslerinin aynı kayıtta birlikte değerlendirilmesi isteniyor.",
+      "vitalSigns": {
+        "hr": 88,
+        "rr": 22,
+        "bp": "132/82",
+        "spo2": 95,
+        "temp": "36.8 °C"
+      },
+      "objectives": [
+        "Kombine kayıtta kalp ve akciğer bileşenlerini ayrıştırmak"
+      ],
+      "tasks": [
+        "Bölgeyi dinleyin.",
+        "Kalp kaynaklı bileşeni tanımlayın.",
+        "Akciğer kaynaklı bileşeni tanımlayın."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "lung_left_upper_anterior",
+          "category": "mixed",
+          "acousticFinding": "mid_systolic_murmur+wheezing",
+          "recordedLocation": "LUA"
+        },
+        {
+          "pointId": "lung_left_upper_posterior",
+          "category": "mixed",
+          "acousticFinding": "mid_systolic_murmur+wheezing"
+        }
+      ],
+      "primaryAcousticFinding": "mid_systolic_murmur+wheezing",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "educational_mapping",
+      "mappingNote": "Kombine kayıt (veri seti mixed kategorisi); hastalık tanımı içermez, ses ayrıştırma eğitimi amaçlıdır.",
+      "technique": {
+        "requiredPoints": [
+          "lung_left_upper_anterior"
+        ],
+        "minPointsVisited": 1,
+        "minDwellMs": 2000,
+        "minListenMsPerPoint": 4000
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Kayıttaki KALP kaynaklı bileşen hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Orta sistolik üfürüm"
+            },
+            {
+              "id": "b",
+              "label": "S3"
+            },
+            {
+              "id": "c",
+              "label": "Normal S1–S2"
+            },
+            {
+              "id": "d",
+              "label": "Geç diyastolik üfürüm"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Kayıtta kalp bileşeni: Orta sistolik üfürüm.",
+          "feedbackIncorrect": "Bu kayıtta kalp kaynaklı bileşen olarak orta sistolik üfürüm duyulur; tekrar dinleyip karşılaştırın.",
+          "hint": "Rüzgâr esintisi (üfürüm) ile çaydanlık düdüğü (wheezing) aynı anda."
+        },
+        {
+          "id": "q2",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Kayıttaki AKCİĞER kaynaklı bileşen hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Wheezing"
+            },
+            {
+              "id": "b",
+              "label": "İnce raller"
+            },
+            {
+              "id": "c",
+              "label": "Ronküs"
+            },
+            {
+              "id": "d",
+              "label": "Normal solunum"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Kayıtta akciğer bileşeni: Wheezing.",
+          "feedbackIncorrect": "Bu kayıtta akciğer kaynaklı bileşen olarak wheezing duyulur; tekrar dinleyip karşılaştırın."
+        }
+      ],
+      "feedback": {
+        "summary": "Kombine kayıt: Orta sistolik üfürüm + Wheezing birlikte duyulur; iki kaynağı ayrıştırmak klinik dinlemenin temelidir.",
+        "techniqueNotes": "Diyafram geniş bantlı dinlemede tercih edilir; odağı değiştirerek bileşenleri ayırın."
+      },
+      "references": [
+        "HLS-CMDS v3 — Mixed kayıtları (mid_systolic_murmur+wheezing)"
+      ],
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 0,
+        "recognition": 70,
+        "interpretation": 0,
+        "diagnosis": 0,
+        "systematic": 10
+      },
+      "masteryThreshold": 80,
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_mixed_esm_coarse",
+      "title": "Kombine: Üfürüm + Kaba Raller",
+      "modes": [
+        "practice"
+      ],
+      "patient": {
+        "age": 66,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Öksürük ve balgam",
+      "history": "Kalp ve akciğer seslerinin aynı kayıtta birlikte değerlendirilmesi isteniyor.",
+      "vitalSigns": {
+        "hr": 90,
+        "rr": 22,
+        "bp": "134/84",
+        "spo2": 93,
+        "temp": "37.8 °C"
+      },
+      "objectives": [
+        "Kombine kayıtta kalp ve akciğer bileşenlerini ayrıştırmak"
+      ],
+      "tasks": [
+        "Bölgeyi dinleyin.",
+        "Kalp kaynaklı bileşeni tanımlayın.",
+        "Akciğer kaynaklı bileşeni tanımlayın."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "lung_left_upper_anterior",
+          "category": "mixed",
+          "acousticFinding": "early_systolic_murmur+coarse_crackles",
+          "recordedLocation": "LUA"
+        },
+        {
+          "pointId": "lung_left_upper_posterior",
+          "category": "mixed",
+          "acousticFinding": "early_systolic_murmur+coarse_crackles"
+        }
+      ],
+      "primaryAcousticFinding": "early_systolic_murmur+coarse_crackles",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "educational_mapping",
+      "mappingNote": "Kombine kayıt (veri seti mixed kategorisi); hastalık tanımı içermez, ses ayrıştırma eğitimi amaçlıdır.",
+      "technique": {
+        "requiredPoints": [
+          "lung_left_upper_anterior"
+        ],
+        "minPointsVisited": 1,
+        "minDwellMs": 2000,
+        "minListenMsPerPoint": 4000
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Kayıttaki KALP kaynaklı bileşen hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erken sistolik üfürüm"
+            },
+            {
+              "id": "b",
+              "label": "Geç sistolik üfürüm"
+            },
+            {
+              "id": "c",
+              "label": "S4"
+            },
+            {
+              "id": "d",
+              "label": "Normal S1–S2"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Kayıtta kalp bileşeni: Erken sistolik üfürüm.",
+          "feedbackIncorrect": "Bu kayıtta kalp kaynaklı bileşen olarak erken sistolik üfürüm duyulur; tekrar dinleyip karşılaştırın.",
+          "hint": "Kısa bir 'fış' sesi ile kaynama fokurtusunun birlikteliği."
+        },
+        {
+          "id": "q2",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Kayıttaki AKCİĞER kaynaklı bileşen hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Kaba raller"
+            },
+            {
+              "id": "b",
+              "label": "İnce raller"
+            },
+            {
+              "id": "c",
+              "label": "Wheezing"
+            },
+            {
+              "id": "d",
+              "label": "Plevral frotman"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Kayıtta akciğer bileşeni: Kaba raller.",
+          "feedbackIncorrect": "Bu kayıtta akciğer kaynaklı bileşen olarak kaba raller duyulur; tekrar dinleyip karşılaştırın."
+        }
+      ],
+      "feedback": {
+        "summary": "Kombine kayıt: Erken sistolik üfürüm + Kaba raller birlikte duyulur; iki kaynağı ayrıştırmak klinik dinlemenin temelidir.",
+        "techniqueNotes": "Diyafram geniş bantlı dinlemede tercih edilir; odağı değiştirerek bileşenleri ayırın."
+      },
+      "references": [
+        "HLS-CMDS v3 — Mixed kayıtları (early_systolic_murmur+coarse_crackles)"
+      ],
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 0,
+        "recognition": 70,
+        "interpretation": 0,
+        "diagnosis": 0,
+        "systematic": 10
+      },
+      "masteryThreshold": 80,
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_mixed_s3_normal",
+      "title": "Kombine: S3 + Normal Solunum",
+      "modes": [
+        "practice"
+      ],
+      "patient": {
+        "age": 29,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Eforla nefes darlığı",
+      "history": "Kalp ve akciğer seslerinin aynı kayıtta birlikte değerlendirilmesi isteniyor.",
+      "vitalSigns": {
+        "hr": 76,
+        "rr": 16,
+        "bp": "118/74",
+        "spo2": 98,
+        "temp": "36.6 °C"
+      },
+      "objectives": [
+        "Kombine kayıtta kalp ve akciğer bileşenlerini ayrıştırmak"
+      ],
+      "tasks": [
+        "Bölgeyi dinleyin.",
+        "Kalp kaynaklı bileşeni tanımlayın.",
+        "Akciğer kaynaklı bileşeni tanımlayın."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "lung_right_lower_anterior",
+          "category": "mixed",
+          "acousticFinding": "s3+normal",
+          "recordedLocation": "RLA"
+        },
+        {
+          "pointId": "lung_right_lower_posterior",
+          "category": "mixed",
+          "acousticFinding": "s3+normal"
+        }
+      ],
+      "primaryAcousticFinding": "s3+normal",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "educational_mapping",
+      "mappingNote": "Kombine kayıt (veri seti mixed kategorisi); hastalık tanımı içermez, ses ayrıştırma eğitimi amaçlıdır.",
+      "technique": {
+        "requiredPoints": [
+          "lung_right_lower_anterior"
+        ],
+        "minPointsVisited": 1,
+        "minDwellMs": 2000,
+        "minListenMsPerPoint": 4000
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Kayıttaki KALP kaynaklı bileşen hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "S3 (üçüncü kalp sesi)"
+            },
+            {
+              "id": "b",
+              "label": "S4"
+            },
+            {
+              "id": "c",
+              "label": "Normal S1–S2"
+            },
+            {
+              "id": "d",
+              "label": "Orta sistolik üfürüm"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Kayıtta kalp bileşeni: S3 (üçüncü kalp sesi).",
+          "feedbackIncorrect": "Bu kayıtta kalp kaynaklı bileşen olarak S3 (üçüncü kalp sesi) duyulur; tekrar dinleyip karşılaştırın.",
+          "hint": "Ken-ta-ta dörtnal ritmi üzerine hafif dalga hışırtısı."
+        },
+        {
+          "id": "q2",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Kayıttaki AKCİĞER kaynaklı bileşen hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Normal solunum sesleri"
+            },
+            {
+              "id": "b",
+              "label": "Wheezing"
+            },
+            {
+              "id": "c",
+              "label": "İnce raller"
+            },
+            {
+              "id": "d",
+              "label": "Ronküs"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Kayıtta akciğer bileşeni: Normal solunum sesleri.",
+          "feedbackIncorrect": "Bu kayıtta akciğer kaynaklı bileşen olarak normal solunum sesleri duyulur; tekrar dinleyip karşılaştırın."
+        }
+      ],
+      "feedback": {
+        "summary": "Kombine kayıt: S3 (üçüncü kalp sesi) + Normal solunum sesleri birlikte duyulur; iki kaynağı ayrıştırmak klinik dinlemenin temelidir.",
+        "techniqueNotes": "Diyafram geniş bantlı dinlemede tercih edilir; odağı değiştirerek bileşenleri ayırın."
+      },
+      "references": [
+        "HLS-CMDS v3 — Mixed kayıtları (s3+normal)"
+      ],
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 0,
+        "recognition": 70,
+        "interpretation": 0,
+        "diagnosis": 0,
+        "systematic": 10
+      },
+      "masteryThreshold": 80,
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_mixed_af_rhonchi",
+      "title": "Kombine: Düzensiz Ritim + Ronküs",
+      "modes": [
+        "practice"
+      ],
+      "patient": {
+        "age": 72,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Çarpıntı ve hırıltılı solunum",
+      "history": "Kalp ve akciğer seslerinin aynı kayıtta birlikte değerlendirilmesi isteniyor.",
+      "vitalSigns": {
+        "hr": 92,
+        "rr": 20,
+        "bp": "138/84",
+        "spo2": 94,
+        "temp": "37.0 °C"
+      },
+      "objectives": [
+        "Kombine kayıtta kalp ve akciğer bileşenlerini ayrıştırmak"
+      ],
+      "tasks": [
+        "Bölgeyi dinleyin.",
+        "Kalp kaynaklı bileşeni tanımlayın.",
+        "Akciğer kaynaklı bileşeni tanımlayın."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "lung_right_lower_anterior",
+          "category": "mixed",
+          "acousticFinding": "atrial_fibrillation+rhonchi",
+          "recordedLocation": "RLA"
+        },
+        {
+          "pointId": "lung_right_lower_posterior",
+          "category": "mixed",
+          "acousticFinding": "atrial_fibrillation+rhonchi"
+        }
+      ],
+      "primaryAcousticFinding": "atrial_fibrillation+rhonchi",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "educational_mapping",
+      "mappingNote": "Kombine kayıt (veri seti mixed kategorisi); hastalık tanımı içermez, ses ayrıştırma eğitimi amaçlıdır.",
+      "technique": {
+        "requiredPoints": [
+          "lung_right_lower_anterior"
+        ],
+        "minPointsVisited": 1,
+        "minDwellMs": 2000,
+        "minListenMsPerPoint": 4000
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Kayıttaki KALP kaynaklı bileşen hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Düzensiz düzensiz ritim (AF ile uyumlu)"
+            },
+            {
+              "id": "b",
+              "label": "Düzenli hızlı ritim"
+            },
+            {
+              "id": "c",
+              "label": "Normal S1–S2"
+            },
+            {
+              "id": "d",
+              "label": "Atriyoventriküler blok"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Kayıtta kalp bileşeni: Düzensiz düzensiz ritim (AF ile uyumlu).",
+          "feedbackIncorrect": "Bu kayıtta kalp kaynaklı bileşen olarak düzensiz düzensiz ritim (AF ile uyumlu) duyulur; tekrar dinleyip karşılaştırın.",
+          "hint": "Düzensiz davul vuruşları üzerine horlama benzeri kaba hırıltı."
+        },
+        {
+          "id": "q2",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Kayıttaki AKCİĞER kaynaklı bileşen hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Ronküs"
+            },
+            {
+              "id": "b",
+              "label": "Wheezing"
+            },
+            {
+              "id": "c",
+              "label": "İnce raller"
+            },
+            {
+              "id": "d",
+              "label": "Plevral frotman"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Kayıtta akciğer bileşeni: Ronküs.",
+          "feedbackIncorrect": "Bu kayıtta akciğer kaynaklı bileşen olarak ronküs duyulur; tekrar dinleyip karşılaştırın."
+        }
+      ],
+      "feedback": {
+        "summary": "Kombine kayıt: Düzensiz düzensiz ritim (AF ile uyumlu) + Ronküs birlikte duyulur; iki kaynağı ayrıştırmak klinik dinlemenin temelidir.",
+        "techniqueNotes": "Diyafram geniş bantlı dinlemede tercih edilir; odağı değiştirerek bileşenleri ayırın."
+      },
+      "references": [
+        "HLS-CMDS v3 — Mixed kayıtları (atrial_fibrillation+rhonchi)"
+      ],
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 0,
+        "recognition": 70,
+        "interpretation": 0,
+        "diagnosis": 0,
+        "systematic": 10
+      },
+      "masteryThreshold": 80,
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_pediatric_normal_heart",
+      "title": "Pediatrik Normal Kardiyak Oskültasyon",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "population": "pediatrik",
+      "patient": {
+        "age": 6,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Okul öncesi rutin muayene",
+      "history": "6 yaşında çocuk, rutin kontrol. Efor kapasitesi yaşına uygun, kardiyak yakınma yok.",
+      "vitalSigns": {
+        "hr": 100,
+        "rr": 22,
+        "bp": "98/62",
+        "spo2": 99,
+        "temp": "36.6 °C"
+      },
+      "objectives": [
+        "Çocukta normal S1–S2 ritmini tanımak",
+        "Pediatrik kalp hızı aralığını bilmek",
+        "Masum üfürümlerin sıklığını kavramak"
+      ],
+      "tasks": [
+        "Odakları sistematik dinleyin.",
+        "Ek ses/üfürüm var mı bakın.",
+        "Pediatrik hız farkını değerlendirin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "cardiac_aortic",
+          "category": "heart",
+          "acousticFinding": "normal",
+          "recordedLocation": "RUSB"
+        },
+        {
+          "pointId": "cardiac_pulmonary",
+          "category": "heart",
+          "acousticFinding": "normal",
+          "recordedLocation": "LUSB"
+        },
+        {
+          "pointId": "cardiac_tricuspid",
+          "category": "heart",
+          "acousticFinding": "normal",
+          "recordedLocation": "LLSB"
+        },
+        {
+          "pointId": "cardiac_mitral",
+          "category": "heart",
+          "acousticFinding": "normal",
+          "recordedLocation": "Apex"
+        }
+      ],
+      "primaryAcousticFinding": "normal",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "mappingNote": "Akustik sınıf (normal S1–S2) doğrulanmıştır; pediatrik bağlam bilgi olarak eklenmiştir. Kayıt klinik manikinden alınmıştır (popülasyon farkı kullanıcıya bildirilir).",
+      "technique": {
+        "requiredPoints": [
+          "cardiac_aortic",
+          "cardiac_pulmonary",
+          "cardiac_tricuspid",
+          "cardiac_mitral"
+        ],
+        "minPointsVisited": 4,
+        "minDwellMs": 1500,
+        "minListenMsPerPoint": 2000,
+        "systematicOrder": true
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz ses hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Normal kalp sesleri (S1–S2)"
+            },
+            {
+              "id": "b",
+              "label": "Sistolik üfürüm"
+            },
+            {
+              "id": "c",
+              "label": "S3"
+            },
+            {
+              "id": "d",
+              "label": "S4"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Çocukta S1–S2 düzenli; ek ses ve üfürüm yoktur.",
+          "feedbackIncorrect": "Kayıtta yalnız S1–S2 vardır; çocuklarda S3 sıklıkla fizyolojiktir ancak bu kayıtta duyulmuyor.",
+          "hint": "Lub-dub düzenini sayın: fazladan vuruş var mı?"
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "6 yaş çocukta istirahat kalp hızı için beklenen aralık hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "70–110/dk"
+            },
+            {
+              "id": "b",
+              "label": "40–60/dk"
+            },
+            {
+              "id": "c",
+              "label": "120–160/dk"
+            },
+            {
+              "id": "d",
+              "label": "30–50/dk"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Okul öncesi/okul çağı çocukta istirahat hızı yaklaşık 70–110/dk'dır; yetişkinden yüksektir.",
+          "feedbackIncorrect": "Çocukta kalp hızı yaşla azalır: 6 yaşta ~70–110/dk beklenir."
+        },
+        {
+          "id": "q3",
+          "type": "multi_choice",
+          "domain": "interpretation",
+          "prompt": "Çocuklarda masum (innocent) üfürümler için doğru olanlar hangileridir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Sağlıklı çocuklarda sık görülür"
+            },
+            {
+              "id": "b",
+              "label": "Genellikle düşük şiddette ve kısa sistoliktir"
+            },
+            {
+              "id": "c",
+              "label": "Her zaman kalp hastalığı gösterir"
+            },
+            {
+              "id": "d",
+              "label": "Pozisyonla değişebilir"
+            }
+          ],
+          "correct": [
+            "a",
+            "b",
+            "d"
+          ],
+          "feedbackCorrect": "Doğru. Masum üfürümler sık, kısa sistolik ve pozisyonla değişebilir; tek başına hastalık göstermez.",
+          "feedbackIncorrect": "Masum üfürümler sağlıklı çocuklarda sık görülür; 'her zaman hastalık gösterir' ifadesi yanlıştır."
+        }
+      ],
+      "feedback": {
+        "summary": "Pediatrik normal kardiyak oskültasyon: S1–S2 düzenli, hız yaşa göre yüksek. Çocuklarda S3 fizyolojik olabilir; masum üfürümler sıktır.",
+        "techniqueNotes": "Çocuklarda göğüs duvarı incedir; oskültasyon genellikle daha kolaydır, ancak hasta uyumu ve sessiz ortam önemlidir."
+      },
+      "references": [
+        "HLS-CMDS v3 — Normal kalp sesi kayıtları",
+        "Pediatrik bağlam bilgisi: yaşa göre normal hız aralıkları (klinik eğitim notu)"
+      ],
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 25,
+        "recognition": 40,
+        "interpretation": 15,
+        "diagnosis": 0,
+        "systematic": 0
+      },
+      "masteryThreshold": 80,
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_pediatric_wheezing",
+      "title": "Pediatrik Wheezing (Obstrüktif Patern)",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "population": "pediatrik",
+      "patient": {
+        "age": 3,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Öksürük ve hırıltılı solunum",
+      "history": "3 yaşında çocuk, üst solunum yolu enfeksiyonu sonrası hırıltılı solunum ve öksürük tarif ediliyor.",
+      "vitalSigns": {
+        "hr": 118,
+        "rr": 34,
+        "bp": "92/58",
+        "spo2": 95,
+        "temp": "37.6 °C"
+      },
+      "objectives": [
+        "Çocukta wheezing'i tanımak",
+        "Yaşa uygun solunum sayısını bilmek",
+        "Yaygın bilateral obstrüktif paterni değerlendirmek"
+      ],
+      "tasks": [
+        "Bilateral ve posterior dinleyin.",
+        "Sesi tanımlayın.",
+        "Solunum sayısını yorumlayın."
+      ],
+      "views": [
+        "front",
+        "back"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "pointId": "lung_right_upper_anterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "recordedLocation": "RUA"
+        },
+        {
+          "pointId": "lung_left_upper_anterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "recordedLocation": "LUA"
+        },
+        {
+          "pointId": "lung_right_lower_anterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "recordedLocation": "RLA"
+        },
+        {
+          "pointId": "lung_left_lower_anterior",
+          "category": "lung",
+          "acousticFinding": "wheezing",
+          "recordedLocation": "LLA"
+        },
+        {
+          "pointId": "lung_right_upper_posterior",
+          "category": "lung",
+          "acousticFinding": "wheezing"
+        },
+        {
+          "pointId": "lung_left_upper_posterior",
+          "category": "lung",
+          "acousticFinding": "wheezing"
+        },
+        {
+          "pointId": "lung_right_lower_posterior",
+          "category": "lung",
+          "acousticFinding": "wheezing"
+        },
+        {
+          "pointId": "lung_left_lower_posterior",
+          "category": "lung",
+          "acousticFinding": "wheezing"
+        }
+      ],
+      "primaryAcousticFinding": "wheezing",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "mappingNote": "Akustik sınıf (wheezing) doğrulanmıştır; hastalık tanısı (bronşiolit/astım) iddia edilmez. Posterior noktalarda kayıt anterior alandan fallback ile gelir.",
+      "technique": {
+        "requiredPoints": [
+          "lung_right_upper_anterior",
+          "lung_left_upper_anterior",
+          "lung_right_lower_anterior",
+          "lung_left_lower_anterior"
+        ],
+        "minPointsVisited": 6,
+        "minDwellMs": 1200,
+        "minListenMsPerPoint": 1800,
+        "systematicOrder": true
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz ses hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Wheezing"
+            },
+            {
+              "id": "b",
+              "label": "İnce raller"
+            },
+            {
+              "id": "c",
+              "label": "Plevral frotman"
+            },
+            {
+              "id": "d",
+              "label": "Normal solunum"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Müzikal, sürekli ve ekspirasyonda belirgin ses wheezing'dir.",
+          "feedbackIncorrect": "Ses kesintili değil; müzikal ve süreklidir — wheezing.",
+          "hint": "Çaydanlık düdüğü benzetmesini düşünün."
+        },
+        {
+          "id": "q2",
+          "type": "single_choice",
+          "domain": "interpretation",
+          "prompt": "3 yaşında beklenen istirahat solunum sayısı aralığı hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "22–38/dk"
+            },
+            {
+              "id": "b",
+              "label": "12–16/dk"
+            },
+            {
+              "id": "c",
+              "label": "40–60/dk"
+            },
+            {
+              "id": "d",
+              "label": "8–12/dk"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Okul öncesi çocukta solunum sayısı dakikada ~22–38'dir.",
+          "feedbackIncorrect": "Yaşla solunum sayısı azalır: 3 yaşta ~22–38/dk beklenir."
+        }
+      ],
+      "feedback": {
+        "summary": "Pediatrik wheezing: yaygın obstrüktif patern; küçük çocuklarda sık görülür. Tanı tek oskültasyonla konmaz; klinik bağlam gerekir.",
+        "techniqueNotes": "Küçük çocuklarda bilateral ve posterior karşılaştırma önemlidir."
+      },
+      "references": [
+        "HLS-CMDS v3 — Wheezing kayıtları"
+      ],
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 25,
+        "recognition": 40,
+        "interpretation": 15,
+        "diagnosis": 0,
+        "systematic": 0
+      },
+      "masteryThreshold": 80,
+      "clinicalReview": "beklemede"
+    },
+    {
+      "id": "case_pediatric_innocent_murmur",
+      "title": "Pediatrik Erken Sistolik Üfürüm (Gerçek Pediatrik Kayıt)",
+      "modes": [
+        "practice",
+        "assessment"
+      ],
+      "population": "pediatrik",
+      "patient": {
+        "age": 5,
+        "sex": "erkek"
+      },
+      "chiefComplaint": "Ateşli hastalık sırasında fark edilen üfürüm",
+      "history": "5 yaşında çocuk, ateşli üst solunum yolu enfeksiyonu sırasında kalp sesleri dinlendiğinde kısa bir sistolik üfürüm duyulmuş. Çocuğun genel durumu iyi, efor kapasitesi normal.",
+      "vitalSigns": {
+        "hr": 112,
+        "rr": 24,
+        "bp": "96/60",
+        "spo2": 98,
+        "temp": "38.1 °C"
+      },
+      "objectives": [
+        "Kısa sistolik üfürümü tanımak",
+        "Masum/patolojik ayrımının tek oskültasyonla YAPILAMAYACAĞINI kavramak"
+      ],
+      "tasks": [
+        "Odakları dinleyin.",
+        "Üfürümün zamanlamasını belirleyin.",
+        "En belirgin odağı seçin."
+      ],
+      "views": [
+        "front"
+      ],
+      "allowedHeads": [
+        "bell",
+        "diaphragm"
+      ],
+      "soundAssignments": [
+        {
+          "soundId": "circor_early_systolic_murmur_cardiac_aortic_001",
+          "pointId": "cardiac_aortic",
+          "category": "heart",
+          "acousticFinding": "early_systolic_murmur"
+        },
+        {
+          "pointId": "cardiac_pulmonary",
+          "category": "heart",
+          "acousticFinding": "early_systolic_murmur",
+          "recordedLocation": "LUSB"
+        },
+        {
+          "pointId": "cardiac_tricuspid",
+          "category": "heart",
+          "acousticFinding": "early_systolic_murmur",
+          "recordedLocation": "LLSB"
+        },
+        {
+          "pointId": "cardiac_mitral",
+          "category": "heart",
+          "acousticFinding": "early_systolic_murmur",
+          "recordedLocation": "Apex"
+        }
+      ],
+      "primaryAcousticFinding": "early_systolic_murmur",
+      "clinicalDiagnosis": null,
+      "mappingValidation": "validated",
+      "mappingNote": "Aort odağı kaydı GERÇEK PEDİATRİK HASTADAN alınmıştır (CirCor DigiScope, ODC-BY 1.0, doğrulanmış erken sistolik zamanlama). Diğer odaklar manikin kayıtlarıdır. Masum/patolojik ayrımı iddia edilmez.",
+      "technique": {
+        "requiredPoints": [
+          "cardiac_aortic",
+          "cardiac_pulmonary",
+          "cardiac_tricuspid",
+          "cardiac_mitral"
+        ],
+        "minPointsVisited": 4,
+        "minDwellMs": 1500,
+        "minListenMsPerPoint": 2000,
+        "systematicOrder": true
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "type": "sound_identify",
+          "domain": "recognition",
+          "prompt": "Duyduğunuz üfürümün zamanlaması hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erken sistolik"
+            },
+            {
+              "id": "b",
+              "label": "Geç sistolik"
+            },
+            {
+              "id": "c",
+              "label": "Geç diyastolik"
+            },
+            {
+              "id": "d",
+              "label": "Sürekli"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Üfürüm S1'i izleyip kısa sürede söner (gerçek pediatrik kayıt, doğrulanmış zamanlama).",
+          "feedbackIncorrect": "S1 ile başlayıp erken sönen üfürüm erken sistoliktir.",
+          "hint": "Kısa bir 'fışş' gibi çabuk sönen üfürüme odaklanın."
+        },
+        {
+          "id": "q2",
+          "type": "interpretation",
+          "domain": "interpretation",
+          "prompt": "Ateşli hastalıkta duyulan kısa sistolik üfürüm için en doğru yaklaşım hangisidir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Klinik bağlam, ateş sonrası yeniden muayene ve gereğinde ileri tetkik ile değerlendirmek"
+            },
+            {
+              "id": "b",
+              "label": "Doğrudan kapak ameliyatı planlamak"
+            },
+            {
+              "id": "c",
+              "label": "Üfürümü tamamen yok saymak"
+            },
+            {
+              "id": "d",
+              "label": "Yalnız oskültasyonla masum demek"
+            }
+          ],
+          "correct": [
+            "a"
+          ],
+          "feedbackCorrect": "Doğru. Ateşli dönemde bu tür üfürümler sık görülür ve genellikle geçicidir; klinik bağlam ve gerektiğinde ateş sonrası yeniden değerlendirme veya ileri tetkik gerekir.",
+          "feedbackIncorrect": "Oskültasyon tek başına masum/patolojik ayrımı yapamaz; klinik bağlam ve ileri değerlendirme gerekir."
+        },
+        {
+          "id": "q4",
+          "type": "bell_diaphragm",
+          "domain": "interpretation",
+          "prompt": "Üfürüm değerlendirmesinde hangi kafa tercih edilir?",
+          "options": [
+            {
+              "id": "a",
+              "label": "Bell"
+            },
+            {
+              "id": "b",
+              "label": "Diyafram"
+            }
+          ],
+          "correct": [
+            "b"
+          ],
+          "feedbackCorrect": "Doğru. Orta-yüksek frekanslı üfürüm bileşenleri diyaframla daha iyi duyulur.",
+          "feedbackIncorrect": "Üfürüm için diyafram uygundur."
+        }
+      ],
+      "feedback": {
+        "summary": "Pediatrik erken sistolik üfürüm: aort odağında gerçek hasta kaydı. Ateşli dönemde duyulan kısa sistolik üfürümler sık görülür; masum/patolojik ayrımı klinik bağlam ve gerekirse ileri tetkik ile yapılır.",
+        "differential": "Kapak lezyonu veya masum üfürüm ayrımı bu içerikte İDDİA EDİLMEZ; karar klinik bütünlük içinde verilir."
+      },
+      "references": [
+        "CirCor DigiScope (PhysioNet v1.0.3) — gerçek pediatrik kayıt, ODC-BY 1.0",
+        "HLS-CMDS v3 — diğer odak kayıtları"
+      ],
+      "scoringWeights": {
+        "technique": 20,
+        "localization": 0,
+        "recognition": 55,
+        "interpretation": 25,
+        "diagnosis": 0,
+        "systematic": 0
+      },
+      "masteryThreshold": 80,
+      "clinicalReview": "beklemede"
+    }
+  ]
+}
