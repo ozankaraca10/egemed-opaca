@@ -1,0 +1,243 @@
+{
+ "version": 1,
+ "generatedAt": "2026-09-17T18:04:01.229Z",
+ "cases": [
+  {
+   "id": "auto_nih_00000001_000",
+   "title": "Kardiyomegali · PA grafi #1",
+   "modes": [
+    "practice"
+   ],
+   "population": "yetiskin",
+   "patient": {
+    "age": 57,
+    "sex": "erkek"
+   },
+   "chiefComplaint": "Akciğer grafisi değerlendirmesi.",
+   "history": "Veri setinde klinik öykü bulunmamaktadır; değerlendirmenizi yalnız görüntü bulgularına dayandırın.",
+   "vitalSigns": {},
+   "objectives": [
+    "Filmi ABCDE sırasıyla sistematik okur.",
+    "Kardiyomegali bulgusunu tanır ve yerini gösterir."
+   ],
+   "imageId": "nih_00000001_000",
+   "primaryFinding": "cardiomegaly",
+   "clinicalDiagnosis": null,
+   "mappingValidation": "educational_mapping",
+   "mappingNote": "Bu etiket rapor metninden otomatik çıkarılmıştır ve radyolog tarafından doğrulanmamıştır. Vaka yalnız uygulama içindir; bulgu sorusu sorulmaz.",
+   "clinicalReview": "beklemede",
+   "technique": {
+    "requiredZones": [
+     "a_trachea",
+     "b_r_upper",
+     "b_l_upper",
+     "b_r_mid",
+     "b_l_mid",
+     "b_r_lower",
+     "b_l_lower",
+     "c_heart",
+     "d_r_diaphragm",
+     "d_l_diaphragm",
+     "e_bones"
+    ],
+    "minDwellMs": 600,
+    "systematicOrder": true
+   },
+   "questions": [
+    {
+     "id": "q_projection",
+     "type": "film_quality",
+     "domain": "quality",
+     "prompt": "Bu grafinin projeksiyonu nedir?",
+     "options": [
+      {
+       "id": "a",
+       "label": "PA (arka-ön)"
+      },
+      {
+       "id": "b",
+       "label": "AP (ön-arka)"
+      },
+      {
+       "id": "c",
+       "label": "Lateral"
+      }
+     ],
+     "correct": [
+      "a"
+     ],
+     "feedbackCorrect": "Doğru, PA grafi. Kalp filme yakın olduğundan boyutu daha doğru yansır; kardiyotorasik oran bu filmde yorumlanabilir.",
+     "feedbackIncorrect": "Bu bir PA grafidir (kaynak: DICOM meta verisi). PA filmde skapulalar genellikle akciğer alanlarının dışına çekilmiştir.",
+     "hint": "Skapulaların konumuna ve klavikulaların eğimine bakın."
+    },
+    {
+     "id": "q_interpret",
+     "type": "interpretation",
+     "domain": "interpretation",
+     "prompt": "Kardiyotorasik oranın güvenilir biçimde değerlendirilebilmesi için hangi koşul gereklidir?",
+     "options": [
+      {
+       "id": "a",
+       "label": "PA projeksiyon ve yeterli inspirasyon"
+      },
+      {
+       "id": "b",
+       "label": "Yatarak çekilmiş AP grafi"
+      },
+      {
+       "id": "c",
+       "label": "Ekspirasyonda çekilmiş grafi"
+      },
+      {
+       "id": "d",
+       "label": "Yalnız lateral grafi"
+      }
+     ],
+     "correct": [
+      "a"
+     ],
+     "feedbackCorrect": "Doğru. AP projeksiyon ve yetersiz inspirasyon kalbi olduğundan büyük gösterir.",
+     "feedbackIncorrect": "Kardiyotorasik oran PA ve iyi inspirasyonlu filmde değerlendirilir; AP ya da ekspiratuvar filmde kalp büyük görünür.",
+     "hint": "Kalp filme yakın mı, uzak mı olmalı?"
+    }
+   ],
+   "feedback": {
+    "summary": "Kalp gölgesinin genişlemesidir. PA filmde kalbin en geniş yatay çapının toraksın en geniş iç çapına oranı (kardiyotorasik oran) 0,5'in üzerindeyse kardiyomegaliden söz edilir. Bu etiket rapor metninden otomatik çıkarılmıştır ve radyolog tarafından doğrulanmamıştır.",
+    "differential": "AP ve yatarak çekilen filmlerde kalp olduğundan büyük görünür; bu filmlerde kardiyotorasik oran güvenilir değildir.",
+    "techniqueNotes": "Önce projeksiyonu ve inspirasyonu kontrol edin; ölçümü kalbin en geniş sağ ve sol kenarları arasından yapın."
+   },
+   "references": [
+    "Wang X, Peng Y, Lu L, Lu Z, Bagheri M, Summers RM. ChestX-ray8: Hospital-scale Chest X-ray Database and Benchmarks on Weakly-Supervised Classification and Localization of Common Thorax Diseases. IEEE CVPR 2017, s. 3462–3471. Veri sağlayıcı: NIH Clinical Center — https://nihcc.app.box.com/v/ChestXray-NIHCC"
+   ],
+   "scoringWeights": {
+    "technique": 10,
+    "systematic": 5,
+    "quality": 10,
+    "localization": 0,
+    "recognition": 0,
+    "interpretation": 75,
+    "diagnosis": 0
+   },
+   "libraryKey": "finding.cardiomegaly",
+   "timeLimitSec": 180
+  },
+  {
+   "id": "auto_nih_00027426_000",
+   "title": "Sistematik okuma · PA grafi #1",
+   "modes": [
+    "practice"
+   ],
+   "population": "yetiskin",
+   "patient": {
+    "age": 53,
+    "sex": "erkek"
+   },
+   "chiefComplaint": "Akciğer grafisi değerlendirmesi.",
+   "history": "Veri setinde klinik öykü bulunmamaktadır; değerlendirmenizi yalnız görüntü bulgularına dayandırın.",
+   "vitalSigns": {},
+   "objectives": [
+    "Filmi ABCDE sırasıyla sistematik okur.",
+    "Film kalitesini değerlendirir."
+   ],
+   "imageId": "nih_00027426_000",
+   "primaryFinding": "no_finding_report",
+   "clinicalDiagnosis": null,
+   "mappingValidation": "educational_mapping",
+   "mappingNote": "NIH raporunda bulgu belirtilmemiştir; bu, filmin radyolog tarafından normal olarak doğrulandığı anlamına gelmez. Vaka yalnız sistematik okuma ve film kalitesi içindir.",
+   "clinicalReview": "beklemede",
+   "technique": {
+    "requiredZones": [
+     "a_trachea",
+     "b_r_upper",
+     "b_l_upper",
+     "b_r_mid",
+     "b_l_mid",
+     "b_r_lower",
+     "b_l_lower",
+     "c_heart",
+     "d_r_diaphragm",
+     "d_l_diaphragm",
+     "e_bones"
+    ],
+    "minDwellMs": 600,
+    "systematicOrder": true
+   },
+   "questions": [
+    {
+     "id": "q_projection",
+     "type": "film_quality",
+     "domain": "quality",
+     "prompt": "Bu grafinin projeksiyonu nedir?",
+     "options": [
+      {
+       "id": "a",
+       "label": "PA (arka-ön)"
+      },
+      {
+       "id": "b",
+       "label": "AP (ön-arka)"
+      },
+      {
+       "id": "c",
+       "label": "Lateral"
+      }
+     ],
+     "correct": [
+      "a"
+     ],
+     "feedbackCorrect": "Doğru, PA grafi. Kalp filme yakın olduğundan boyutu daha doğru yansır; kardiyotorasik oran bu filmde yorumlanabilir.",
+     "feedbackIncorrect": "Bu bir PA grafidir (kaynak: DICOM meta verisi). PA filmde skapulalar genellikle akciğer alanlarının dışına çekilmiştir.",
+     "hint": "Skapulaların konumuna ve klavikulaların eğimine bakın."
+    },
+    {
+     "id": "q_interpret",
+     "type": "interpretation",
+     "domain": "interpretation",
+     "prompt": "Sistematik akciğer grafisi okumasında ABCDE yaklaşımının doğru sırası hangisidir?",
+     "options": [
+      {
+       "id": "a",
+       "label": "Hava yolu → akciğer/plevra → kalp/mediasten → diyafram → kemik ve yumuşak doku"
+      },
+      {
+       "id": "b",
+       "label": "Kalp → akciğer → hava yolu → kemik → diyafram"
+      },
+      {
+       "id": "c",
+       "label": "Kemik → diyafram → kalp → akciğer → hava yolu"
+      },
+      {
+       "id": "d",
+       "label": "Akciğer → kalp → hava yolu → diyafram → kemik"
+      }
+     ],
+     "correct": [
+      "a"
+     ],
+     "feedbackCorrect": "Doğru. Her filmde aynı sırayı izlemek kaçırılan bulgu riskini azaltır.",
+     "feedbackIncorrect": "ABCDE: Airway (hava yolu), Breathing (akciğer/plevra), Cardiac (kalp/mediasten), Diaphragm (diyafram), Everything else (kemik, yumuşak doku, diyafram altı).",
+     "hint": "Harflerin İngilizce karşılıklarını düşünün: Airway, Breathing, Cardiac…"
+    }
+   ],
+   "feedback": {
+    "summary": "Bu filmde değerlendirme sistematik okuma ve film kalitesi üzerinedir. Bu etiket rapor metninden otomatik çıkarılmıştır ve radyolog tarafından doğrulanmamıştır.",
+    "techniqueNotes": "Her filmde hava yolu, akciğerler, kalp, diyafram ve kemikleri aynı sırayla okuyun."
+   },
+   "references": [
+    "Wang X, Peng Y, Lu L, Lu Z, Bagheri M, Summers RM. ChestX-ray8: Hospital-scale Chest X-ray Database and Benchmarks on Weakly-Supervised Classification and Localization of Common Thorax Diseases. IEEE CVPR 2017, s. 3462–3471. Veri sağlayıcı: NIH Clinical Center — https://nihcc.app.box.com/v/ChestXray-NIHCC"
+   ],
+   "scoringWeights": {
+    "technique": 10,
+    "systematic": 5,
+    "quality": 10,
+    "localization": 0,
+    "recognition": 0,
+    "interpretation": 75,
+    "diagnosis": 0
+   },
+   "libraryKey": "technique.systematic",
+   "timeLimitSec": 180
+  }
+ ]
+}

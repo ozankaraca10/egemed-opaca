@@ -1,112 +1,71 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import type { AuscultationPoint, SoundRecord } from '../core/types'
-import pointsData from '../data/auscultation-points.json'
-import libraryData from '../data/library.json'
-import { engine } from '../audio/engineSingleton'
-import { resolveLibrarySound, resolveLibrarySoundEx } from '../core/resolver'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from '../core/store'
-import { libraryTitle, libraryShortTitle, librarySub } from '../data/terminology'
+import { examplesFor, isExpertSource } from '../core/images'
+import { ZONES } from '../data/zones'
 import { ALL_CASES, poolFor } from '../data/pool'
-import { countUnlistenedInOtherView, otherViewHintText } from '../core/flow'
-import { PatientStage, type StageHandle } from '../ui/PatientStage'
-import { RegionChipList } from '../ui/RegionChips'
-import { WaveformView } from '../ui/WaveformView'
-import { Toolbar } from '../ui/Toolbar'
+import { LIBRARY_GROUPS, LIBRARY_ITEMS, LABEL_SOURCE_TEXT, VIEW_TEXT, findingShort, type LibraryItem } from '../data/terminology'
+import { FilmViewer, type FilmViewerHandle } from '../ui/FilmViewer'
+import { ZoneChips } from '../ui/ZoneChips'
 import { Footer, EcgDeco } from '../ui/chrome'
-import { PediatricRefModal } from '../ui/PediatricRefModal'
-import { IconHeart, IconLungs, IconWave, IconDoc, IconStethoscope, IconInfo, IconCompare, IconArrowRight } from '../ui/icons'
+import { IconDoc, IconInfo, IconArrowRight, IconLungs, IconHeart, IconBone, IconScan, IconFilm, IconChevronLeft, IconChevronRight } from '../ui/icons'
 
-/** Öğrenme modu (§3A): kütüphane + simülatör. Skor yok; rehberli, sınırsız dinleme. */
+/** Öğrenme modu: kütüphane + film görüntüleyici. Skor ve süre yok. */
 
-interface LibItemFull {
-  key: string
-  category: string
-  acousticFinding: string
-  description: string
-  metaphor?: string
-  s1?: string
-  s2?: string
-  phase?: string
-  clinical: string
-  bestPoints: string[]
-  group: string
-}
+const LEARN_DWELL_MS = 800
 
 export function LearnScreen() {
   const { state, dispatch } = useStore()
-  // madde 5 (wave 2): Sonuçlar ekranından "Öğrenme modunda çalış" ile gelindiğinde ilgili
-  // kalem seçili açılır (tek seferlik — tüketilince store'daki alan temizlenir).
-  const [selectedKey, setSelectedKey] = useState<string>(() => state.learnFocusKey ?? 'heart.normal')
-  const [tab, setTab] = useState<'desc' | 'wave' | 'clin'>('desc')
+  const [selectedKey, setSelectedKey] = useState<string>(() => state.learnFocusKey ?? LIBRARY_ITEMS[0].key)
+  const [tab, setTab] = useState<'desc' | 'film' | 'clin'>('desc')
+  const [exampleIdx, setExampleIdx] = useState(0)
+  const [showExpert, setShowExpert] = useState(true)
+  const [activeZones, setActiveZones] = useState<string[]>([])
+  const viewerRef = useRef<FilmViewerHandle>(null)
+
   useEffect(() => {
     if (state.learnFocusKey) dispatch({ type: 'setLearnFocus', key: null })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  const stageRef = useRef<StageHandle>(null)
-  const [activePoint, setActivePoint] = useState<string | null>(null)
-  const [pedModalOpen, setPedModalOpen] = useState(false)
 
-  const points = pointsData.points as AuscultationPoint[]
-  const items = useMemo(() => {
-    const out: Record<string, LibItemFull> = {}
-    for (const g of libraryData.groups)
-      for (const it of g.items) out[it.key] = { ...(it as unknown as LibItemFull), group: g.id }
-    return out
-  }, [])
-  const item = items[selectedKey]
-  const isHeart = item.group === 'heart'
-  const isMixed = item.group === 'mixed'
-
-  // vaka kapsamı (sağ panel bilgi satırı §36)
-  const coverage = useMemo(() => {
-    const m: Record<string, { p: number; a: number }> = {}
-    for (const c of ALL_CASES) {
-      const k = c.primaryAcousticFinding
-      if (!m[k]) m[k] = { p: 0, a: 0 }
-      if (c.modes.includes('practice')) m[k].p++
-      if (c.modes.includes('assessment')) m[k].a++
+  const item = LIBRARY_ITEMS.find((it) => it.key === selectedKey) ?? LIBRARY_ITEMS[0]
+  const examples = useMemo(() => {
+    if (item.key === 'technique.projection') {
+      // PA ve AP örneklerini dönüşümlü sun
+      const pa = examplesFor(null, 'PA')
+      const ap = examplesFor(null, 'AP')
+      const out = []
+      for (let i = 0; i < Math.max(pa.length, ap.length) && out.length < 12; i++) {
+        if (pa[i]) out.push(pa[i])
+        if (ap[i]) out.push(ap[i])
+      }
+      return out
     }
-    return m
-  }, [])
-  const cov = coverage[item.acousticFinding] ?? { p: 0, a: 0 }
+    return examplesFor(item.finding).slice(0, 24)
+  }, [item])
+  const image = examples[exampleIdx] ?? examples[0]
 
-  // madde 4 (wave 2): "Bu sesle uygulama yap" — bu bulguya ait ilk 3-5 uygulama vakasından
-  // tek vakalık(a yakın) bir oturum başlatır, sonra Uygulama moduna geçer.
-  const startPracticeForFinding = () => {
-    const matches = poolFor('practice').filter((c) => c.primaryAcousticFinding === item.acousticFinding)
-    const ids = matches.slice(0, 5).map((c) => c.id)
-    if (!ids.length) return
-    const seed = (Date.now() % 2147483647) | 0
-    dispatch({ type: 'startSession', practiceIds: ids, assessmentIds: state.session.assessmentIds, seed })
-    dispatch({ type: 'startMode', mode: 'practice' })
-  }
-
-  // kalem değişince önceki sesi durdur
   useEffect(() => {
-    engine.stop()
-  }, [selectedKey])
-
-  // madde 4 (wave 3): mobilde kütüphane yatay şerittir — seçili kalem şeritte ortalanır
-  useEffect(() => {
+    setExampleIdx(0)
     document.querySelector('.lib-item.active')?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
   }, [selectedKey])
 
-  const stageSounds = useMemo(() => {
-    const cache = new Map<string, ReturnType<typeof resolveLibrarySoundEx>>()
-    const resolve = (pointId: string) => {
-      if (cache.has(pointId)) return cache.get(pointId)!
-      const res = resolveLibrarySoundEx(item.category, item.acousticFinding, pointId)
-      cache.set(pointId, res)
-      return res
-    }
-    return { resolve }
+  const coverage = useMemo(() => {
+    if (!item.finding) return { p: 0, a: 0 }
+    const list = ALL_CASES.filter((c) => c.primaryFinding === item.finding)
+    return { p: list.filter((c) => c.modes.includes('practice')).length, a: list.filter((c) => c.modes.includes('assessment')).length }
   }, [item])
 
-  const soundsForStage = (pointId: string): SoundRecord | null => stageSounds.resolve(pointId).record
-  const activeFallback = activePoint ? stageSounds.resolve(activePoint).fallbackFrom : undefined
+  const startPractice = () => {
+    const ids = poolFor('practice').filter((c) => c.primaryFinding === item.finding).slice(0, 5).map((c) => c.id)
+    if (!ids.length) return
+    dispatch({ type: 'startSession', practiceIds: ids, assessmentIds: state.session.assessmentIds, seed: (Date.now() % 2147483647) | 0 })
+    dispatch({ type: 'startMode', mode: 'practice' })
+  }
 
-  const title = libraryTitle(item.key)
-  const libSound = resolveLibrarySound(item.category, item.acousticFinding)
+  const onZoneEnter = useCallback((ids: string[]) => dispatch({ type: 'zoneEnter', zoneIds: ids }), [dispatch])
+  const onZoneDwell = useCallback((ids: string[], ms: number) => dispatch({ type: 'zoneDwell', zoneIds: ids, dwellMs: ms }), [dispatch])
+  const annotationFinding = item.finding && item.finding !== 'normal' ? item.finding : null
+  const hasExpertBox = !!image && !!annotationFinding && image.annotations.some((a) => a.finding === annotationFinding && isExpertSource(a.source))
 
   return (
     <>
@@ -114,193 +73,176 @@ export function LearnScreen() {
       <div className="screen" style={{ position: 'relative', zIndex: 1 }}>
         <div className="container tall screen-body no-scroll">
           <div className="learn-grid">
-            <div className="lib-col">
-              <h2>{isMixed ? 'Kombine Sesler' : isHeart ? 'Kalp Sesleri' : 'Akciğer Sesleri'}</h2>
-              <p className="lib-sub">Dinle, tanı, öğren.</p>
-              {libraryData.groups.map((g) => (
+            <nav className="lib-col" aria-label="Öğrenme kütüphanesi">
+              <h2>Kütüphane</h2>
+              <p className="lib-sub">Konu seçin, filmi okuyun.</p>
+              {LIBRARY_GROUPS.map((g) => (
                 <div className="lib-group" key={g.id}>
-                  <div className="g-title">
-                    <GroupIcon group={g.id} />
-                    {g.title}
-                  </div>
+                  <div className="g-title"><GroupIcon group={g.id} />{g.title}</div>
                   <div className="lib-items">
                     {g.items.map((it) => (
                       <button
                         key={it.key}
                         className={`lib-item ${it.key === selectedKey ? 'active' : ''}`}
                         onClick={() => setSelectedKey(it.key)}
-                        title={libraryTitle(it.key)}
+                        aria-current={it.key === selectedKey}
+                        title={it.title}
                       >
                         <span className="ic"><GroupIcon group={g.id} /></span>
                         <span className="lib-main">
-                          <b>{libraryShortTitle(it.key)}</b>
-                          <span>{librarySub(it.key)}</span>
+                          <b>{it.short}</b>
+                          <span>{it.sub}</span>
                         </span>
-                        <span className="lib-right"><span className="chev">›</span></span>
+                        <span className="lib-right">
+                          <span className="lib-count" title="Örnek film sayısı">{countFor(it)}</span>
+                        </span>
                       </button>
                     ))}
                   </div>
                 </div>
               ))}
-            </div>
+            </nav>
 
             <div className="sim-main">
-              <div className="stage-card">
-                <PatientStage
-                  ref={stageRef}
-                  points={points}
-                  filterIds={item.bestPoints}
-                  view={state.view}
-                  head={state.head}
-                  volume={state.volume}
-                  showPoints
-                  showLabels
-                  bodyType="erkek"
-                  mode="learn"
-                  engine={engine}
-                  soundFor={soundsForStage}
-                  onVisit={(pointId) => dispatch({ type: 'visit', pointId })}
-                  onDwell={(pointId, dwellMs) => dispatch({ type: 'dwell', pointId, dwellMs })}
-                  onListen={(pointId, listenMs) => dispatch({ type: 'listen', pointId, listenMs })}
-                  onPlayingChange={(_playing, pt) => setActivePoint(pt)}
-                />
-                <RegionChipList
-                  points={points}
-                  view={state.view}
-                  pointIds={item.bestPoints}
-                  activePoint={activePoint}
-                  visits={state.telemetry.visits}
-                  onSelect={(pointId) => stageRef.current?.placeAt(pointId)}
-                  otherViewHint={otherViewHintText(
-                    state.view,
-                    countUnlistenedInOtherView(points, item.bestPoints, state.view, state.telemetry.visits)
+              <div className="stage-card film-card">
+                <div className="film-card-head">
+                  <div className="example-nav" role="group" aria-label="Örnek filmler">
+                    <button type="button" className="icon-btn" disabled={examples.length < 2} onClick={() => setExampleIdx((i) => (i - 1 + examples.length) % examples.length)} aria-label="Önceki örnek">
+                      <IconChevronLeft width={16} height={16} />
+                    </button>
+                    <span className="example-count">{examples.length ? `Örnek ${exampleIdx + 1} / ${examples.length}` : 'Örnek film yok'}</span>
+                    <button type="button" className="icon-btn" disabled={examples.length < 2} onClick={() => setExampleIdx((i) => (i + 1) % examples.length)} aria-label="Sonraki örnek">
+                      <IconChevronRight width={16} height={16} />
+                    </button>
+                  </div>
+                  {annotationFinding && (
+                    <label className="points-toggle">
+                      <input type="checkbox" checked={showExpert} onChange={(e) => setShowExpert(e.target.checked)} disabled={!hasExpertBox} />
+                      {hasExpertBox ? 'Uzman işaretlemesini göster' : 'Bu filmde uzman işaretlemesi yok'}
+                    </label>
                   )}
-                />
-                {activeFallback && (
-                  <div className="note-strip" style={{ marginTop: 8 }}>
-                    <IconInfo width={17} height={17} />
-                    <span className="small">
-                      Bu bölge için veri setinde doğrudan kayıt yok; aynı bulgunun{' '}
-                      <strong>{points.find((x) => x.id === activeFallback)?.fullLabel}</strong> kaydı çalınmaktadır.
-                    </span>
+                </div>
+                {image ? (
+                  <FilmViewer
+                    ref={viewerRef}
+                    image={image}
+                    zones={ZONES}
+                    showZones={state.showZones}
+                    showAnnotations={showExpert && hasExpertBox}
+                    annotationFinding={annotationFinding}
+                    onZoneEnter={onZoneEnter}
+                    onZoneDwell={onZoneDwell}
+                    onActiveZones={setActiveZones}
+                    onTool={(tool) => dispatch({ type: 'toolUsed', tool })}
+                    onToggleZones={() => dispatch({ type: 'toggleZones' })}
+                  />
+                ) : (
+                  <div className="film-empty-card">
+                    <IconFilm width={28} height={28} />
+                    <p>Bu konu için henüz örnek film içe aktarılmadı.</p>
+                    <p className="small">Radyolog etiketli filmler için <code>npm run import:nih</code> ya da <code>npm run import:rsna</code> çalıştırın.</p>
                   </div>
                 )}
+                <ZoneChips
+                  zones={ZONES}
+                  visits={state.telemetry.visits}
+                  activeZones={activeZones}
+                  minDwellMs={LEARN_DWELL_MS}
+                  highlight={item.bestZones}
+                  onSelect={(id) => viewerRef.current?.focusZone(id)}
+                />
               </div>
-              <Toolbar stageRef={stageRef} activePoint={activePoint} />
             </div>
 
             <div className="sim-side">
               <div className="card">
                 <div className="card-title-row">
                   <div className="ic"><GroupIcon group={item.group} /></div>
-                  <h3>{title}</h3>
-                  <div className="card-title-actions">
-                    <span className="badge blue">{findingBadge(item.key)}</span>
-                    <button type="button" className="btn outline small ped-ref-btn" onClick={() => setPedModalOpen(true)}>
-                      <IconInfo width={14} height={14} /> Pediatrik referans
-                    </button>
-                  </div>
+                  <h3>{item.title}</h3>
+                  <div className="card-title-actions"><span className="badge blue">{item.badge}</span></div>
                 </div>
-                <div className="tabbar info-tabs">
-                  <button className={tab === 'desc' ? 'active' : ''} onClick={() => setTab('desc')}>
-                    <IconDoc /> Açıklama
-                  </button>
-                  <button className={tab === 'wave' ? 'active' : ''} onClick={() => setTab('wave')}>
-                    <IconWave /> Dalga Formu
-                  </button>
-                  <button className={tab === 'clin' ? 'active' : ''} onClick={() => setTab('clin')}>
-                    <IconStethoscope /> Klinik Bilgi
-                  </button>
+                <div className="tabbar info-tabs" role="tablist">
+                  <button role="tab" aria-selected={tab === 'desc'} className={tab === 'desc' ? 'active' : ''} onClick={() => setTab('desc')}><IconDoc /> Açıklama</button>
+                  <button role="tab" aria-selected={tab === 'film'} className={tab === 'film' ? 'active' : ''} onClick={() => setTab('film')}><IconFilm /> Film bilgisi</button>
+                  <button role="tab" aria-selected={tab === 'clin'} className={tab === 'clin' ? 'active' : ''} onClick={() => setTab('clin')}><IconScan /> Klinik</button>
                 </div>
                 {tab === 'desc' && (
                   <div className="info-body">
                     <p>{item.description}</p>
-                    {item.metaphor && (
-                      <div className="metaphor-card mt-12">
-                        <span className="m-ic"><IconWave width={20} height={20} /></span>
-                        <div>
-                          <b>Ses metaforu</b>
-                          <p>{item.metaphor}</p>
-                        </div>
+                    <div className="metaphor-card mt-12">
+                      <span className="m-ic"><IconScan width={20} height={20} /></span>
+                      <div>
+                        <b>Radyolojik ipucu</b>
+                        <p>{item.sign}</p>
                       </div>
-                    )}
-                    {isHeart && item.s1 && item.s2 && (
-                      <div className="exp-cards mt-12">
-                        <div className="exp-card" title={`S1: ${item.s1}`}>
-                          <span className="chip s1">S1</span>
-                          <p>{item.s1}</p>
-                        </div>
-                        <div className="exp-card" title={`S2: ${item.s2}`}>
-                          <span className="chip s2">S2</span>
-                          <p>{item.s2}</p>
-                        </div>
-                      </div>
-                    )}
-                    {!isHeart && item.phase && (
-                      <div className="note-strip mt-12">
-                        <IconWave />
-                        <span>{item.phase}</span>
-                      </div>
-                    )}
+                    </div>
+                    <div className="note-strip mt-12">
+                      <IconInfo />
+                      <span><b>Okurken:</b> {item.readingTip}</span>
+                    </div>
                   </div>
                 )}
-                {tab === 'wave' && (
-                  libSound ? (
-                    <WaveformView sound={libSound} engine={engine} head={state.head} title="Örnek ses kaydı (tam segment)" />
-                  ) : (
-                    <div className="note-strip">
-                      <IconInfo /> Bu bulgu için kullanılabilir kayıt bulunamadı (veri seti eksikliği). Kütüphanenin diğer kalemlerini deneyin.
-                    </div>
-                  )
+                {tab === 'film' && (
+                  <div className="info-body">
+                    {image ? (
+                      <dl className="film-meta">
+                        <dt>Kaynak</dt><dd>{image.sourceDataset} · {image.sourceFile}</dd>
+                        <dt>Projeksiyon</dt><dd>{VIEW_TEXT[image.viewPosition]}</dd>
+                        <dt>Hasta</dt><dd>{image.ageYears != null ? `${image.ageYears} yaş` : 'yaş bilinmiyor'}{image.sex ? `, ${image.sex === 'F' ? 'kadın' : 'erkek'}` : ''}</dd>
+                        <dt>Etiketler</dt>
+                        <dd>
+                          <ul className="label-list">
+                            {Object.entries(image.findings).map(([f, src]) => (
+                              <li key={f} className={isExpertSource(src) ? 'expert' : 'nlp'}>
+                                {findingShort(f)} <span>{LABEL_SOURCE_TEXT[src] ?? src}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </dd>
+                        <dt>Hekim onayı</dt><dd>{image.clinicalReview === 'onayli' ? 'Onaylı' : 'Beklemede'}</dd>
+                      </dl>
+                    ) : (
+                      <p>Film seçilmedi.</p>
+                    )}
+                    <p className="src-line"><IconInfo /> Rapor metninden otomatik çıkarılan etiketler öğrenme amaçlı gösterilir; değerlendirmede kullanılmaz.</p>
+                  </div>
                 )}
                 {tab === 'clin' && (
                   <div className="info-body">
-                    <p className="src-line" style={{ marginTop: 0 }}>
-                      <IconCompare />
-                      Vaka kapsamı: {cov.p > 0 ? `${cov.p} uygulama vakası` : 'vaka yok'}
-                      {cov.a > 0 ? `, ${cov.a} değerlendirme vakası` : ''}
-                    </p>
-                    {cov.p > 0 && (
-                      <button type="button" className="btn outline small mb-12" onClick={startPracticeForFinding}>
-                        Bu sesle uygulama yap <IconArrowRight width={14} height={14} />
-                      </button>
+                    <div className="klin-strip"><IconScan /><span>{item.clinical}</span></div>
+                    {item.finding && (
+                      <>
+                        <p className="src-line">
+                          Vaka kapsamı: {coverage.p ? `${coverage.p} uygulama vakası` : 'uygulama vakası yok'}
+                          {coverage.a ? `, ${coverage.a} değerlendirme vakası` : ''}
+                        </p>
+                        {coverage.p > 0 && (
+                          <button type="button" className="btn outline small" onClick={startPractice}>
+                            Bu konuda uygulama yap <IconArrowRight width={14} height={14} />
+                          </button>
+                        )}
+                      </>
                     )}
-                    <div className="klin-strip mt-12">
-                      <IconStethoscope />
-                      <span>{item.clinical}</span>
-                    </div>
-                    <p className="src-line">
-                      <IconInfo />
-                      Kaynak: HLS-CMDS v3 — CC BY 4.0 (DOI 10.17632/8972jxbpmp.3)
-                    </p>
                   </div>
                 )}
               </div>
-
             </div>
           </div>
         </div>
       </div>
       <Footer />
-      <PediatricRefModal open={pedModalOpen} onClose={() => setPedModalOpen(false)} />
     </>
   )
 }
 
-function GroupIcon({ group, size = 17 }: { group: string; size?: number }) {
-  if (group === 'heart') return <IconHeart width={size} height={size} />
-  if (group === 'mixed') return <IconCompare width={size} height={size} />
-  return <IconLungs width={size} height={size} />
+function countFor(it: LibraryItem): number {
+  if (it.key === 'technique.projection') return examplesFor(null, 'PA').length + examplesFor(null, 'AP').length
+  return examplesFor(it.finding).length
 }
 
-function findingBadge(key: string): string {
-  if (key.startsWith('mixed')) return 'Kombine'
-  if (key === 'heart.normal') return 'S1 – S2'
-  if (key === 'heart.s3') return 'S3'
-  if (key === 'heart.s4') return 'S4'
-  if (key.startsWith('heart.murmur')) return 'Üfürüm'
-  if (key === 'heart.atrial_fibrillation') return 'Ritim'
-  if (key === 'heart.tachycardia') return 'Hız'
-  if (key === 'heart.av_block') return 'İletim'
-  return 'Ses'
+function GroupIcon({ group, size = 17 }: { group: string; size?: number }) {
+  if (group === 'cardiac') return <IconHeart width={size} height={size} />
+  if (group === 'bone') return <IconBone width={size} height={size} />
+  if (group === 'technique') return <IconScan width={size} height={size} />
+  return <IconLungs width={size} height={size} />
 }

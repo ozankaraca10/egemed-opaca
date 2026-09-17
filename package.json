@@ -1,5 +1,5 @@
 {
-  "name": "egemed-ausculta",
+  "name": "egemed-opaca",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -10,14 +10,14 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "import:hls-cmds": "node scripts/import-hls-cmds.mjs ${SOUNDS_DIR:-/tmp/egemed-ausculta/hls-cmds}",
-    "validate": "node scripts/validate-audio.mjs",
-    "build:scorm12": "vite build && node scripts/build-scorm.mjs 12",
-    "build:scorm": "vite build && node scripts/build-scorm.mjs 12",
-    "import:circor": "node scripts/import-circor.mjs",
-    "e2e": "node scripts/e2e-screens.mjs",
-    "e2e:session": "node scripts/e2e-session.mjs",
-    "build:html": "vite build && node scripts/build-html.mjs"
+    "import:sample": "node scripts/import-nih.mjs fixtures/nih-sample --include-nlp --replace && node scripts/generate-cases.mjs",
+    "import:nih": "node scripts/import-nih.mjs",
+    "import:rsna": "node scripts/import-rsna.mjs",
+    "cases": "node scripts/generate-cases.mjs",
+    "validate": "node scripts/validate-images.mjs",
+    "build:scorm": "npm run validate && tsc -b && vite build && node scripts/build-scorm.mjs",
+    "build:html": "npm run validate && tsc -b && vite build && node scripts/build-html.mjs",
+    "e2e": "node scripts/e2e-screens.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",

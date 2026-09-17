@@ -1,188 +1,74 @@
 {
   "version": 1,
   "module": {
-    "product": "EGEMED Ausculta",
-    "subtitle": "Kardiyopulmoner Oskültasyon Simülatörü",
-    "trademark": "EGEMED Ausculta™",
+    "product": "EGEMED Opaca",
+    "subtitle": "Radyolojik Görüntüleme Simülatörü",
+    "trademark": "EGEMED Opaca™",
     "developedBy": "Ege Üniversitesi Tıp Fakültesi Dekanlığı",
     "copyright": "Tüm hakları saklıdır © 2026",
-    "logoSource": "https://egelogo.ege.edu.tr/ (Ege Üniversitesi Kurumsal Kimlik — Tıp Fakültesi amblemi)",
-    "evidence": {
-      "statement": "Simülasyon tabanlı eğitimin kardiyak oskültasyon becerilerini geliştirdiği sistematik derleme ve meta-analizle gösterilmiştir.",
-      "citation": "McKinney J, Cook DA, Wood D, Hatala R. Simulation-based training for cardiac auscultation skills: systematic review and meta-analysis. J Gen Intern Med. 2013;28(2):283–291.",
-      "doi": "10.1007/s11606-012-2198-y",
-      "url": "https://doi.org/10.1007/s11606-012-2198-y"
-    }
+    "logoSource": "https://egelogo.ege.edu.tr/ (Ege Üniversitesi Kurumsal Kimlik — Tıp Fakültesi amblemi)"
   },
   "credits": [
     {
       "role": "Yazılım geliştirme, öğretim ve ölçme-değerlendirme tasarımı",
-      "people": [
-        {
-          "name": "Doç. Dr. Ozan KARACA",
-          "url": "https://unisis.ege.edu.tr/researcher=ozan.karaca"
-        }
-      ]
+      "people": [{ "name": "Doç. Dr. Ozan KARACA", "url": "https://unisis.ege.edu.tr/researcher=ozan.karaca" }]
     },
     {
-      "role": "Öğretim tasarımı ve tıbbi validasyon",
-      "people": [
-        {
-          "name": "Prof. Dr. Hatice ŞAHİN",
-          "url": "https://unisis.ege.edu.tr/researcher=hatice.sahin"
-        },
-        {
-          "name": "Prof. Dr. Burcu BARUTÇUOĞLU",
-          "url": "https://unisis.ege.edu.tr/researcher=burcu.barutcuoglu"
-        },
-        {
-          "name": "Prof. Dr. İpek KAPLAN BULUT",
-          "url": "https://unisis.ege.edu.tr/researcher=ipek.kaplan.bulut"
-        }
-      ]
+      "role": "Radyolojik içerik ve tıbbi validasyon",
+      "people": [{ "name": "Radyoloji uzmanı (belirlenecek)" }]
     },
     {
       "role": "Kullanıcı kabul testleri",
-      "people": [
-        {
-          "name": "Öğrenci 1"
-        },
-        {
-          "name": "Öğrenci 2"
-        },
-        {
-          "name": "Öğrenci 3"
-        }
-      ]
+      "people": [{ "name": "Öğrenci 1" }, { "name": "Öğrenci 2" }, { "name": "Öğrenci 3" }]
     }
   ],
   "datasets": [
     {
-      "id": "hls-cmds-v3",
-      "title": "HLS-CMDS: Heart and Lung Sounds Dataset Recorded from a Clinical Manikin using Digital Stethoscope",
-      "authors": [
-        "Yasaman Torabi",
-        "Shahram Shirani",
-        "James P. Reilly"
-      ],
-      "datasetDoi": "10.17632/8972jxbpmp.3",
-      "articleDoi": "10.1109/IEEEDATA.2025.3566012",
-      "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
-      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "usage": "Kayıtlar klinik manikin üzerinden dijital stetoskop ile alınmıştır; bu modülde eğitim amaçlı olarak kullanılmıştır.",
-      "attributionText": "Torabi, Y., Shirani, S., & Reilly, J. P. HLS-CMDS: Heart and Lung Sounds Dataset Recorded from a Clinical Manikin using Digital Stethoscope (Version 3). Mendeley Data. DOI: 10.17632/8972jxbpmp.3 — CC BY 4.0"
+      "id": "nih-cxr14",
+      "title": "NIH ChestX-ray14 (ChestX-ray8 genişletilmiş)",
+      "authors": ["Xiaosong Wang", "Yifan Peng", "Le Lu", "Zhiyong Lu", "Mohammadhadi Bagheri", "Ronald M. Summers"],
+      "datasetUrl": "https://nihcc.app.box.com/v/ChestXray-NIHCC",
+      "articleUrl": "https://openaccess.thecvf.com/content_cvpr_2017/papers/Wang_ChestX-ray8_Hospital-Scale_Chest_CVPR_2017_paper.pdf",
+      "license": "Kullanım kısıtlaması yok; atıf koşullu (NIH Clinical Center)",
+      "licenseUrl": "https://cloud.google.com/healthcare/docs/resources/public-datasets/nih-chest",
+      "usage": "Görüntüler ve radyolog tarafından çizilmiş sınırlayıcı kutular (BBox_List_2017). Rapor tabanlı (NLP) etiketler yalnız meta veri olarak tutulur.",
+      "attributionText": "Wang X, Peng Y, Lu L, Lu Z, Bagheri M, Summers RM. ChestX-ray8: Hospital-scale Chest X-ray Database and Benchmarks on Weakly-Supervised Classification and Localization of Common Thorax Diseases. IEEE CVPR 2017, s. 3462–3471. Veri sağlayıcı: NIH Clinical Center — https://nihcc.app.box.com/v/ChestXray-NIHCC"
     },
     {
-      "id": "physionet-circor",
-      "title": "The CirCor DigiScope Phonocardiogram Dataset",
-      "authors": [
-        "Jorge Oliveira",
-        "Francesco Renna",
-        "Paulo Costa",
-        "Marcelo Nogueira",
-        "Ana Cristina Oliveira",
-        "Andoni Elola",
-        "Carlos Ferreira",
-        "Alipio Jorge",
-        "Ali Bahrami Rad",
-        "Matthew Reyna",
-        "Reza Sameni",
-        "Gari D. Clifford",
-        "Miguel T. Coimbra"
-      ],
-      "datasetDoi": "https://physionet.org/content/circor-heart-sound/1.0.3/",
-      "license": "ODC-BY 1.0 (Open Data Commons Attribution)",
-      "licenseUrl": "https://physionet.org/content/circor-heart-sound/view-license/1.0.3/",
-      "attributionText": "Oliveira, J., et al. (2022). The CirCor DigiScope Phonocardiogram Dataset (v1.0.3). PhysioNet. https://doi.org/10.13026/cy60-yn18 — ODC-BY 1.0",
-      "note": "Pediatrik gerçek hasta kayıtları (4 örnek vaka havuzunda kullanılıyor)."
-    }
-  ],
-  "assets": [
+      "id": "google-nih-adjudicated",
+      "title": "Google Health — NIH ChestX-ray14 radyolog panel etiketleri",
+      "authors": ["Anna Majkowska", "Sid Mittal", "David F. Steiner", "ve ark."],
+      "datasetUrl": "https://cloud.google.com/healthcare/docs/resources/public-datasets/nih-chest",
+      "articleDoi": "10.1148/radiol.2019191293",
+      "license": "Atıf koşullu paylaşım — lisans metni ayrıca incelenmeli",
+      "licenseUrl": "https://cloud.google.com/healthcare/docs/resources/public-datasets/nih-chest",
+      "usage": "Kırık, pnömotoraks, havalı alan opasitesi ve nodül/kitle için panel kararı (var/yok).",
+      "attributionText": "Majkowska A, Mittal S, Steiner DF, ve ark. Chest Radiograph Interpretation Using Deep Learning Models: Assessment Using Radiologist Adjudicated Reference Standards and Population-Adjusted Evaluation. Radiology. 2020. doi:10.1148/radiol.2019191293"
+    },
     {
-      "id": "body-front-back",
-      "title": "İnsan gövdesi anterior/posterior görselleri (retouched)",
-      "authors": [
-        "Mikael Häggström, M.D."
-      ],
-      "source": "Wikimedia Commons",
-      "license": "Creative Commons Zero (CC0 1.0 — kamu malı benzeri)",
-      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
-      "usage": "Modülde hasta ön/arka gövde görseli olarak kullanılmıştır; yalnız gövde bölgesi kırpılmıştır.",
-      "attributionText": "Häggström, M. Anterior/Posterior view of human male (retouched). Wikimedia Commons, CC0 1.0"
+      "id": "rsna-pneumonia-2018",
+      "title": "RSNA Pneumonia Detection Challenge (2018)",
+      "authors": ["George Shih", "Carol C. Wu", "Safwan S. Halabi", "ve ark."],
+      "datasetUrl": "https://www.rsna.org/education/ai-resources-and-training/ai-image-challenge/RSNA-Pneumonia-Detection-Challenge-2018",
+      "articleDoi": "10.1148/ryai.2019180041",
+      "license": "Akademik araştırma ve eğitim dahil kullanım izinli; atıf koşullu (RSNA Terms of Use)",
+      "licenseUrl": "https://www.rsna.org/education/ai-resources-and-training/ai-image-challenge/RSNA-Pneumonia-Detection-Challenge-2018",
+      "usage": "RSNA ve STR radyologlarının çizdiği 'akciğer opasitesi' kutuları ve radyolog 'Normal' sınıfı. Etiket opasitedir, pnömoni tanısı değildir.",
+      "attributionText": "Shih G, Wu CC, Halabi SS, ve ark. Augmenting the National Institutes of Health Chest Radiograph Dataset with Expert Annotations of Possible Pneumonia. Radiol Artif Intell. 2019;1(1):e180041. Veri sağlayıcı: NIH Clinical Center; açıklamalar: RSNA ve STR."
     }
   ],
   "inventory": [
-    {
-      "id": "hls-cmds-v3",
-      "title": "HLS-CMDS: Heart and Lung Sounds Dataset (Clinical Manikin, Digital Stethoscope)",
-      "authors": [
-        "Yasaman Torabi",
-        "Shahram Shirani",
-        "James P. Reilly"
-      ],
-      "organization": "Mendeley Data",
-      "type": "both",
-      "population": "Klinik manikin (yetişkin)",
-      "classes": "10 kalp + 6 akciğer + 145 kombine (mixed)",
-      "recordings": 535,
-      "sampleRateHz": 4000,
-      "license": "CC BY 4.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
-      "licenseVerified": true,
-      "status": "bundled",
-      "accessUrl": "https://data.mendeley.com/datasets/8972jxbpmp/3",
-      "downloadSizeMb": 38,
-      "importScript": "npm run import:hls-cmds",
-      "notes": "Birincil veri seti. Tüm modların (kütüphane/uygulama/değerlendirme) temeli; pakete dahildir.",
-      "attributionText": "Torabi, Y., Shirani, S., & Reilly, J. P. HLS-CMDS (Version 3). Mendeley Data. DOI: 10.17632/8972jxbpmp.3 — CC BY 4.0",
-      "labelTypes": [
-        "akustik sınıf",
-        "kayıt konumu",
-        "cinsiyet"
-      ]
-    },
-    {
-      "id": "physionet-circor",
-      "title": "The CirCor DigiScope Phonocardiogram Dataset",
-      "authors": [
-        "Jorge Oliveira",
-        "Francesco Renna",
-        "Paulo Costa",
-        "Marcelo Nogueira",
-        "Ana Cristina Oliveira",
-        "Andoni Elola",
-        "Carlos Ferreira",
-        "Alipio Jorge",
-        "Ali Bahrami Rad",
-        "Matthew Reyna",
-        "Reza Sameni",
-        "Gari D. Clifford",
-        "Miguel T. Coimbra"
-      ],
-      "organization": "PhysioNet (MIT-LCP) / CirCor",
-      "type": "heart",
-      "population": "Pediatrik (0-30 yaş)",
-      "classes": "Murmur zamanlaması (Erken/Orta/Geç/Holosistolik), normal; S1/S2 segmentasyonu",
-      "recordings": 5282,
-      "sampleRateHz": 4000,
-      "license": "ODC-BY 1.0 (Open Data Commons Attribution)",
-      "licenseUrl": "https://physionet.org/content/circor-heart-sound/view-license/1.0.3/",
-      "licenseVerified": true,
-      "status": "samples_included",
-      "accessUrl": "https://physionet.org/content/circor-heart-sound/1.0.3/",
-      "downloadSizeMb": 449,
-      "importScript": "node scripts/import-circor.mjs <dizin>",
-      "notes": "Gerçek hastalardan (pediatrik) üfürüm kayıtları — manikin kayıtlarını tamamlar. 4 örnek kayıt envantere aktarılmıştır (paket dışı, ayrı manifest). Erken/Orta/Geç sistolik eşlemeleri doğrulanmış; holosistolik eğitim eşlemesidir.",
-      "attributionText": "Oliveira, J., et al. (2022). The CirCor DigiScope Phonocardiogram Dataset (v1.0.3). PhysioNet. https://doi.org/10.13026/cy60-yn18 — ODC-BY 1.0",
-      "labelTypes": [
-        "üfürüm zamanlaması",
-        "üfürüm şekli",
-        "gradyan",
-        "odağı",
-        "S1/S2 segmentasyonu",
-        "yaş/cinsiyet"
-      ]
-    }
+    { "id": "nih-cxr14", "title": "NIH ChestX-ray14", "status": "importer_ready", "licenseVerified": true, "labelTypes": ["rapor NLP (14 bulgu)", "radyolog kutusu (~1000 görüntü)"], "population": "Yetişkin ağırlıklı, az sayıda pediatrik", "importScript": "npm run import:nih -- <klasör>", "notes": "Çekirdek görüntü havuzu. NLP etiketleri değerlendirmeye girmez." },
+    { "id": "google-nih-adjudicated", "title": "Google panel etiketleri (NIH üzerinde)", "status": "importer_ready", "licenseVerified": false, "labelTypes": ["panel kararı (4 bulgu)"], "population": "Yetişkin", "importScript": "npm run import:nih -- <klasör> --google <csv>", "notes": "Lisans metni doğrulanana kadar validate adımı bu etiketlerle üretilen paketi durdurur (OPACA_ALLOW_LICENSE_REVIEW=1 yalnız yerel geliştirme içindir)." },
+    { "id": "rsna-pneumonia-2018", "title": "RSNA Pneumonia Detection Challenge", "status": "importer_ready", "licenseVerified": true, "labelTypes": ["radyolog kutusu (opasite)", "radyolog sınıfı (Normal)"], "population": "Yetişkin ağırlıklı", "importScript": "npm run import:rsna -- <klasör>", "notes": "Radyolog okumalı normal filmlerin ana kaynağı." },
+    { "id": "siim-acr-ptx", "title": "SIIM-ACR Pneumothorax Segmentation", "status": "license_review", "licenseVerified": false, "labelTypes": ["radyolog maskesi (pnömotoraks)"], "population": "Yetişkin", "notes": "Kaggle yarışma koşulları doğrulanmadı; pakete alınmaz." },
+    { "id": "jsrt", "title": "JSRT Chest Radiograph Database", "status": "license_review", "licenseVerified": false, "labelTypes": ["BT doğrulamalı nodül konumu", "malign/benign"], "population": "Yetişkin", "notes": "Kullanım koşulları kayıt sonrası okunmalı; nodül için altın standart adayı." },
+    { "id": "nlm-montgomery-shenzhen", "title": "NLM Montgomery ve Shenzhen TB setleri", "status": "license_review", "licenseVerified": false, "labelTypes": ["radyolog okuması (TB/normal)"], "population": "Yetişkin ve çocuk", "notes": "Tüberküloz modülü için aday; koşullar doğrulanmadı." },
+    { "id": "padchest-gr", "title": "PadChest-GR", "status": "license_review", "licenseVerified": false, "labelTypes": ["radyolog kutusu (tüm bulgular)", "lateral grafi"], "population": "Yetişkin", "notes": "Başvuru ile erişim; lateral grafi ve serbest hava/tüp-kateter için aday." },
+    { "id": "vindr-cxr", "title": "VinDr-CXR", "status": "inventory_only", "licenseVerified": true, "labelTypes": ["radyolog kutusu (22 bulgu)"], "population": "Yetişkin", "notes": "PhysioNet kullanım sözleşmesi veri paylaşımını yasaklar; öğrencilere dağıtılan pakete alınamaz." },
+    { "id": "mimic-cxr", "title": "MIMIC-CXR", "status": "inventory_only", "licenseVerified": true, "labelTypes": ["rapor metni"], "population": "Yetişkin", "notes": "PhysioNet kısıtlı erişim; pakete alınamaz." },
+    { "id": "chexpert", "title": "CheXpert", "status": "inventory_only", "licenseVerified": false, "labelTypes": ["rapor tabanlı etiket", "radyolog uzlaşı test seti"], "population": "Yetişkin", "notes": "Stanford araştırma sözleşmesi; pakete alınmaz." }
   ],
-  "disclaimer": "Ses kayıtlarının büyük bölümü klinik manikinden alınmıştır; CirCor kaynaklı az sayıdaki gerçek pediatrik hasta kaydı ilgili vakalarda açıkça belirtilir. Simülasyon eğitim amaçlıdır; tek başına klinik tanı koymak için kullanılamaz."
+  "assets": [],
+  "disclaimer": "Görüntüler açık veri setlerinden alınmıştır ve kimliksizleştirilmiştir. Bulgu etiketlerinin kaynağı her vakada belirtilir; rapor metninden otomatik çıkarılan etiketler değerlendirmede kullanılmaz. Simülasyon eğitim amaçlıdır; tek başına klinik tanı koymak için kullanılamaz."
 }

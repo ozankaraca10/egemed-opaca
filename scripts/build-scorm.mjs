@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 /**
  * SCORM paketleyici (§50).
- *   node scripts/build-scorm.mjs 12     → SCORM 1.2 (varsayılan; tek hedef)
- *   node scripts/build-scorm.mjs 12     → SCORM 1.2 yedek paketi
+ *   node scripts/build-scorm.mjs        → SCORM 1.2 paketi (tek hedef)
  * dist/ içeriğini paketleyip imsmanifest.xml'i köke yerleştirir.
- * Çıktı: dist/EGEMED-Ausculta-SCORM12.zip
+ * Çıktı: dist/EGEMED-Opaca-SCORM12.zip
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -19,7 +18,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const DIST = path.join(ROOT, 'dist')
 const version = '12' // SCORM 2004 kullanımdan kaldırıldı (kullanıcı kararı); yalnız 1.2 paketlenir
 const STAGE = path.join(ROOT, 'build', `scorm${version}`)
-const outZip = path.join(DIST, 'EGEMED-Ausculta-SCORM12.zip')
+const outZip = path.join(DIST, 'EGEMED-Opaca-SCORM12.zip')
 
 if (!fs.existsSync(path.join(DIST, 'index.html'))) {
   console.error('dist/ boş — önce `npm run build` çalıştırın.')
@@ -43,23 +42,23 @@ let manifest
 <manifest xmlns="http://www.imsglobal.org/xsd/imscp_v1p1"
           xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          identifier="EGEMED_AUSCULTA_MANIFEST"
+          identifier="EGEMED_OPACA_MANIFEST"
           version="1.2"
           xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 http://www.imsglobal.org/xsd/imscp_v1p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 http://www.adlnet.org/xsd/adlcp_rootv1p2.xsd">
   <metadata>
     <schema>ADL SCORM</schema>
     <schemaversion>1.2</schemaversion>
   </metadata>
-  <organizations default="EGEMED-AUSCULTA-ORG">
-    <organization identifier="EGEMED-AUSCULTA-ORG">
-      <title>EGEMED Ausculta — Kardiyopulmoner Oskültasyon Simülatörü</title>
-      <item identifier="ITEM-AUSCULTA" identifierref="RES-AUSCULTA">
-        <title>Ausculta</title>
+  <organizations default="EGEMED-OPACA-ORG">
+    <organization identifier="EGEMED-OPACA-ORG">
+      <title>EGEMED Opaca — Radyolojik Görüntüleme Simülatörü</title>
+      <item identifier="ITEM-OPACA" identifierref="RES-OPACA">
+        <title>Opaca</title>
       </item>
     </organization>
   </organizations>
   <resources>
-    <resource identifier="RES-AUSCULTA" type="webcontent" adlcp:scormtype="sco" href="index.html">
+    <resource identifier="RES-OPACA" type="webcontent" adlcp:scormtype="sco" href="index.html">
       <file href="index.html"/>
 ${files.filter((f) => f !== 'index.html').map((f) => `      <file href="${escXml(f.replace(/\\/g, '/'))}"/>`).join('\n')}
     </resource>

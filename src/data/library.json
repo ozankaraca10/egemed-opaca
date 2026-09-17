@@ -1,231 +1,320 @@
 {
-  "version": 2,
+  "version": 1,
+  "note": "Öğrenme kütüphanesi. 'interpretation' şablonu generate-cases.mjs tarafından uygulama/değerlendirme vakalarına eklenir; metinler hekim onayına tabidir (docs/klinik-degerlendirme-listesi.csv).",
   "groups": [
     {
-      "id": "heart",
-      "title": "Kalp Sesleri",
+      "id": "technique",
+      "title": "Temel okuma",
       "items": [
         {
-          "key": "heart.normal",
-          "category": "heart",
-          "acousticFinding": "normal",
-          "description": "Normal kalp sesleri, sağlıklı bireylerde kalbin kapakçıklarının açılıp kapanması sonucu oluşan S1 ve S2 seslerinden oluşur.",
-          "metaphor": "Lub-dub — sakin ve eşit aralıklı iki vuruş (kapı tıklatması gibi).",
-          "s1": "Mitral ve triküspit kapakçıkların kapanmasıyla oluşur. Sistol başlangıcını gösterir. Genellikle daha uzun ve düşük frekanslıdır.",
-          "s2": "Aort ve pulmoner kapakçıkların kapanmasıyla oluşur. Diyastol başlangıcını gösterir. Daha kısa ve yüksek frekanslıdır.",
-          "clinical": "Normal S1–S2 ritmi düzenlidir; ek ses ve üfürüm yoktur. S1 en iyi apekste, S2 üst sternal kenarlarda duyulur.",
-          "bestPoints": ["cardiac_mitral", "cardiac_pulmonary", "cardiac_aortic", "cardiac_tricuspid"]
+          "key": "technique.systematic",
+          "finding": null,
+          "title": "Sistematik okuma (ABCDE)",
+          "short": "ABCDE okuma",
+          "sub": "Her filmde aynı sıra",
+          "description": "Her grafiyi aynı sırayla okumak bulgu kaçırmayı azaltır: önce hasta ve film bilgisi, sonra film kalitesi, ardından hava yolu (A), akciğerler ve plevra (B), kalp ve mediasten (C), diyafram ve kostofrenik açılar (D) ve son olarak kemikler, yumuşak doku ve diyafram altı (E).",
+          "sign": "Sık kaçırılan alanlar: apeksler, hiluslar, kalp gölgesinin arkası, diyafram altı ve kaburgalar.",
+          "readingTip": "Bir bulgu bulduğunuzda durmayın; okumayı tamamlayın. İkinci bulgu çoğu zaman ilkinin nedenini açıklar.",
+          "clinical": "Sistematik yaklaşım, öğrencinin bulguları tekrarlanabilir biçimde raporlamasını sağlar.",
+          "bestZones": ["a_trachea", "b_r_upper", "b_l_upper", "c_heart", "d_r_diaphragm", "d_l_diaphragm", "e_subdiaphragm", "e_bones"],
+          "badge": "Yöntem"
         },
         {
-          "key": "heart.s3",
-          "category": "heart",
-          "acousticFinding": "s3",
-          "description": "S3 (üçüncü kalp sesi), erken diyastolde hızlı ventriküler dolum fazında duyulan düşük frekanslı ek sestir.",
-          "metaphor": "Ken-ta-ta — dörtnala (galo) ritmi; S2'yi hemen izleyen yumuşak üçüncü vuruş.",
-          "s1": "Sistol başında normal olarak duyulur.",
-          "s2": "Diyastol başında duyulur; S3, S2'den hemen sonra gelir.",
-          "clinical": "S3 apekste en belirgindir. Gençlerde fizyolojik olabilir; ileri yaşta ventriküler disfonksiyonla ilişkilendirilir.",
-          "bestPoints": ["cardiac_mitral", "cardiac_tricuspid", "cardiac_pulmonary"]
+          "key": "technique.projection",
+          "finding": null,
+          "title": "Projeksiyon: PA ve AP",
+          "short": "PA / AP",
+          "sub": "Film kalitesinin ilk adımı",
+          "description": "PA (arka-ön) grafi ayakta, derin inspirasyonda çekilir ve kalp filme yakın olduğu için boyutu daha doğru yansır. AP (ön-arka) grafi çoğunlukla yatak başında çekilir; kalp filmden uzak olduğundan olduğundan büyük görünür.",
+          "sign": "PA filmde skapulalar genellikle akciğer alanlarının dışına çekilmiştir; AP filmde skapulalar akciğer alanlarına süperpoze olabilir.",
+          "readingTip": "Kardiyomegali yorumu yapmadan önce projeksiyonu kontrol edin: kardiyotorasik oran yalnız PA filmde güvenilir biçimde kullanılır.",
+          "clinical": "Bu modüldeki projeksiyon bilgisi veri setinin DICOM meta verisinden (ViewPosition) alınır.",
+          "bestZones": ["e_bones", "c_heart"],
+          "badge": "Kalite"
         },
         {
-          "key": "heart.s4",
-          "category": "heart",
-          "acousticFinding": "s4",
-          "description": "S4 (dördüncü kalp sesi), geç diyastolde atriyal kontraksiyonla dolum sırasında oluşan düşük frekanslı presistolik sestir.",
-          "metaphor": "Ta-lub-dub ('Tennessee' ritmi) — S1'den hemen önce gelen hafif ama sert bir vuruş.",
-          "s1": "Sistol başında duyulur; S4, S1'den hemen önce gelir.",
-          "s2": "Diyastol başında normal olarak duyulur.",
-          "clinical": "S4 ventrikül sertliğinin arttığı durumlarda (ileri yaş, hipertansiyon, aort darlığı, hipertrofik kardiyomiyopati) duyulur. Atriyal fibrilasyonda duyulmaz.",
-          "bestPoints": ["cardiac_pulmonary", "cardiac_mitral"]
-        },
-        {
-          "key": "heart.murmur.early_systolic",
-          "category": "heart",
-          "acousticFinding": "early_systolic_murmur",
-          "description": "Erken sistolik üfürüm, S1'den hemen sonra başlayıp sistolün ilk yarısında söner.",
-          "metaphor": "S1'i izleyen kısa bir 'fışş' — buhar kaçağı sesi gibi çabuk söner.",
-          "s1": "Üfürüm S1 ile birlikte başlar.",
-          "s2": "Üfürüm S2'ye ulaşmadan biter.",
-          "clinical": "Erken sistolik üfürümde başlangıç noktası ve kısa süre karakteristiktir; nedeni klinik bağlamla değerlendirilir.",
-          "bestPoints": ["cardiac_pulmonary", "cardiac_aortic", "cardiac_mitral", "cardiac_tricuspid"]
-        },
-        {
-          "key": "heart.murmur.mid_systolic",
-          "category": "heart",
-          "acousticFinding": "mid_systolic_murmur",
-          "description": "Orta sistolik üfürüm, S1 ile S2 arasında duyulan ejeksiyon tipi üfürümdür; sistolün ortasında yoğunlaşır.",
-          "metaphor": "Sistol ortasında kabaran ve sönen bir rüzgâr esintisi (üfleme sesi).",
-          "s1": "S1 düz başlar; üfürüm S1'i izler.",
-          "s2": "Üfürüm S2'den önce söner.",
-          "clinical": "Sistolik üfürümde zamanlama, en belirgin odak, şiddet ve karakter değerlendirilir. Akustik bulgu ile kapak lezyonu tanımı ayrı tutulur.",
-          "bestPoints": ["cardiac_mitral", "cardiac_aortic", "cardiac_pulmonary", "cardiac_tricuspid"]
-        },
-        {
-          "key": "heart.murmur.late_systolic",
-          "category": "heart",
-          "acousticFinding": "late_systolic_murmur",
-          "description": "Geç sistolik üfürüm, sistolün ikinci yarısında belirginleşir ve S2'ye doğru ilerler.",
-          "metaphor": "Yaklaşan tren sesi gibi S2'ye doğru giderek güçlenen üfürüm.",
-          "s1": "Üfürüm S1'den sonra, sistolün ortasında başlar.",
-          "s2": "Üfürüm S2'ye kadar sürer.",
-          "clinical": "Geç sistolik üfürüm, klik varlığı açısından ayrıca değerlendirilir; nedeni klinik bağlamla ilişkilendirilir.",
-          "bestPoints": ["cardiac_mitral", "cardiac_pulmonary", "cardiac_aortic", "cardiac_tricuspid"]
-        },
-        {
-          "key": "heart.murmur.late_diastolic",
-          "category": "heart",
-          "acousticFinding": "late_diastolic_murmur",
-          "description": "Geç diyastolik (presistolik) üfürüm, diyastolün son bölümünde, S1'den hemen önce duyulur.",
-          "metaphor": "Uzaktan yaklaşan bir düdük gibi S1 öncesi duyulan alçak frekanslı üfleme.",
-          "s1": "Üfürüm S1'e kadar sürer ve S1 ile kesilir.",
-          "s2": "Üfürüm geç diyastolde, S2'den belirgin bir sessizlik sonrası başlar.",
-          "clinical": "Presistolik üfürümler zamanlama ve karakter ile değerlendirilir; atriyal fibrilasyonda duyulmaz.",
-          "bestPoints": ["cardiac_mitral", "cardiac_pulmonary", "cardiac_tricuspid"]
-        },
-        {
-          "key": "heart.atrial_fibrillation",
-          "category": "heart",
-          "acousticFinding": "atrial_fibrillation",
-          "description": "Atriyal fibrilasyonda ritim tamamen düzensizdir (düzensiz düzensiz); S1 şiddeti atıştan atışa değişir.",
-          "metaphor": "Düzensiz davul vuruşları — aralıklar her atışta değişir (yağmur damlaları gibi).",
-          "s1": "Şiddeti değişkendir.",
-          "s2": "Değişken aralıklarla duyulur.",
-          "clinical": "Düzensiz düzensiz ritim AF'nin akustik karşılığıdır; tanı EKG ile doğrulanır.",
-          "bestPoints": ["cardiac_mitral", "cardiac_pulmonary", "cardiac_aortic"]
-        },
-        {
-          "key": "heart.tachycardia",
-          "category": "heart",
-          "acousticFinding": "tachycardia",
-          "description": "Taşikardide kalp hızı artar; diyastolik dolum süresi kısalır.",
-          "metaphor": "Hızlı metronom / koşan ayak sesleri — düzenli ama sık vuruşlar.",
-          "s1": "Belirgin biçimde sıklaşır.",
-          "s2": "Diyastolik aralık kısalır.",
-          "clinical": "Düzenli taşikardide diyastol önce kısalır; nedeni ayrıca değerlendirilir.",
-          "bestPoints": ["cardiac_mitral", "cardiac_pulmonary"]
-        },
-        {
-          "key": "heart.av_block",
-          "category": "heart",
-          "acousticFinding": "av_block",
-          "description": "Atriyoventriküler iletim bozukluklarında S1 şiddeti ve atış aralıkları değişebilir.",
-          "metaphor": "Arada kaçırılan davul vuruşları — beklenen vuruş gecikir.",
-          "s1": "Şiddeti değişken olabilir.",
-          "s2": "Aralıklar değişkendir.",
-          "clinical": "Kesin blok derecesi EKG ile saptanır; oskültasyon destekleyici bulgu verir.",
-          "bestPoints": ["cardiac_tricuspid", "cardiac_mitral"]
+          "key": "finding.normal",
+          "finding": "normal",
+          "title": "Normal akciğer grafisi",
+          "short": "Normal grafi",
+          "sub": "Karşılaştırma için referans",
+          "description": "Trakea orta hatta, akciğer alanları simetrik havalı, hiluslar normal konum ve boyutta, kalp gölgesi normal genişlikte, diyafram konturları ve kostofrenik açılar keskin, kemik yapılar düzgündür.",
+          "sign": "Sol hilus sağdan biraz yüksek, sağ hemidiyafram soldan biraz yüksek olabilir; bunlar normal varyasyondur.",
+          "readingTip": "Patolojik filmi yorumlamadan önce aynı projeksiyondaki normal filmle yan yana karşılaştırın.",
+          "clinical": "Bu modülde 'normal' etiketi yalnız radyolog okumasıyla (ör. RSNA 'Normal' sınıfı) verilir; NIH'nin rapor tabanlı 'No Finding' etiketi normal kabul edilmez.",
+          "bestZones": ["a_trachea", "b_r_mid", "b_l_mid", "c_heart", "d_r_diaphragm", "d_l_diaphragm"],
+          "badge": "Referans",
+          "interpretation": {
+            "prompt": "Sistematik akciğer grafisi okumasında ABCDE yaklaşımının doğru sırası hangisidir?",
+            "options": [
+              { "id": "a", "label": "Hava yolu → akciğer/plevra → kalp/mediasten → diyafram → kemik ve yumuşak doku" },
+              { "id": "b", "label": "Kalp → akciğer → hava yolu → kemik → diyafram" },
+              { "id": "c", "label": "Kemik → diyafram → kalp → akciğer → hava yolu" },
+              { "id": "d", "label": "Akciğer → kalp → hava yolu → diyafram → kemik" }
+            ],
+            "correct": ["a"],
+            "feedbackCorrect": "Doğru. Her filmde aynı sırayı izlemek kaçırılan bulgu riskini azaltır.",
+            "feedbackIncorrect": "ABCDE: Airway (hava yolu), Breathing (akciğer/plevra), Cardiac (kalp/mediasten), Diaphragm (diyafram), Everything else (kemik, yumuşak doku, diyafram altı).",
+            "hint": "Harflerin İngilizce karşılıklarını düşünün: Airway, Breathing, Cardiac…"
+          }
         }
       ]
     },
     {
-      "id": "lung",
-      "title": "Akciğer Sesleri",
+      "id": "pleura",
+      "title": "Plevra",
       "items": [
         {
-          "key": "lung.normal",
-          "category": "lung",
-          "acousticFinding": "normal",
-          "description": "Normal (veziküler) solunum sesi yumuşak, düşük frekanslı ve süreklidir; inspirasyon ekspirasyondan uzundur.",
-          "metaphor": "Hafif deniz dalgası hışırtısı — yumuşak ve sürekli.",
-          "phase": "İnspirasyon ekspirasyondan uzun; ekspirasyon sesi kısa sürede söner.",
-          "clinical": "Bilateral simetri esastır; asimetri patolojiye işaret edebilir.",
-          "bestPoints": ["lung_right_upper_anterior", "lung_left_upper_anterior", "lung_right_middle_anterior", "lung_left_middle_anterior", "lung_right_lower_anterior", "lung_left_lower_anterior", "lung_right_upper_posterior", "lung_left_upper_posterior", "lung_right_middle_posterior", "lung_left_middle_posterior", "lung_right_lower_posterior", "lung_left_lower_posterior"]
+          "key": "finding.pneumothorax",
+          "finding": "pneumothorax",
+          "title": "Pnömotoraks",
+          "short": "Pnömotoraks",
+          "sub": "Plevral çizgi, periferde damar izi yok",
+          "description": "Plevral boşlukta hava bulunmasıdır. Viseral plevra ince, keskin bir çizgi olarak görülür; bu çizginin periferinde akciğer damar izi izlenmez.",
+          "sign": "Yatarak çekilen AP filmde hava önde toplanır; 'derin sulkus' görünümü tek ipucu olabilir.",
+          "readingTip": "Apeksleri ve lateral göğüs duvarını yakınlaştırarak inceleyin; cilt kıvrımı çizgisi plevral çizgiyle karışabilir, cilt kıvrımı çoğu zaman göğüs duvarının ötesine uzanır.",
+          "clinical": "Tansiyon pnömotoraks klinik bir tanıdır; hemodinamik bozulma varsa grafi beklenmeden müdahale edilir.",
+          "bestZones": ["b_r_upper", "b_l_upper", "e_bones", "d_r_diaphragm", "d_l_diaphragm"],
+          "badge": "Plevra",
+          "interpretation": {
+            "prompt": "Pnömotorakslı bir grafide aşağıdakilerden hangisi tansiyon pnömotoraksı düşündüren radyografik bulgudur?",
+            "options": [
+              { "id": "a", "label": "Mediastenin ve trakeanın karşı tarafa itilmesi" },
+              { "id": "b", "label": "Trakeanın aynı tarafa çekilmesi" },
+              { "id": "c", "label": "Aynı taraf hilusunun yükselmesi" },
+              { "id": "d", "label": "Karşı taraf kostofrenik açısının küntleşmesi" }
+            ],
+            "correct": ["a"],
+            "feedbackCorrect": "Doğru. Artan intraplevral basınç mediasteni karşı tarafa iter; aynı taraf hemidiyafram basıklaşabilir. Tanı klinik bulgularla konur.",
+            "feedbackIncorrect": "Tansiyon pnömotoraksta basınç artışı mediasteni ve trakeayı karşı tarafa iter. Aynı tarafa çekilme hacim kaybını (ör. atelektazi) düşündürür.",
+            "hint": "Basınç artan taraftan ne yöne itilme beklenir?"
+          }
         },
         {
-          "key": "lung.wheezing",
-          "category": "lung",
-          "acousticFinding": "wheezing",
-          "description": "Wheezing, ekspirasyonda duyulan yüksek frekanslı, süreklilik arz eden müzikal hışıltı sesidir.",
-          "metaphor": "Çaydanlık düdüğü / ıslık — müzikal, ekspirasyonda belirgin.",
-          "phase": "Ekspirasyonda belirgin; geniş yaygın daralmada iki faza yayılır.",
-          "clinical": "Küçük hava yollarında daralma, obstrüksiyon veya bronkospazm ile ilişkilidir.",
-          "bestPoints": ["lung_right_upper_anterior", "lung_left_upper_anterior", "lung_right_middle_anterior", "lung_left_middle_anterior", "lung_right_lower_anterior", "lung_left_lower_anterior", "lung_right_upper_posterior", "lung_left_upper_posterior", "lung_right_middle_posterior", "lung_left_middle_posterior", "lung_right_lower_posterior", "lung_left_lower_posterior"]
-        },
-        {
-          "key": "lung.rhonchi",
-          "category": "lung",
-          "acousticFinding": "rhonchi",
-          "description": "Ronküs, düşük frekanslı (<300 Hz civarı), kaba ve sürekli nitelikte hırıltı sesidir.",
-          "metaphor": "Uykuda horlama sesi — kaba, düşük frekanslı; öksürükle değişebilir.",
-          "phase": "Her iki fazda duyulabilir; öksürükle değişebilir.",
-          "clinical": "Büyük hava yollarında sekresyon veya daralmayla ilişkilidir.",
-          "bestPoints": ["lung_left_upper_anterior", "lung_right_middle_anterior", "lung_left_lower_anterior", "lung_left_upper_posterior", "lung_right_middle_posterior", "lung_left_lower_posterior"]
-        },
-        {
-          "key": "lung.fine_crackles",
-          "category": "lung",
-          "acousticFinding": "fine_crackles",
-          "description": "İnce raller, inspirasyon sonunda duyulan kısa, yüksek frekanslı, kesintili patlama sesleridir.",
-          "metaphor": "Karda yürüme sesi / saç ovuşturma — ince ve kuru; inspirasyon sonunda.",
-          "phase": "İnspirasyon sonunda yoğunlaşır.",
-          "clinical": "Alveollerin açılmasına bağlıdır; öksürükle genellikle değişmez.",
-          "bestPoints": ["lung_left_upper_anterior", "lung_right_lower_anterior", "lung_right_upper_anterior", "lung_left_upper_posterior", "lung_right_lower_posterior", "lung_right_upper_posterior"]
-        },
-        {
-          "key": "lung.coarse_crackles",
-          "category": "lung",
-          "acousticFinding": "coarse_crackles",
-          "description": "Kaba raller, daha kaba, düşük frekanslı ve 'nemli' nitelikte kesintili seslerdir.",
-          "metaphor": "Suyun içinde balon patlaması / kaynama fokurtusu — daha kaba ve nemli.",
-          "phase": "İnspirasyon boyunca (bazen ekspirasyon başında) duyulur.",
-          "clinical": "Büyük hava yollarındaki sekresyonla ilişkilidir; öksürükle değişebilir.",
-          "bestPoints": ["lung_right_lower_anterior", "lung_left_lower_anterior", "lung_left_middle_anterior", "lung_right_lower_posterior", "lung_left_lower_posterior", "lung_left_middle_posterior"]
-        },
-        {
-          "key": "lung.pleural_rub",
-          "category": "lung",
-          "acousticFinding": "pleural_rub",
-          "description": "Plevral frotman, plevral yüzeylerin sürtünmesiyle oluşan kaba, gıcırtılı sürtünme sesidir.",
-          "metaphor": "Kar gıcırtısı / deri sürtünmesi — iki fazlı gıcırtı.",
-          "phase": "İnspirasyon ve ekspirasyonun her ikisinde duyulur (iki fazlı).",
-          "clinical": "Plevral enflamasyonla ilişkilidir; lokalizedir ve hastanın tuttuğu yerde belirgindir.",
-          "bestPoints": ["lung_left_middle_anterior", "lung_right_middle_anterior", "lung_left_upper_anterior", "lung_left_middle_posterior", "lung_right_middle_posterior", "lung_left_upper_posterior"]
+          "key": "finding.pleural_effusion",
+          "finding": "pleural_effusion",
+          "title": "Plevral efüzyon",
+          "short": "Plevral efüzyon",
+          "sub": "Kostofrenik açı küntleşmesi, menisküs",
+          "description": "Plevral boşlukta sıvı birikimidir. Dik filmde sıvı yerçekimiyle aşağıda toplanır; kostofrenik açı küntleşir ve laterale doğru yükselen içbükey bir menisküs görülür.",
+          "sign": "Yatarak çekilen filmde sıvı arkaya yayılır ve hemitoraksta yaygın, silik bir yoğunluk artışı olarak görülebilir.",
+          "readingTip": "İki kostofrenik açıyı yan yana karşılaştırın; büyük efüzyonda mediastenin karşı tarafa itilip itilmediğine bakın.",
+          "clinical": "Dik PA grafide görünür olması için genellikle birkaç yüz mL sıvı gerekir; lateral grafi daha az miktarı gösterebilir.",
+          "bestZones": ["d_r_diaphragm", "d_l_diaphragm", "b_r_lower", "b_l_lower"],
+          "badge": "Plevra",
+          "interpretation": {
+            "prompt": "Dik PA akciğer grafisinde plevral sıvının ilk göze çarpan bulgusu genellikle hangisidir?",
+            "options": [
+              { "id": "a", "label": "Lateral kostofrenik açının küntleşmesi" },
+              { "id": "b", "label": "Apikal plevral kep" },
+              { "id": "c", "label": "Hilusların genişlemesi" },
+              { "id": "d", "label": "Trakeanın aynı tarafa çekilmesi" }
+            ],
+            "correct": ["a"],
+            "feedbackCorrect": "Doğru. Dik pozisyonda sıvı en alt noktada, kostofrenik açıda toplanır.",
+            "feedbackIncorrect": "Dik filmde sıvı yerçekimiyle aşağıda toplandığından ilk bulgu çoğunlukla kostofrenik açı küntleşmesidir.",
+            "hint": "Hasta ayaktayken sıvı nereye gider?"
+          }
         }
       ]
     },
     {
-      "id": "mixed",
-      "title": "Kombine Sesler (Kalp + Akciğer)",
+      "id": "parenchyma",
+      "title": "Akciğer parankimi",
       "items": [
         {
-          "key": "mixed.msm_wheezing",
-          "category": "mixed",
-          "acousticFinding": "mid_systolic_murmur+wheezing",
-          "description": "Aynı kayıtta orta sistolik üfürüm (kalp) ile wheezing (akciğer) birlikte duyulur; iki kaynağın ayrıştırılması gerekir.",
-          "metaphor": "Rüzgâr esintisi (üfürüm) ile çaydanlık düdüğünün (wheezing) aynı anda duyulması.",
-          "phase": "Kalp bileşeni sistolde, akciğer bileşeni ekspirasyonda belirgindir.",
-          "clinical": "Gerçek hastada kalp ve akciğer sesleri aynı bölgede üst üste gelir; odak değiştirerek ayrıştırma öğretilir.",
-          "bestPoints": ["lung_left_upper_anterior", "lung_left_upper_posterior"]
+          "key": "finding.airspace_opacity",
+          "finding": "airspace_opacity",
+          "title": "Havalı alan opasitesi",
+          "short": "Havalı alan opasitesi",
+          "sub": "Konsolidasyon, hava bronkogramı",
+          "description": "Alveollerdeki havanın sıvı, iltihap, kan ya da hücreyle yer değiştirmesi sonucu oluşan yoğunluk artışıdır. Sınırları silik olabilir; içinde hava bronkogramı görülebilir.",
+          "sign": "Silüet işareti: opasite kalp ya da diyafram kenarını siliyorsa aynı düzlemde komşudur (ör. sağ kalp kenarı silinmesi → sağ orta lob).",
+          "readingTip": "Kalp ve diyafram kenarlarının net olup olmadığını kontrol edin; silinen kenar opasitenin lobunu gösterir.",
+          "clinical": "Opasite radyografik bir bulgudur; pnömoni tanısı klinik tabloyla birlikte konur. RSNA veri setindeki etiket de 'akciğer opasitesi'dir, pnömoni tanısı değildir.",
+          "bestZones": ["b_r_mid", "b_r_lower", "b_l_mid", "b_l_lower", "c_heart"],
+          "badge": "Parankim",
+          "interpretation": {
+            "prompt": "Bir opasitenin içinde hava bronkogramı görülmesi neyi gösterir?",
+            "options": [
+              { "id": "a", "label": "Alveollerin dolu, bronşların ise hava içerdiğini" },
+              { "id": "b", "label": "Bronşların tıkalı olduğunu" },
+              { "id": "c", "label": "Opasitenin plevral sıvı olduğunu" },
+              { "id": "d", "label": "Opasitenin göğüs duvarından kaynaklandığını" }
+            ],
+            "correct": ["a"],
+            "feedbackCorrect": "Doğru. Hava bronkogramı, lezyonun alveoler (parankimal) kaynaklı olduğunu destekler.",
+            "feedbackIncorrect": "Hava bronkogramı, çevresindeki alveoller dolu olduğu için görünür hale gelen açık hava yollarıdır; parankimal süreci destekler.",
+            "hint": "Havayla dolu bir tüp, yoğun bir zemin üzerinde nasıl görünür?"
+          }
         },
         {
-          "key": "mixed.esm_coarse",
-          "category": "mixed",
-          "acousticFinding": "early_systolic_murmur+coarse_crackles",
-          "description": "Erken sistolik üfürüm ile kaba rallerin birlikte duyulduğu kombine kayıt.",
-          "metaphor": "Kısa bir 'fış' (üfürüm) ile kaynama fokurtusunun (kaba raller) birlikteliği.",
-          "phase": "Üfürüm erken sistolde; kaba raller inspirasyonda.",
-          "clinical": "Kombine kayıtlarda her iki bileşen ayrı ayrı tanımlanmalıdır.",
-          "bestPoints": ["lung_left_upper_anterior", "lung_left_upper_posterior"]
+          "key": "finding.nodule_mass",
+          "finding": "nodule_mass",
+          "title": "Nodül ve kitle",
+          "short": "Nodül / kitle",
+          "sub": "Yuvarlak, sınırlı opasite",
+          "description": "Akciğer içinde yuvarlak ya da ovale yakın, görece sınırlı opasitedir. Boyutu 3 cm ve altında olanlar nodül, 3 cm'den büyük olanlar kitle olarak adlandırılır.",
+          "sign": "Meme başı gölgesi nodülü taklit edebilir; genellikle iki tarafta simetriktir ve sınırı kısmen belirsizdir.",
+          "readingTip": "Kalp gölgesinin arkası, hiluslar ve apeksler gibi süperpozisyon alanlarını ayrıca yakınlaştırın.",
+          "clinical": "Grafide saptanan nodül çoğu zaman BT ile değerlendirmeyi gerektirir; benign/malign ayrımı grafiyle yapılamaz.",
+          "bestZones": ["b_r_upper", "b_l_upper", "b_r_mid", "b_l_mid", "c_mediastinum"],
+          "badge": "Parankim",
+          "interpretation": {
+            "prompt": "Akciğer grafisinde nodül ile kitle ayrımında kullanılan boyut sınırı hangisidir?",
+            "options": [
+              { "id": "a", "label": "1 cm" },
+              { "id": "b", "label": "3 cm" },
+              { "id": "c", "label": "5 cm" },
+              { "id": "d", "label": "8 cm" }
+            ],
+            "correct": ["b"],
+            "feedbackCorrect": "Doğru. 3 cm ve altı nodül, 3 cm'den büyük lezyon kitle olarak adlandırılır.",
+            "feedbackIncorrect": "Sınır 3 cm'dir: 3 cm ve altı nodül, üzeri kitle.",
+            "hint": "Fleischner terminolojisindeki sınırı düşünün."
+          }
         },
         {
-          "key": "mixed.s3_normal",
-          "category": "mixed",
-          "acousticFinding": "s3+normal",
-          "description": "S3 ek sesi ile normal solunum seslerinin birlikte duyulduğu kombine kayıt.",
-          "metaphor": "Ken-ta-ta dörtnal ritmi üzerine hafif dalga hışırtısı.",
-          "phase": "S3 erken diyastolde; solunum sesi ekspirasyonda söner.",
-          "clinical": "Beklenen kombinasyon; solunum sesi kalp sesini maskeleyebilir.",
-          "bestPoints": ["lung_right_lower_anterior", "lung_right_lower_posterior"]
+          "key": "finding.atelectasis",
+          "finding": "atelectasis",
+          "title": "Atelektazi",
+          "short": "Atelektazi",
+          "sub": "Hacim kaybıyla giden opasite",
+          "description": "Akciğer dokusunun kısmen ya da tamamen havasızlaşmasıdır. Opasiteye hacim kaybı bulguları eşlik eder.",
+          "sign": "Hacim kaybı bulguları: fissürün yer değiştirmesi, hilusun çekilmesi, hemidiyaframın yükselmesi, mediastenin aynı tarafa kayması.",
+          "readingTip": "Fissürleri, hilus seviyesini ve diyafram yüksekliğini karşı tarafla kıyaslayın.",
+          "clinical": "Postoperatif dönemde ve hava yolu tıkanıklığında sık görülür; nedenin araştırılması gerekir.",
+          "bestZones": ["b_r_lower", "b_l_lower", "b_r_mid", "d_r_diaphragm", "d_l_diaphragm", "a_trachea"],
+          "badge": "Parankim",
+          "interpretation": {
+            "prompt": "Atelektaziyi konsolidasyondan ayırmada en yardımcı radyografik bulgu hangisidir?",
+            "options": [
+              { "id": "a", "label": "Hacim kaybı bulguları (fissür, hilus ya da diyafram yer değiştirmesi)" },
+              { "id": "b", "label": "Hava bronkogramı varlığı" },
+              { "id": "c", "label": "Opasitenin yoğunluğu" },
+              { "id": "d", "label": "Karşı kostofrenik açının küntleşmesi" }
+            ],
+            "correct": ["a"],
+            "feedbackCorrect": "Doğru. Konsolidasyonda hacim genellikle korunur; atelektazide hacim kaybı bulguları eşlik eder.",
+            "feedbackIncorrect": "Hava bronkogramı her ikisinde de görülebilir. Ayırıcı bulgu hacim kaybıdır.",
+            "hint": "Havasızlaşan akciğer komşu yapıları nasıl etkiler?"
+          }
         },
         {
-          "key": "mixed.af_rhonchi",
-          "category": "mixed",
-          "acousticFinding": "atrial_fibrillation+rhonchi",
-          "description": "Düzensiz düzensiz ritim (AF) ile ronküsün birlikte duyulduğu kombine kayıt.",
-          "metaphor": "Düzensiz davul vuruşları üzerine horlama benzeri kaba hırıltı.",
-          "phase": "Ritim düzensiz; ronküs her iki fazda duyulabilir.",
-          "clinical": "Ritim analizi ile akciğer sesi ayrıştırması birlikte yapılır.",
-          "bestPoints": ["lung_right_lower_anterior", "lung_right_lower_posterior"]
+          "key": "finding.edema",
+          "finding": "edema",
+          "title": "Pulmoner ödem",
+          "short": "Pulmoner ödem",
+          "sub": "İnterstisyel ve alveoler dolum",
+          "description": "Akciğer interstisyumunda ve alveollerde sıvı birikimidir. Kardiyojenik ödemde bulgular sıklıkla iki taraflı ve hiluslar çevresinde belirgindir.",
+          "sign": "Üst lob damarlarında belirginleşme, peribronşiyal kalınlaşma, Kerley B çizgileri, hilus çevresinde 'yarasa kanadı' dağılımı.",
+          "readingTip": "Alt zonlarda periferde, plevraya dik uzanan kısa yatay çizgileri (Kerley B) yakınlaştırarak arayın.",
+          "clinical": "Kardiyomegali ve plevral efüzyon eşlik ediyorsa kardiyojenik neden düşünülür; kesin ayrım klinik tabloyla yapılır.",
+          "bestZones": ["b_r_mid", "b_l_mid", "b_r_lower", "b_l_lower", "c_heart", "d_r_diaphragm"],
+          "badge": "Parankim",
+          "interpretation": {
+            "prompt": "Kardiyojenik pulmoner ödemde akciğer grafisinde hangi bulgu beklenir?",
+            "options": [
+              { "id": "a", "label": "Kerley B çizgileri ve üst lob damarlarında belirginleşme" },
+              { "id": "b", "label": "Diyafram altında serbest hava" },
+              { "id": "c", "label": "Tek taraflı hiperlüsent hemitoraks" },
+              { "id": "d", "label": "Trakeanın karşı tarafa itilmesi" }
+            ],
+            "correct": ["a"],
+            "feedbackCorrect": "Doğru. Artmış pulmoner venöz basınç damar redistribüsyonu ve interstisyel ödeme yol açar.",
+            "feedbackIncorrect": "Kardiyojenik ödemde interstisyel sıvı Kerley B çizgilerine, venöz basınç artışı üst lob damarlarının belirginleşmesine yol açar.",
+            "hint": "İnterstisyumda sıvı birikince septalar nasıl görünür?"
+          }
+        },
+        {
+          "key": "finding.emphysema",
+          "finding": "emphysema",
+          "title": "Amfizem",
+          "short": "Amfizem",
+          "sub": "Hiperinflasyon",
+          "description": "Distal hava boşluklarının kalıcı genişlemesi ve alveol duvarlarının yıkımıdır. Grafide akciğerler aşırı havalanmış görünür.",
+          "sign": "Diyaframların düzleşmesi, akciğer alanlarında hiperlüsensi ve damar izlerinde azalma, dar ve uzun kalp gölgesi, büller.",
+          "readingTip": "Diyaframların kubbesini ve arka kaburga sayısını değerlendirin; büllerin sınırlarını pnömotoraksla karıştırmayın.",
+          "clinical": "Grafi hafif olgularda normal olabilir; tanı ve derecelendirme solunum fonksiyon testleri ve BT ile yapılır.",
+          "bestZones": ["d_r_diaphragm", "d_l_diaphragm", "b_r_upper", "b_l_upper", "c_heart"],
+          "badge": "Parankim",
+          "interpretation": {
+            "prompt": "Amfizemli bir hastanın akciğer grafisinde hangi bulgu beklenir?",
+            "options": [
+              { "id": "a", "label": "Diyaframların düzleşmesi ve hiperinflasyon" },
+              { "id": "b", "label": "Kardiyomegali ve Kerley B çizgileri" },
+              { "id": "c", "label": "İki taraflı kostofrenik açı küntleşmesi" },
+              { "id": "d", "label": "Hilusların yukarı çekilmesi" }
+            ],
+            "correct": ["a"],
+            "feedbackCorrect": "Doğru. Hava hapsi akciğer hacmini artırır ve diyaframları düzleştirir.",
+            "feedbackIncorrect": "Amfizemin temel grafi bulgusu hiperinflasyondur: düzleşmiş diyaframlar ve hiperlüsent akciğer alanları.",
+            "hint": "Hava hapsi akciğer hacmini nasıl etkiler?"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cardiac",
+      "title": "Kalp ve mediasten",
+      "items": [
+        {
+          "key": "finding.cardiomegaly",
+          "finding": "cardiomegaly",
+          "title": "Kardiyomegali",
+          "short": "Kardiyomegali",
+          "sub": "Kardiyotorasik oran > 0,5 (PA)",
+          "description": "Kalp gölgesinin genişlemesidir. PA filmde kalbin en geniş yatay çapının toraksın en geniş iç çapına oranı (kardiyotorasik oran) 0,5'in üzerindeyse kardiyomegaliden söz edilir.",
+          "sign": "AP ve yatarak çekilen filmlerde kalp olduğundan büyük görünür; bu filmlerde kardiyotorasik oran güvenilir değildir.",
+          "readingTip": "Önce projeksiyonu ve inspirasyonu kontrol edin; ölçümü kalbin en geniş sağ ve sol kenarları arasından yapın.",
+          "clinical": "Perikardiyal efüzyon da kalp gölgesini genişletebilir; grafi ikisini ayırt edemez.",
+          "bestZones": ["c_heart", "c_mediastinum", "d_r_diaphragm", "d_l_diaphragm"],
+          "badge": "Kalp",
+          "interpretation": {
+            "prompt": "Kardiyotorasik oranın güvenilir biçimde değerlendirilebilmesi için hangi koşul gereklidir?",
+            "options": [
+              { "id": "a", "label": "PA projeksiyon ve yeterli inspirasyon" },
+              { "id": "b", "label": "Yatarak çekilmiş AP grafi" },
+              { "id": "c", "label": "Ekspirasyonda çekilmiş grafi" },
+              { "id": "d", "label": "Yalnız lateral grafi" }
+            ],
+            "correct": ["a"],
+            "feedbackCorrect": "Doğru. AP projeksiyon ve yetersiz inspirasyon kalbi olduğundan büyük gösterir.",
+            "feedbackIncorrect": "Kardiyotorasik oran PA ve iyi inspirasyonlu filmde değerlendirilir; AP ya da ekspiratuvar filmde kalp büyük görünür.",
+            "hint": "Kalp filme yakın mı, uzak mı olmalı?"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bone",
+      "title": "Kemik ve yumuşak doku",
+      "items": [
+        {
+          "key": "finding.fracture",
+          "finding": "fracture",
+          "title": "Kemik kırığı",
+          "short": "Kırık",
+          "sub": "Kaburga, klavikula",
+          "description": "Akciğer grafisinde en sık kaburga ve klavikula kırıkları görülür. Kortekste süreklilik kaybı, basamaklanma ya da iyileşme dönemindeki kallus aranır.",
+          "sign": "Aynı hizada birden çok kaburga kırığı yelken göğüs (flail chest) açısından önemlidir.",
+          "readingTip": "Kaburgaları tek tek, önce üst sonra alt kenarları boyunca izleyin; kontrast ve parlaklığı artırmak kortikal hattı belirginleştirir.",
+          "clinical": "Kaburga kırıklarının önemli bir kısmı grafide görülmeyebilir; klinik şüphede eşlik eden pnömotoraks ve hemotoraks mutlaka aranır.",
+          "bestZones": ["e_bones", "b_r_upper", "b_l_upper"],
+          "badge": "Kemik",
+          "interpretation": {
+            "prompt": "Grafide kaburga kırığı saptanan bir hastada eşlik edebilecek hangi bulgu mutlaka aranmalıdır?",
+            "options": [
+              { "id": "a", "label": "Pnömotoraks" },
+              { "id": "b", "label": "Kardiyomegali" },
+              { "id": "c", "label": "Amfizem" },
+              { "id": "d", "label": "Hilus genişlemesi" }
+            ],
+            "correct": ["a"],
+            "feedbackCorrect": "Doğru. Kırık kaburga uçları plevrayı yaralayabilir; pnömotoraks ve hemotoraks mutlaka aranır.",
+            "feedbackIncorrect": "Kırık kaburga plevrayı yaralayabilir; bu nedenle pnömotoraks ve hemotoraks aranmalıdır.",
+            "hint": "Kırık uç komşu hangi yapıyı zedeleyebilir?"
+          }
         }
       ]
     }

@@ -1,54 +1,30 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useStore } from '../core/store'
-import { engine } from '../audio/engineSingleton'
-import { resolveLibrarySoundEx } from '../core/resolver'
+import { IMAGES } from '../core/images'
+import { ZONES } from '../data/zones'
 import { tutorialProgress, type TutorialEvent } from '../core/flow'
-import pointsData from '../data/auscultation-points.json'
-import libraryData from '../data/library.json'
-import type { AuscultationPoint, SoundRecord } from '../core/types'
-import { PatientStage, type StageHandle } from '../ui/PatientStage'
-import { Toolbar } from '../ui/Toolbar'
+import type { Point } from '../core/geometry'
+import { FilmViewer } from '../ui/FilmViewer'
 import { Footer, EcgDeco } from '../ui/chrome'
 import { IconArrowRight, IconCheck } from '../ui/icons'
 
-/** İlk kullanım öğreticisi (§45, madde 5 — wave 3): artık statik bir fotoğraf değil, gerçek
- *  `PatientStage` (öğrenme modu, heart.normal sesleri) üzerinde 3 rehberli adım: (1) stetoskobu
- *  sürükle, (2) bir odağa bırak, (3) Bell/Diyafram değiştir. İlerleme saf `tutorialProgress`
- *  fonksiyonuyla hesaplanır (bkz. core/flow.ts) — bileşen yalnız olayları toplayıp bu fonksiyona
- *  besler. Üç adım tamamlanınca kutlama mesajı + "Modlara geç" CTA'sı görünür. "Atla" bağlantısı
- *  her an adımları atlayıp devam etmeye izin verir; "Tekrar gösterme" onay kutusu korunur.
- *  Yardım modalındaki statik 6 adımlık `TutorialSteps` listesi bu ekrandan bağımsız, değişmedi. */
+/** İlk kullanım öğreticisi: gerçek görüntüleyici üzerinde üç rehberli adım. */
 
 const STEP_TEXT = [
-  { title: 'Stetoskobu sürükleyin', desc: 'Sağdaki hasta üzerinde stetoskopu tıklayıp sürüklemeye başlayın.' },
-  { title: 'Bir odağa bırakın', desc: 'İşaretli oskültasyon noktalarından birinin üzerine bırakın — ses otomatik çalar.' },
-  { title: 'Bell veya Diyaframı değiştirin', desc: 'Alt araç çubuğundan stetoskop kafasını değiştirin.' },
+  { title: 'Filmi yakınlaştırın', desc: 'Fare tekerleğini ya da alttaki + düğmesini kullanın; sürükleyerek kaydırın.' },
+  { title: 'Pencereyi değiştirin', desc: 'Pencere listesinden Kemik ya da Akciğer seçin veya parlaklık/kontrastı ayarlayın.' },
+  { title: 'Film üzerine işaret koyun', desc: 'İşaretle aracı açık; filmde herhangi bir noktaya tıklayın.' },
 ] as const
 
-const points = pointsData.points as AuscultationPoint[]
-const heartNormal = (libraryData.groups as unknown as { items: { key: string; bestPoints: string[] }[] }[])
-  .flatMap((g) => g.items)
-  .find((it) => it.key === 'heart.normal')
-const tutorialFilterIds = heartNormal?.bestPoints
+const demoImage = IMAGES.find((r) => r.validationStatus === 'validated' && r.viewPosition === 'PA') ?? IMAGES[0]
 
 export function TutorialScreen() {
-  const { state, dispatch } = useStore()
+  const { dispatch } = useStore()
   const [dontShow, setDontShow] = useState(false)
   const [events, setEvents] = useState<TutorialEvent[]>([])
-  const stageRef = useRef<StageHandle>(null)
-  const initialHead = useRef(state.head)
-
+  const [mark, setMark] = useState<Point | null>(null)
   const progress = useMemo(() => tutorialProgress(events), [events])
-  const addEvent = (e: TutorialEvent) => setEvents((prev) => (prev.includes(e) ? prev : [...prev, e]))
-
-  // adım 3: head store'da global — öğretici mount olduğundaki değerden farklılaşınca tamamlanır
-  useEffect(() => {
-    if (state.head !== initialHead.current) addEvent('head')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.head])
-
-  const soundFor = (pointId: string): SoundRecord | null =>
-    resolveLibrarySoundEx('heart', 'normal', pointId).record
+  const add = (e: TutorialEvent) => setEvents((prev) => (prev.includes(e) ? prev : [...prev, e]))
 
   const finish = () => {
     if (dontShow) dispatch({ type: 'tutorialDone', done: true })
@@ -63,10 +39,9 @@ export function TutorialScreen() {
         <div className="container screen-body">
           <div className="tutorial-wrap">
             <div className="tut-text-col">
-              <h1 className="tut-title">Nasıl Kullanılır?</h1>
-              <p className="tut-lead">Aşağıdaki 3 adımı sağdaki hasta üzerinde bizzat deneyerek geçin.</p>
-              <p className="tut-sub">Her adımı tamamladığınızda işaretlenir — sırayla yapmak zorunlu değildir.</p>
-
+              <h1 className="tut-title">Nasıl kullanılır?</h1>
+              <p className="tut-lead">Üç adımı sağdaki film üzerinde deneyin.</p>
+              <p className="tut-sub">Tamamlanan adımlar işaretlenir; sıra zorunlu değildir.</p>
               <div className="tut-steps tut-steps-live">
                 {STEP_TEXT.map((s, i) => (
                   <div className={`tut-step ${progress.steps[i] ? 'done' : ''} ${!progress.steps[i] && progress.currentStep === i ? 'active' : ''}`} key={s.title}>
@@ -78,53 +53,35 @@ export function TutorialScreen() {
                   </div>
                 ))}
               </div>
-
               {progress.allDone && (
                 <div className="tut-celebrate" role="status">
-                  <strong>Harika, hazırsınız!</strong> Artık simülatörü kullanmayı biliyorsunuz.
+                  <strong>Hazırsınız.</strong> Vakalarda okuma bölgeleri incelendikçe listede işaretlenir.
                 </div>
               )}
-
               <div className="tut-footer">
                 <label className="tut-again">
                   <input type="checkbox" checked={dontShow} onChange={(e) => setDontShow(e.target.checked)} />
                   Tekrar gösterme
                 </label>
                 {progress.allDone ? (
-                  <button className="btn primary" onClick={finish}>
-                    Modlara geç <IconArrowRight />
-                  </button>
+                  <button className="btn primary" onClick={finish}>Modlara geç <IconArrowRight /></button>
                 ) : (
-                  <button className="hero-link tut-skip" onClick={finish}>
-                    Atla
-                  </button>
+                  <button className="hero-link tut-skip" onClick={finish}>Atla</button>
                 )}
               </div>
             </div>
-
-            <div className={`stage-card tut-stage-col ${progress.currentStep < 2 ? 'tut-highlight' : ''}`}>
-              <PatientStage
-                ref={stageRef}
-                points={points}
-                filterIds={tutorialFilterIds}
-                view="front"
-                head={state.head}
-                volume={state.volume}
-                showPoints
-                showLabels
-                bodyType="erkek"
-                mode="learn"
-                engine={engine}
-                soundFor={soundFor}
-                onVisit={() => addEvent('snap')}
-                onDwell={() => undefined}
-                onListen={() => undefined}
-                onPlayingChange={() => undefined}
-                onDragStart={() => addEvent('drag')}
+            <div className={`stage-card film-card tut-stage-col ${progress.allDone ? '' : 'tut-highlight'}`}>
+              <FilmViewer
+                image={demoImage}
+                zones={ZONES}
+                showZones
+                showAnnotations={false}
+                markEnabled
+                mark={mark}
+                onMark={(p) => { setMark(p); add('mark') }}
+                onTool={(t) => { if (t === 'zoom') add('zoom'); if (t === 'window') add('window') }}
+                label="Öğretici film görüntüleyici"
               />
-              <div className={progress.currentStep === 2 && !progress.allDone ? 'tut-highlight' : ''}>
-                <Toolbar stageRef={stageRef} activePoint={null} />
-              </div>
             </div>
           </div>
         </div>

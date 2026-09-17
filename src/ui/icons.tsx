@@ -91,3 +91,12 @@ export const IconSwap = (p: P) => (
     <path d="M20 16H7l3 3" />
   </svg>
 )
+export const IconFilm = (p: P) => (
+  <svg {...base(p)}><rect x="3" y="3" width="18" height="18" rx="2.5" /><path d="M12 6v9" /><path d="M12 8c-2.5 0-4.5 1.5-5 5-.3 2 .3 3.5 2 3.5 2 0 3-1.5 3-3.5" /><path d="M12 8c2.5 0 4.5 1.5 5 5 .3 2-.3 3.5-2 3.5-2 0-3-1.5-3-3.5" /></svg>
+)
+export const IconScan = (p: P) => (
+  <svg {...base(p)}><path d="M4 8V5a1 1 0 0 1 1-1h3" /><path d="M16 4h3a1 1 0 0 1 1 1v3" /><path d="M20 16v3a1 1 0 0 1-1 1h-3" /><path d="M8 20H5a1 1 0 0 1-1-1v-3" /><path d="M3 12h18" /></svg>
+)
+export const IconBone = (p: P) => (
+  <svg {...base(p)}><path d="M17 10c.7.7 2 .7 2.8-.2a2 2 0 0 0-1.4-3.3 2 2 0 0 0-3.3-1.4c-.9.8-.9 2.1-.2 2.8L8.1 14.9c-.7-.7-2-.7-2.8.2a2 2 0 0 0 1.4 3.3 2 2 0 0 0 3.3 1.4c.9-.8.9-2.1.2-2.8z" /></svg>
+)

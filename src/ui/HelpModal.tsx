@@ -60,10 +60,10 @@ export function HelpModal({ open, onClose }: { open: boolean; onClose: () => voi
           <div className="help-tips">
             <b>İpuçları</b>
             <ul>
-              <li>En iyi deneyim için kulaklık kullanın; ses düzeyi denetimi alt araç çubuğundadır, başlangıç ekranında kulaklık test tonu vardır.</li>
-              <li>Bölge listesini klavyeyle de kullanabilirsiniz (Tab ile odaklanın).</li>
-              <li>Çalma sırasında sağdaki paneldeki Dalga Formu sekmesi ve turuncu ipucu düğmesi öğrenmeyi destekler.</li>
-              <li>Geliştiriciler, kaynaklar ve lisanslar için üstteki “Hakkında” düğmesine bakın.</li>
+              <li>Görüntüleyici klavyeyle de kullanılır: Tab ile odaklanın, ok tuşlarıyla kaydırın, + / − ile yakınlaştırın, 0 ile sıfırlayın.</li>
+              <li>Okuma bölgesi çiplerine tıklamak filmi o bölgeye yakınlaştırır.</li>
+              <li>Kardiyotorasik oranı yalnız PA filmde yorumlayın; projeksiyon bilgisi olgu kartında yazar.</li>
+              <li>Geliştiriciler, veri setleri ve lisanslar için üstteki “Hakkında” düğmesine bakın.</li>
             </ul>
           </div>
           <p className="help-note">Bu simülatör eğitim amaçlıdır; tanı koydurmaz. Klinik karar her zaman hasta bağlamıyla verilir.</p>

@@ -1,46 +1,38 @@
-import libraryData from './library.json'
 import sourcesData from './sources.json'
-import pointsData from './auscultation-points.json'
 import { ALL_CASES, poolFor } from './pool'
-import { RECORDS, EXTERNAL_RECORDS } from '../core/resolver'
+import { IMAGES } from '../core/images'
+import { LIBRARY_ITEMS } from './terminology'
+import { ZONES } from './zones'
+import { EXPERT_SOURCES } from '../core/types'
 
-/** Envanter zenginliği metrikleri — landing sayfasında gösterilir (tamamen veri odaklı). */
-
+/** Envanter metrikleri — başlangıç ekranında gösterilir (tamamen veri odaklı). */
 export interface InventoryMetrics {
-  datasets: number
-  datasetsVerified: number
-  datasetsPediatric: number
-  bundledRecordings: number
-  externalRecordings: number
-  soundClasses: number
-  auscultationPoints: number
+  datasetsUsed: number
+  images: number
+  expertImages: number
+  annotatedImages: number
+  libraryItems: number
+  zones: number
   totalCases: number
   practicePoolSize: number
   assessmentPoolSize: number
   assessmentQuestions: number
-  pediatricCases: number
-  mixedCases: number
 }
 
 export function computeMetrics(): InventoryMetrics {
-  const inv = (sourcesData as unknown as { inventory: { population: string; title: string; notes: string; licenseVerified: boolean; status: string }[] }).inventory ?? []
-  const libraryCount = libraryData.groups.reduce((s, g) => s + g.items.length, 0)
-  const assessmentPool = poolFor('assessment')
-  const practicePool = poolFor('practice')
-  const bundled = RECORDS.filter((r) => r.sourceDataset === 'hls-cmds-v3').length
+  const used = new Set(IMAGES.map((r) => r.sourceDataset))
+  const ds = (sourcesData.datasets as { id: string }[]).filter((d) => used.has(d.id))
+  const assessment = poolFor('assessment')
   return {
-    datasets: inv.length,
-    datasetsVerified: inv.filter((x) => x.licenseVerified).length,
-    datasetsPediatric: inv.filter((x) => /pediatrik|pediatric|çocuk|fetal/i.test(`${x.population} ${x.title} ${x.notes}`)).length,
-    bundledRecordings: bundled,
-    externalRecordings: EXTERNAL_RECORDS.length,
-    soundClasses: libraryCount,
-    auscultationPoints: (pointsData.points as unknown[]).length,
+    datasetsUsed: ds.length,
+    images: IMAGES.length,
+    expertImages: IMAGES.filter((r) => Object.values(r.findings).some((s) => (EXPERT_SOURCES as readonly string[]).includes(s))).length,
+    annotatedImages: IMAGES.filter((r) => r.annotations.length > 0).length,
+    libraryItems: LIBRARY_ITEMS.length,
+    zones: ZONES.length,
     totalCases: ALL_CASES.length,
-    practicePoolSize: practicePool.length,
-    assessmentPoolSize: assessmentPool.length,
-    assessmentQuestions: assessmentPool.reduce((s, c) => s + c.questions.length, 0),
-    pediatricCases: ALL_CASES.filter((c) => (c as { population?: string }).population === 'pediatrik').length,
-    mixedCases: ALL_CASES.filter((c) => c.primaryAcousticFinding.includes('+')).length,
+    practicePoolSize: poolFor('practice').length,
+    assessmentPoolSize: assessment.length,
+    assessmentQuestions: assessment.reduce((s, c) => s + c.questions.length, 0),
   }
 }

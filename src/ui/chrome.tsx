@@ -43,7 +43,7 @@ export function Header() {
         <BrandMark size={32} />
         <span className="brand-block">
           <span className="brand-top">EGEMED</span>
-          <span className="brand-name">Ausculta<sup className="tm">™</sup></span>
+          <span className="brand-name">Opaca<sup className="tm">™</sup></span>
         </span>
       </button>
       <div className="spacer" />
@@ -91,7 +91,7 @@ export function Header() {
         className="eg-header-chip clickable"
         onClick={() => dispatch({ type: 'goto', screen: 'sources' })}
         aria-label="Hakkında"
-        title="EGEMED Ausculta Hakkında"
+        title="EGEMED Opaca Hakkında"
       >
         <IconInfo /> <span className="chip-text">Hakkında</span>
       </button>
@@ -124,14 +124,14 @@ export function Footer() {
       <div className="footer-left">
         <img src="brand/logo-icon-web.png" alt="" className="footer-seal" />
         <span className="footer-text">
-          <span className="footer-brand">EGEMED Ausculta<sup className="tm">™</sup></span>
-          <span className="footer-sub"> Kardiyopulmoner Oskültasyon Simülatörü</span>
+          <span className="footer-brand">EGEMED Opaca<sup className="tm">™</sup></span>
+          <span className="footer-sub"> Radyolojik Görüntüleme Simülatörü</span>
           <span className="footer-inst">, Ege Üniversitesi Tıp Fakültesi Dekanlığı tarafından geliştirilmiştir.</span>
           <span className="footer-copy"> Tüm hakları saklıdır © 2026</span>
         </span>
       </div>
       <div className="footer-right">
-        <span className="footer-attr2">Ses kayıtları: HLS-CMDS v3 · CC BY 4.0 — CirCor · ODC-BY 1.0</span>
+        <span className="footer-attr2">Görüntüler: NIH Clinical Center (ChestX-ray14) · RSNA/STR açıklamaları</span>
       </div>
     </footer>
   )

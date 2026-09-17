@@ -1,0 +1,54 @@
+{
+ "generatedAt": "2026-09-17T18:00:54.203Z",
+ "count": 2,
+ "records": [
+  {
+   "id": "nih_00000001_000",
+   "sourceDataset": "nih-cxr14",
+   "sourceFile": "00000001_000.png",
+   "viewPosition": "PA",
+   "ageYears": 57,
+   "sex": "M",
+   "population": "yetiskin",
+   "width": 512,
+   "height": 512,
+   "originalWidth": 512,
+   "originalHeight": 512,
+   "findings": {
+    "cardiomegaly": "report_nlp"
+   },
+   "negatives": {},
+   "annotations": [],
+   "quality": null,
+   "runtimeUrl": "assets/xray/runtime/nih_00000001_000.webp",
+   "bytes": 11930,
+   "validationStatus": "validated",
+   "clinicalReview": "beklemede",
+   "issues": []
+  },
+  {
+   "id": "nih_00027426_000",
+   "sourceDataset": "nih-cxr14",
+   "sourceFile": "00027426_000.png",
+   "viewPosition": "PA",
+   "ageYears": 53,
+   "sex": "M",
+   "population": "yetiskin",
+   "width": 512,
+   "height": 512,
+   "originalWidth": 512,
+   "originalHeight": 512,
+   "findings": {
+    "no_finding_report": "report_nlp"
+   },
+   "negatives": {},
+   "annotations": [],
+   "quality": null,
+   "runtimeUrl": "assets/xray/runtime/nih_00027426_000.webp",
+   "bytes": 11866,
+   "validationStatus": "validated",
+   "clinicalReview": "beklemede",
+   "issues": []
+  }
+ ]
+}

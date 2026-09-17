@@ -1,42 +1,40 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import type { AuscultationPoint, CaseDef, CaseResult, Question, ScoringWeights } from '../core/types'
-import pointsData from '../data/auscultation-points.json'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { CaseDef, CaseResult, Question, ScoringWeights } from '../core/types'
 import { ALL_CASES, poolFor } from '../data/pool'
+import { ZONES } from '../data/zones'
 import { sampleSession, SESSION_SIZE } from '../core/session'
-import type { BodyType } from '../ui/PatientStage'
-import { engine } from '../audio/engineSingleton'
-import { resolveCaseSoundsEx, resolveCaseSounds, assessmentPointFilter } from '../core/resolver'
+import { getImage } from '../core/images'
+import { isAnswerCorrect } from '../core/answers'
+import { decodeMark, encodeMark } from '../core/geometry'
 import { useStore, computeAggregate } from '../core/store'
-import { nextActionForSubmit, countUnlistenedInOtherView, otherViewHintText } from '../core/flow'
+import { nextActionForSubmit, isTimedOut, remainingSec } from '../core/flow'
 import { bus } from '../core/events'
-import { PatientStage, type StageHandle } from '../ui/PatientStage'
-import { Toolbar } from '../ui/Toolbar'
+import { FilmViewer, type FilmViewerHandle } from '../ui/FilmViewer'
+import { ZoneChips } from '../ui/ZoneChips'
 import { QuestionCard, FeedbackCard } from '../ui/Questions'
-import { RegionChipList } from '../ui/RegionChips'
 import { Footer, EcgDeco } from '../ui/chrome'
-import { PediatricRefModal } from '../ui/PediatricRefModal'
-import { IconDoc, IconArrowRight, IconInfo } from '../ui/icons'
+import { IconDoc, IconArrowRight, IconInfo, IconLightbulb, IconClock } from '../ui/icons'
+import { LABEL_SOURCE_TEXT, VIEW_TEXT, findingShort } from '../data/terminology'
 
-/** Simülasyon ekranı — Uygulama & Değerlendirme (§3B, §3C): hasta solda, olgu/görev/soru sağda. */
+/** Uygulama ve Değerlendirme: film solda, olgu/soru sağda. */
 
-const cases = ALL_CASES
-const points = pointsData.points as AuscultationPoint[]
+export const DEFAULT_CASE_TIME_SEC = 180
 
 export function SimulationScreen() {
   const { state, dispatch, runtime } = useStore()
-  // oturum örneklemi: rastgele 10 vaka (yoksa havuzun tamamı)
-  const sessionIds = state.mode === 'assessment' ? state.session.assessmentIds : state.session.practiceIds
-  const byId = new Map(cases.map((c) => [c.id, c]))
+  const isAssessment = state.mode === 'assessment'
+  const sessionIds = isAssessment ? state.session.assessmentIds : state.session.practiceIds
+  const byId = useMemo(() => new Map(ALL_CASES.map((c) => [c.id, c])), [])
   const sessionCases = sessionIds.map((id) => byId.get(id)).filter((c): c is CaseDef => !!c)
-  const caseList = sessionCases.length ? sessionCases : poolFor(state.mode)
-  const caseDef = caseList[state.caseIndex] ?? caseList[0]
+  const caseList = sessionCases.length ? sessionCases : poolFor(state.mode).slice(0, SESSION_SIZE)
+  const caseDef: CaseDef | undefined = caseList[state.caseIndex] ?? caseList[0]
 
-  // K3: SCORM devam ettirmede oturum örneklemi boş kalırsa (eski/bozuk suspend verisi),
-  // aynı tohumla yeniden üretip kalıcı hale getir — tohum korunuyorsa aynı 10 vaka çıkar.
+  // K3: devam ettirmede oturum listesi boşsa aynı tohumla yeniden üret
   useEffect(() => {
     if (sessionCases.length > 0 || state.mode === 'learn') return
-    const seed = state.session.seed || Date.now()
+    const seed = state.session.seed || Date.now() % 2147483647
     const ids = sampleSession(poolFor(state.mode), seed, SESSION_SIZE)
+    if (!ids.length) return
     dispatch({
       type: 'startSession',
       practiceIds: state.mode === 'practice' ? ids : state.session.practiceIds,
@@ -45,27 +43,12 @@ export function SimulationScreen() {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionCases.length, state.mode])
-  const stageRef = useRef<StageHandle>(null)
-  const [activePoint, setActivePoint] = useState<string | null>(null)
-  const [pedModalOpen, setPedModalOpen] = useState(false)
 
-  const isAssessment = state.mode === 'assessment'
-  const resolved = useMemoSounds(caseDef)
-  // O7: değerlendirmede kaydı gerçekten o bölgeden alınmamış (posterior fallback) noktalar sunulmaz
-  const pointIds = useMemo(
-    () => (isAssessment ? assessmentPointFilter(caseDef.soundAssignments) : caseDef.soundAssignments.map((a) => a.pointId)),
-    [caseDef, isAssessment]
-  )
-  const q: Question | undefined = caseDef.questions[state.step]
-  const canSubmit = !!q && (state.answers[q.id]?.length ?? 0) > 0
-  const revealed = q ? !!state.revealed[q.id] : false
-  const isPediatricCase = (caseDef as CaseDef & { population?: string }).population === 'pediatrik'
-
-  // vaka bitince: aggregate + SCORM raporu + sonuç ekranı
+  // oturum bitti → sonuç
   useEffect(() => {
-    if (state.caseIndex < caseList.length) return
+    if (!caseList.length || state.caseIndex < caseList.length) return
     const agg = computeAggregate(state.caseResults)
-    if (state.mode === 'assessment') {
+    if (isAssessment) {
       runtime?.reportScore(agg.total, agg.mastery, true)
       bus.emit({ type: 'assessment_completed', total: agg.total, at: Date.now() })
     }
@@ -73,215 +56,184 @@ export function SimulationScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.caseIndex])
 
-  const shownAtRef = useRef<Record<string, number>>({})
+  if (!caseDef) {
+    return (
+      <>
+        <EcgDeco />
+        <div className="screen" style={{ position: 'relative', zIndex: 1 }}>
+          <div className="container screen-body">
+            <div className="card empty-state">
+              <h2>Bu modda henüz vaka yok</h2>
+              <p>
+                Vaka havuzu görüntü envanterinden üretilir. Veri setini içe aktarıp vakaları yeniden üretin:
+                <code> npm run import:nih -- &lt;klasör&gt;</code> ve <code>npm run cases</code>.
+              </p>
+              <button className="btn primary" onClick={() => dispatch({ type: 'goto', screen: 'modes' })}>Mod seçimine dön</button>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </>
+    )
+  }
+  return <CaseView key={`${state.mode}-${state.caseIndex}-${caseDef.id}`} caseDef={caseDef} total={caseList.length} />
+}
 
-  // görüntülenen vakayı store'a bildir (havuz/ders fark edilmez; tek doğruluk kaynağı)
+function CaseView({ caseDef, total }: { caseDef: CaseDef; total: number }) {
+  const { state, dispatch, runtime } = useStore()
+  const isAssessment = state.mode === 'assessment'
+  const image = getImage(caseDef.imageId)
+  const viewerRef = useRef<FilmViewerHandle>(null)
+  const [activeZones, setActiveZones] = useState<string[]>([])
+  const [hintOpen, setHintOpen] = useState(false)
+  const shownAtRef = useRef<Record<string, number>>({})
+  const q: Question | undefined = caseDef.questions[state.step]
+  const revealed = q ? !!state.revealed[q.id] : false
+  const given = q ? state.answers[q.id] ?? [] : []
+  const canSubmit = !!q && given.length > 0
+  const summaryOpen = !!state.pendingSummary
+  const timeLimit = isAssessment ? caseDef.timeLimitSec ?? DEFAULT_CASE_TIME_SEC : undefined
+
   useEffect(() => {
-    if (!caseDef) return
     dispatch({ type: 'caseMount', caseDef })
     bus.emit({ type: 'case_started', caseId: caseDef.id, mode: state.mode, at: Date.now() })
-    void resolveCaseSounds(caseDef.soundAssignments)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [caseDef.id])
+  }, [])
 
-  // madde 5: olgu kartı yeni vakada 600ms kısa vurgu (kenar parlaması)
-  const [caseFlash, setCaseFlash] = useState(false)
   useEffect(() => {
-    setCaseFlash(true)
-    const t = window.setTimeout(() => setCaseFlash(false), 600)
-    return () => window.clearTimeout(t)
-  }, [caseDef.id])
+    if (q && !shownAtRef.current[q.id]) shownAtRef.current[q.id] = Date.now()
+    setHintOpen(false)
+  }, [q])
 
-  // madde 5: değerlendirmede vaka değişince 1.4s geçiş paneli (ilk vaka hariç); süre boyunca
-  // sahne/soru pasif. prefers-reduced-motion animasyonu kapatır, süre aynı kalır (global CSS).
-  const [transitioning, setTransitioning] = useState(false)
-  const firstCaseRef = useRef(true)
+  // değerlendirmede özet gösterilmez → hemen sonraki vaka
   useEffect(() => {
-    if (!isAssessment) return
-    if (firstCaseRef.current) {
-      firstCaseRef.current = false
-      return
-    }
-    setTransitioning(true)
-    const t = window.setTimeout(() => setTransitioning(false), 1400)
-    return () => window.clearTimeout(t)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [caseDef.id])
-
-  // madde 5: değerlendirmede geri bildirim/özet kartı gösterilmez — finishCase'in hemen
-  // ardından otomatik olarak sıradaki vakaya geçilir (bkz. yukarıdaki geçiş paneli).
-  useEffect(() => {
-    if (!isAssessment || !state.pendingSummary) return
-    dispatch({ type: 'nextCase' })
+    if (isAssessment && state.pendingSummary) dispatch({ type: 'nextCase' })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAssessment, state.pendingSummary])
 
-  const primaryAction = () => {
-    if (!q) return
-    const action = nextActionForSubmit(state.mode, revealed, isLastQuestion(caseDef, q))
-    if (action === 'advance') {
-      dispatch({ type: 'advance' })
-      return
-    }
-    if (action === 'finish') {
-      dispatch({ type: 'finishCase' })
-      return
-    }
-    if (!canSubmit) return
-    const given = state.answers[q.id] ?? []
-    const correct = isCorrect(q, given)
-    dispatch({ type: 'submitAnswer', qid: q.id, correct })
-    // saveInteractions çağrısı her iki modda son soru GÖNDERİLDİĞİNDE yapılır (submit anında)
-    if (isLastQuestion(caseDef, q)) {
-      const now = Date.now()
-      const latency: Record<string, number> = {}
-      for (const qq of caseDef.questions) {
-        const t0 = shownAtRef.current[qq.id]
-        if (t0) latency[qq.id] = now - t0
-      }
-      runtime?.saveInteractions(caseDef.id, caseDef.questions, state.answers, latency)
-    }
-    if (action === 'submit-then-finish') dispatch({ type: 'finishCase' })
-    else if (action === 'submit-then-advance') dispatch({ type: 'advance' })
-    // action === 'submit' (uygulama, ilk tık): yalnız gönderilir — geri bildirim gösterilir, İLERLEME YOK
+  const saveInteractions = () => {
+    const now = Date.now()
+    const latency: Record<string, number> = {}
+    for (const qq of caseDef.questions) if (shownAtRef.current[qq.id]) latency[qq.id] = now - shownAtRef.current[qq.id]
+    runtime?.saveInteractions(caseDef.id, caseDef.questions, state.answers, image, latency)
   }
 
-  const showCaseEndCard = state.mode === 'practice' && !!state.pendingSummary
+  // vaka süre sınırı: dolunca verilmiş yanıtlarla vaka kapanır
+  const timedOut = isTimedOut(state.caseElapsed, timeLimit)
+  useEffect(() => {
+    if (!timedOut || summaryOpen || state.currentCaseId !== caseDef.id) return
+    bus.emit({ type: 'case_timeout', caseId: caseDef.id, at: Date.now() })
+    saveInteractions()
+    dispatch({ type: 'finishCase' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timedOut, state.currentCaseId])
+
+  const primaryAction = () => {
+    if (!q) return
+    const isLast = caseDef.questions[caseDef.questions.length - 1]?.id === q.id
+    const action = nextActionForSubmit(state.mode, revealed, isLast)
+    if (action === 'advance') return dispatch({ type: 'advance' })
+    if (action === 'finish') return dispatch({ type: 'finishCase' })
+    if (!canSubmit) return
+    dispatch({ type: 'submitAnswer', qid: q.id, correct: isAnswerCorrect(q, given, image) })
+    if (isLast) saveInteractions()
+    if (action === 'submit-then-finish') dispatch({ type: 'finishCase' })
+    else if (action === 'submit-then-advance') dispatch({ type: 'advance' })
+  }
+
+  const markEnabled = !!q && q.type === 'localization' && !revealed && !summaryOpen
+  const mark = q?.type === 'localization' ? decodeMark(given[0]) : null
+  // uzman kutuları: uygulamada lokalizasyon yanıtı açıldıktan sonra ya da vaka sonu özetinde
+  const revealAnnotations = !isAssessment && ((q?.type === 'localization' && revealed) || summaryOpen)
+  const annotationFinding = q?.type === 'localization' ? q.targetFinding : caseDef.primaryFinding
+
+  const onZoneEnter = useCallback((ids: string[]) => dispatch({ type: 'zoneEnter', zoneIds: ids }), [dispatch])
+  const onZoneDwell = useCallback((ids: string[], ms: number) => dispatch({ type: 'zoneDwell', zoneIds: ids, dwellMs: ms }), [dispatch])
+  const remaining = remainingSec(state.caseElapsed, timeLimit)
+  const primarySource = image?.findings[caseDef.primaryFinding]
 
   return (
     <>
       <EcgDeco />
       <div className="screen" style={{ position: 'relative', zIndex: 1 }}>
         <div className="container tall screen-body no-scroll">
-          <div
-            className={[
-              'sim-grid',
-              isAssessment ? 'wide-left mode-assessment' : 'mode-practice',
-              transitioning ? 'is-transitioning' : '',
-            ].join(' ')}
-          >
-            {transitioning && (
-              <div className="case-transition" role="status" aria-live="polite">
-                <div className="case-transition-card">
-                  <div className="ct-big">Vaka {state.caseIndex + 1} / {caseList.length} · Yeni hasta</div>
-                  <div className="ct-sub">Olgu bilgisini okuyun ve muayeneye başlayın.</div>
-                </div>
-              </div>
-            )}
-            <div className={`sim-main ${showCaseEndCard ? 'is-inert' : ''}`}>
-              {isAssessment && (
-                <div className={`strict-banner ${state.caseIndex > 0 ? 'compact' : ''}`} role="alert">
-                  {state.caseIndex === 0 ? (
-                    <>
-                      <strong>Manuel muayene modu.</strong>
-                      {/* madde 4 (wave 3): mobilde tek satır kompakt kalması için ayrıntı metni gizlenir */}
-                      <span className="strict-banner-detail"> Her bölge yalnızca <b>bir kez</b> dinlenebilir; işaretleme, ipucu ve tekrar dinleme yoktur.</span>
-                    </>
-                  ) : (
-                    <span><strong>Manuel muayene</strong> · tek dinleme</span>
-                  )}
+          <div className={`sim-grid ${isAssessment ? 'mode-assessment' : 'mode-practice'}`}>
+            <div className={`sim-main ${summaryOpen ? 'is-inert' : ''}`}>
+              {isAssessment && state.caseIndex === 0 && (
+                <div className="strict-banner" role="alert">
+                  <strong>Değerlendirme.</strong>
+                  <span className="strict-banner-detail"> Okuma bölgesi katmanı, uzman işaretlemesi ve ipucu kapalı; her vaka için süre sınırı vardır.</span>
                 </div>
               )}
-              <div className="stage-card">
-                <div className="stage-top stage-top-right">
-                  {state.mode !== 'assessment' ? (
-                    <label className="points-toggle">
-                      <input type="checkbox" checked={state.showPoints} onChange={(e) => dispatch({ type: 'togglePoints', show: e.target.checked })} />
-                      Dinleme noktalarını göster
-                    </label>
-                  ) : null}
-                </div>
-                <PatientStage
-                  key={state.caseIndex}
-                  ref={stageRef}
-                  points={points}
-                  filterIds={pointIds}
-                  bodyType={((caseDef as CaseDef & { population?: string }).population === 'pediatrik' ? 'pediatrik' : 'erkek') as BodyType}
+              <div className="stage-card film-card">
+                <FilmViewer
+                  ref={viewerRef}
+                  image={image}
+                  zones={ZONES}
+                  showZones={!isAssessment && state.showZones}
+                  showAnnotations={revealAnnotations}
+                  annotationFinding={annotationFinding}
                   strict={isAssessment}
-                  view={state.view}
-                  head={state.head}
-                  volume={state.volume}
-                  showPoints={state.mode !== 'assessment' && state.showPoints}
-                  showLabels={state.mode !== 'assessment' && state.showPoints}
-                  mode={state.mode}
-                  engine={engine}
-                  soundFor={(pointId) => resolved.sounds[pointId] ?? null}
-                  onVisit={(pointId) => { dispatch({ type: 'visit', pointId }); bus.emit({ type: 'auscultation_started', pointId, at: Date.now() }) }}
-                  onDwell={(pointId, dwellMs) => dispatch({ type: 'dwell', pointId, dwellMs })}
-                  onListen={(pointId, listenMs) => dispatch({ type: 'listen', pointId, listenMs })}
-                  onPlayingChange={(_playing, pt) => setActivePoint(pt)}
+                  markEnabled={markEnabled}
+                  mark={mark}
+                  onMark={(p) => {
+                    if (!q) return
+                    dispatch({ type: 'answer', qid: q.id, values: [encodeMark(p)] })
+                    bus.emit({ type: 'mark_placed', qid: q.id, at: Date.now() })
+                  }}
+                  onZoneEnter={onZoneEnter}
+                  onZoneDwell={onZoneDwell}
+                  onActiveZones={setActiveZones}
+                  onTool={(tool) => dispatch({ type: 'toolUsed', tool })}
+                  onToggleZones={isAssessment ? undefined : () => dispatch({ type: 'toggleZones' })}
+                  inert={summaryOpen}
                 />
-                <RegionChipList
-                  points={points}
-                  view={state.view}
-                  pointIds={pointIds}
-                  activePoint={activePoint}
+                <ZoneChips
+                  zones={ZONES}
                   visits={state.telemetry.visits}
-                  onSelect={(pointId) => stageRef.current?.placeAt(pointId)}
+                  activeZones={activeZones}
+                  minDwellMs={caseDef.technique.minDwellMs}
+                  onSelect={(id) => viewerRef.current?.focusZone(id)}
                   hideUntilFocus={isAssessment}
-                  otherViewHint={
-                    isAssessment
-                      ? null
-                      : otherViewHintText(state.view, countUnlistenedInOtherView(points, pointIds, state.view, state.telemetry.visits))
-                  }
                 />
-                {!isAssessment && activePoint && resolved.fallbacks[activePoint] && (
-                  <div className="note-strip" style={{ marginTop: 0 }}>
-                    <IconInfo width={16} height={16} />
-                    <span className="small">
-                      Bu bölge için doğrulanmış posterior kayıt yok; aynı bulgunun{' '}
-                      <strong>{points.find((x) => x.id === resolved.fallbacks[activePoint])?.fullLabel}</strong> kaydı
-                      çalınmaktadır.
-                    </span>
-                  </div>
-                )}
               </div>
-              <Toolbar
-                caseDef={caseDef}
-                stageRef={stageRef}
-                activePoint={activePoint}
-                question={state.mode === 'practice' ? q : undefined}
-                onHint={() => dispatch({ type: 'useHint' })}
-                strict={isAssessment}
-              />
             </div>
 
             <div className="sim-side">
-              <div className={`card ${caseFlash ? 'case-flash' : ''}`}>
+              <div className="card case-card">
                 <div className="card-title-row">
                   <div className="ic"><IconDoc /></div>
                   <h3>Olgu</h3>
                   <div className="card-title-actions">
-                    <span className="badge blue">Vaka {state.caseIndex + 1}/{caseList.length}</span>
-                    {!isAssessment && caseDef.mappingNote && <MappingNotePopover note={caseDef.mappingNote} />}
-                    {!isAssessment && isPediatricCase && (
-                      <button type="button" className="btn outline small ped-ref-btn" onClick={() => setPedModalOpen(true)}>
-                        <IconInfo width={14} height={14} /> Pediatrik referans
-                      </button>
+                    <span className="badge blue">Vaka {state.caseIndex + 1}/{total}</span>
+                    {remaining != null && (
+                      <span className={`badge ${remaining <= 30 ? 'orange' : 'purple'} case-timer`} aria-live="off">
+                        <IconClock width={13} height={13} /> {fmtSec(remaining)}
+                      </span>
                     )}
+                    {!isAssessment && <SourcePopover text={sourceNote(caseDef, primarySource)} />}
                   </div>
                 </div>
-                <p style={{ marginTop: 0 }}>
-                  <strong>{caseDef.patient.age} yaşında {caseDef.patient.sex} hasta.</strong> <b>Başvuru:</b> {caseDef.chiefComplaint}.{' '}
-                  {/* madde 4 (wave 3): mobilde olgu kartı kısa kalsın diye öykü metni gizlenir (yaş/cinsiyet/başvuru yeterli) */}
-                  <span className="case-history-full">{caseDef.history}</span>
+                <p className="case-line">
+                  <strong>{patientLine(caseDef)}</strong> {caseDef.chiefComplaint}
+                  <span className="case-history-full"> {caseDef.history}</span>
                 </p>
                 <div className="kv-grid">
-                  {caseDef.vitalSigns.hr && <KV k="Kalp hızı" v={`${caseDef.vitalSigns.hr}/dk`} />}
+                  <KV k="Projeksiyon" v={VIEW_TEXT[image?.viewPosition ?? 'unknown']} />
+                  {caseDef.vitalSigns.hr && <KV k="Nabız" v={`${caseDef.vitalSigns.hr}/dk`} />}
                   {caseDef.vitalSigns.rr && <KV k="Solunum" v={`${caseDef.vitalSigns.rr}/dk`} />}
-                  {caseDef.vitalSigns.bp && <KV k="TA" v={caseDef.vitalSigns.bp} />}
                   {caseDef.vitalSigns.spo2 && <KV k="SpO₂" v={`%${caseDef.vitalSigns.spo2}`} />}
                   {caseDef.vitalSigns.temp && <KV k="Ateş" v={caseDef.vitalSigns.temp} />}
                 </div>
               </div>
 
-              {showCaseEndCard && state.pendingSummary ? (
+              {summaryOpen && !isAssessment && state.pendingSummary ? (
                 <CaseEndCard
                   summary={state.pendingSummary}
                   caseDef={caseDef}
                   caseNumber={state.caseIndex + 1}
-                  totalCases={caseList.length}
-                  isLast={state.caseIndex + 1 >= caseList.length}
+                  totalCases={total}
+                  isLast={state.caseIndex + 1 >= total}
                   onNext={() => dispatch({ type: 'nextCase' })}
                 />
               ) : q && (
@@ -289,16 +241,31 @@ export function SimulationScreen() {
                   <QuestionCard
                     q={q}
                     caseId={caseDef.id}
-                    value={state.answers[q.id] ?? []}
+                    value={given}
                     onChange={(values) => dispatch({ type: 'answer', qid: q.id, values })}
                     revealed={revealed}
                     index={state.step}
                     total={caseDef.questions.length}
                   />
+                  {hintOpen && q.hint && (
+                    <div className="hint-box" role="note">
+                      <IconLightbulb />
+                      <span>{q.hint} <span className="muted small">(ipucu: −5 puan)</span></span>
+                    </div>
+                  )}
                   {state.mode === 'practice' && revealed && (
-                    <FeedbackCard correct={isCorrect(q, state.answers[q.id] ?? [])} q={q} given={state.answers[q.id] ?? []} />
+                    <FeedbackCard correct={isAnswerCorrect(q, given, image)} q={q} given={given} />
                   )}
                   <div className="q-nav">
+                    {state.mode === 'practice' && q.hint && !hintOpen && !revealed && (
+                      <button
+                        className="btn outline small"
+                        onClick={() => { dispatch({ type: 'useHint' }); setHintOpen(true) }}
+                        title="İpucu kullanımı −5 puan"
+                      >
+                        <IconLightbulb /> İpucu
+                      </button>
+                    )}
                     <button
                       className={`btn ${isAssessment ? 'purple' : 'primary'}`}
                       style={{ flex: 1 }}
@@ -306,17 +273,10 @@ export function SimulationScreen() {
                       disabled={!canSubmit && !(state.mode === 'practice' && revealed)}
                     >
                       {state.mode === 'practice' && revealed
-                        ? isLastQuestion(caseDef, q) ? 'Vakayı tamamla' : 'Devam Et'
+                        ? caseDef.questions[caseDef.questions.length - 1]?.id === q.id ? 'Vakayı tamamla' : 'Devam et'
                         : 'Yanıtla'} <IconArrowRight />
                     </button>
                   </div>
-                </div>
-              )}
-
-              {state.mode === 'practice' && !showCaseEndCard && (
-                <div className="note-strip">
-                  <IconInfo />
-                  <span>İpucu kullanmak uygulama puanınızı düşürür. Değerlendirme modunda ipucu yoktur.</span>
                 </div>
               )}
             </div>
@@ -324,17 +284,11 @@ export function SimulationScreen() {
         </div>
       </div>
       <Footer />
-      <PediatricRefModal open={pedModalOpen} onClose={() => setPedModalOpen(false)} />
     </>
   )
 }
 
-/** madde 5: uygulama modunda vaka bitince gösterilen özet kartı — soru kartının yerinde,
- *  sahne "pasif" hâlde. Skoru, alan bazlı kısa çubukları, klinik özeti/ayırıcı tanıyı ve
- *  teknik notunu gösterir; "Sonraki vaka" ile nextCase dispatch edilir. */
-function CaseEndCard({
-  summary, caseDef, caseNumber, totalCases, isLast, onNext,
-}: {
+function CaseEndCard({ summary, caseDef, caseNumber, totalCases, isLast, onNext }: {
   summary: CaseResult
   caseDef: CaseDef
   caseNumber: number
@@ -343,9 +297,11 @@ function CaseEndCard({
   onNext: () => void
 }) {
   const rows: { key: keyof ScoringWeights; label: string }[] = [
-    { key: 'technique', label: 'Teknik' },
+    { key: 'technique', label: 'Okuma kapsamı' },
+    { key: 'systematic', label: 'ABCDE sırası' },
+    { key: 'quality', label: 'Film kalitesi' },
+    { key: 'recognition', label: 'Bulgu tanıma' },
     { key: 'localization', label: 'Lokalizasyon' },
-    { key: 'recognition', label: 'Tanıma' },
     { key: 'interpretation', label: 'Yorum' },
   ]
   return (
@@ -368,19 +324,17 @@ function CaseEndCard({
           )
         })}
       </div>
-      {caseDef.feedback?.summary && (
-        <div className="case-end-block">
-          <b>Klinik özet</b>
-          <p>{caseDef.feedback.summary}</p>
-        </div>
-      )}
-      {caseDef.feedback?.differential && (
+      <div className="case-end-block">
+        <b>Ana bulgu: {findingShort(caseDef.primaryFinding)}</b>
+        <p>{caseDef.feedback.summary}</p>
+      </div>
+      {caseDef.feedback.differential && (
         <div className="case-end-block">
           <b>Ayırıcı düşünceler</b>
           <p>{caseDef.feedback.differential}</p>
         </div>
       )}
-      {caseDef.feedback?.techniqueNotes && <p className="case-end-note">{caseDef.feedback.techniqueNotes}</p>}
+      {caseDef.feedback.techniqueNotes && <p className="case-end-note">{caseDef.feedback.techniqueNotes}</p>}
       <div className="q-nav">
         <button className="btn primary" style={{ flex: 1 }} onClick={onNext}>
           {isLast ? 'Sonuçları gör' : 'Sonraki vaka'} <IconArrowRight />
@@ -390,19 +344,13 @@ function CaseEndCard({
   )
 }
 
-/** madde 7 (wave 2): kayıt bilgisi artık tıklamayla açılan bir popover — dokunmatikte de
- *  çalışır (title tooltip yerine). Dışarı tıklayınca / ESC ile kapanır. */
-function MappingNotePopover({ note }: { note: string }) {
+function SourcePopover({ text }: { text: string }) {
   const [open, setOpen] = useState(false)
   const wrapRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     if (!open) return
-    const onDoc = (e: MouseEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false)
-    }
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
-    }
+    const onDoc = (e: MouseEvent) => { if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false) }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
     document.addEventListener('mousedown', onDoc)
     document.addEventListener('keydown', onKey)
     return () => {
@@ -412,26 +360,32 @@ function MappingNotePopover({ note }: { note: string }) {
   }, [open])
   return (
     <div className="popover-wrap" ref={wrapRef}>
-      <button
-        type="button"
-        className="btn outline small mapping-note-btn"
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-      >
-        <IconInfo width={14} height={14} /> Kayıt bilgisi
+      <button type="button" className="btn outline small" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+        <IconInfo width={14} height={14} /> Görüntü kaynağı
       </button>
-      {open && (
-        <div className="popover" role="note">
-          {note}
-        </div>
-      )}
+      {open && <div className="popover" role="note">{text}</div>}
     </div>
   )
 }
 
-/* vaka bazında ses haritası + fallback bilgisi (dürüst posterior eğitimi §14) */
-function useMemoSounds(caseDef: CaseDef) {
-  return useMemo(() => resolveCaseSoundsEx(caseDef.soundAssignments), [caseDef])
+function sourceNote(c: CaseDef, src: string | undefined): string {
+  const img = getImage(c.imageId)
+  const parts = [
+    img ? `Kaynak: ${img.sourceDataset} (${img.sourceFile}).` : 'Görüntü kaydı bulunamadı.',
+    `Ana bulgu etiketi: ${src ? LABEL_SOURCE_TEXT[src] ?? src : 'yok'}.`,
+  ]
+  if (c.mappingNote) parts.push(c.mappingNote)
+  return parts.join(' ')
+}
+
+function patientLine(c: CaseDef): string {
+  const age = c.patient.age != null ? `${c.patient.age} yaşında` : 'Yaşı bilinmeyen'
+  const sex = c.patient.sex ? `${c.patient.sex} hasta.` : 'hasta.'
+  return `${age} ${sex}`
+}
+
+function fmtSec(s: number): string {
+  return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 }
 
 function KV({ k, v }: { k: string; v: string }) {
@@ -441,12 +395,4 @@ function KV({ k, v }: { k: string; v: string }) {
       <div className="v">{v}</div>
     </div>
   )
-}
-
-function isCorrect(q: Question, given: string[]): boolean {
-  return given.length > 0 && q.correct.length === given.length && given.every((g) => q.correct.includes(g))
-}
-
-function isLastQuestion(caseDef: CaseDef, q?: Question): boolean {
-  return !!q && caseDef.questions[caseDef.questions.length - 1]?.id === q.id
 }

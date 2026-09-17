@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /** Bağımsız HTML çıktısı üretir (SCORM'sız kullanım için).
- *  dist/ içeriğini release/EGEMED-Ausculta-HTML/ altına kopyalar ve zip üretir.
+ *  dist/ içeriğini release/EGEMED-Opaca-HTML/ altına kopyalar ve zip üretir.
  *  Çıktı herhangi bir web sunucusunda ya da yerel klasörden çalıştırılabilir;
  *  LMS/SCORM gerekmez (SCORM 1.2 paketi ayrıca `npm run build:scorm` ile üretilir). */
 import fs from 'node:fs'
@@ -12,7 +12,7 @@ import { injectCsp } from './lib/inject-csp.mjs'
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const DIST = path.join(ROOT, 'dist')
 const RELEASE = path.join(ROOT, 'release')
-const OUT_DIR = path.join(RELEASE, 'EGEMED-Ausculta-HTML')
+const OUT_DIR = path.join(RELEASE, 'EGEMED-Opaca-HTML')
 
 if (!fs.existsSync(path.join(DIST, 'index.html'))) {
   console.error('dist/ boş — önce `npm run build` çalıştırın.')
@@ -53,19 +53,19 @@ if (fs.existsSync(outIndexPath)) {
 fs.writeFileSync(
   path.join(OUT_DIR, 'NASIL-CALISTIRILIR.txt'),
   [
-    'EGEMED Ausculta — Kardiyopulmoner Oskültasyon Simülatörü (bağımsız HTML çıktı)',
+    'EGEMED Opaca — Radyolojik Görüntüleme Simülatörü (bağımsız HTML çıktı)',
     '',
     'Bu klasörü bir web sunucusunda yayınlayın (ör. okul/intranet sunucusu):',
     '  python3 -m http.server 8080   veya   npx serve .',
     'ya da tüm klasörü bir web alanına yükleyip index.html adresini açın.',
     '',
     'Notlar:',
-    '- SCORM/LMS gerekmez; çevrimdışı çalışır, tüm sesler ve görseller klasördedir.',
-    '- Sesler tarayıcı politikaları nedeniyle file:// ile değil, HTTP üzerinden en iyi çalışır.',
-    '- İlk açılışta "Nasıl Kullanılır?" ekranı görünür; kulaklık önerilir.',
-    '- Ses kayıtları: HLS-CMDS v3 (CC BY 4.0) ve CirCor (ODC-BY 1.0); ayrıntı "Kaynaklar" ekranında.',
+    '- SCORM/LMS gerekmez; çevrimdışı çalışır, tüm görüntüler klasördedir.',
+    '- Tarayıcı güvenlik politikaları nedeniyle file:// yerine HTTP üzerinden açın.',
+    '- İlk açılışta "Nasıl kullanılır?" ekranı görünür.',
+    '- Görüntüler: NIH ChestX-ray14 (NIH Clinical Center) ve RSNA/STR açıklamaları; atıflar "Hakkında" ekranında.',
     '',
-    'EGEMED Ausculta © 2026',
+    'EGEMED Opaca © 2026',
   ].join('\n')
 )
 
@@ -73,7 +73,7 @@ const zip = new JSZip()
 for (const f of listFiles(OUT_DIR)) {
   zip.file(f.replace(/\\/g, '/'), fs.readFileSync(path.join(OUT_DIR, f)))
 }
-const zipPath = path.join(RELEASE, 'EGEMED-Ausculta-HTML.zip')
+const zipPath = path.join(RELEASE, 'EGEMED-Opaca-HTML.zip')
 const buf = await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE', compressionOptions: { level: 6 } })
 fs.writeFileSync(zipPath, buf)
 

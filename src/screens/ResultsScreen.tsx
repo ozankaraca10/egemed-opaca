@@ -4,16 +4,13 @@ import { Footer, EcgDeco } from '../ui/chrome'
 import { aggregateResults } from '../core/scoring'
 import { ALL_CASES, poolFor } from '../data/pool'
 import { sampleSession, SESSION_SIZE } from '../core/session'
-import { firstWeakLibraryKey, libraryKeyForCase, weakDomainKeys } from '../core/flow'
-import libraryData from '../data/library.json'
+import { firstWeakLibraryKey, weakDomainKeys } from '../core/flow'
+import { libraryKeyForFinding } from '../data/terminology'
+import { decodeMark } from '../core/geometry'
 import {
-  IconStethoscope, IconLungs, IconWave, IconDoc, IconCheckCircle, IconExit, IconClock, IconChevronRight,
+  IconScan, IconLungs, IconFilm, IconDoc, IconCheckCircle, IconExit, IconClock, IconChevronRight, IconTarget,
 } from '../ui/icons'
 import type { ScoringWeights } from '../core/types'
-
-const libraryItems = libraryData.groups.flatMap((g) =>
-  g.items.map((it) => ({ key: it.key, category: it.category, acousticFinding: it.acousticFinding }))
-)
 
 /** Sonuç ekranı (§24, madde 7): sola hizalı rapor düzeni — özet şerit, alan bazlı yüzde
  *  performans, genişleyebilir vaka raporu tablosu. */
@@ -31,12 +28,13 @@ export function ResultsScreen() {
   const [expanded, setExpanded] = useState<string | null>(null)
 
   const domainRows: { key: keyof ScoringWeights; label: string; icon: React.ReactNode }[] = [
-    { key: 'technique', label: 'Oskültasyon tekniği', icon: <IconStethoscope /> },
-    { key: 'localization', label: 'Anatomik lokalizasyon', icon: <IconLungs /> },
-    { key: 'recognition', label: 'Ses tanımlama', icon: <IconWave /> },
+    { key: 'technique', label: 'Okuma kapsamı', icon: <IconScan /> },
+    { key: 'systematic', label: 'ABCDE sırası', icon: <IconScan /> },
+    { key: 'quality', label: 'Film kalitesi', icon: <IconFilm /> },
+    { key: 'recognition', label: 'Bulgu tanıma', icon: <IconLungs /> },
+    { key: 'localization', label: 'Lokalizasyon', icon: <IconTarget /> },
     { key: 'interpretation', label: 'Klinik yorum', icon: <IconDoc /> },
     { key: 'diagnosis', label: 'Tanı (varsa)', icon: <IconCheckCircle /> },
-    { key: 'systematic', label: 'Sistematik muayene', icon: <IconStethoscope /> },
   ]
 
   // D12: gerçek bir LMS içindeyse oturumu sonlandır ve sekmeyi/penceresini kapatmayı dene;
@@ -59,9 +57,10 @@ export function ResultsScreen() {
   }
   // madde 5: yanlış yanıtlanan ilk vakanın öğrenme kütüphanesi kalemi — LearnScreen'i
   // o kaleme odaklı açar (tek seferlik; bkz. core/store.tsx learnFocusKey).
-  const weakLearnKey = firstWeakLibraryKey(state.caseResults, (caseId) =>
-    libraryKeyForCase(cases.find((c) => c.id === caseId), libraryItems)
-  )
+  const weakLearnKey = firstWeakLibraryKey(state.caseResults, (caseId) => {
+    const c = cases.find((x) => x.id === caseId)
+    return c ? c.libraryKey ?? libraryKeyForFinding(c.primaryFinding) : null
+  })
   const studyLearn = () => {
     if (weakLearnKey) dispatch({ type: 'setLearnFocus', key: weakLearnKey })
     dispatch({ type: 'startMode', mode: 'learn' })
@@ -70,12 +69,13 @@ export function ResultsScreen() {
 
   // madde 5: %60 altındaki alanlar için küçük "zayıf alan" çipleri
   const weakLabels: Record<string, string> = {
-    technique: 'Oskültasyon tekniği',
+    technique: 'Okuma kapsamı',
+    systematic: 'ABCDE sırası',
+    quality: 'Film kalitesi',
     localization: 'Lokalizasyon',
-    recognition: 'Ses tanımlama',
+    recognition: 'Bulgu tanıma',
     interpretation: 'Klinik yorum',
     diagnosis: 'Tanı',
-    systematic: 'Sistematik muayene',
   }
   const weakKeys = weakDomainKeys(domains, 60)
 
@@ -94,8 +94,8 @@ export function ResultsScreen() {
           </h1>
           <p className="results-sub-v2">
             {passed
-              ? 'Tebrikler — performansınız hedefin üzerinde. Bu düzeyi korumak için öğrenme modunda farklı ses sınıflarıyla pratik yapmaya devam edebilirsiniz.'
-              : 'Hedef puanın altında kaldınız. Öğrenme modunda ilgili ses sınıflarını tekrar dinleyip uygulama modunda yeniden denemeniz önerilir.'}
+              ? 'Tebrikler — performansınız hedefin üzerinde. Bu düzeyi korumak için öğrenme modunda farklı bulgularla okumaya devam edebilirsiniz.'
+              : 'Hedef puanın altında kaldınız. Öğrenme modunda ilgili bulguların örnek filmlerini inceleyip uygulama modunda yeniden denemeniz önerilir.'}
           </p>
 
           {weakKeys.length > 0 && (
@@ -197,12 +197,16 @@ export function ResultsScreen() {
                                 {r.answers.map((a) => {
                                   const question = c?.questions.find((qq) => qq.id === a.qid)
                                   if (!question) return null
-                                  const givenLabels =
-                                    a.given.map((id) => question.options.find((o) => o.id === id)?.label).filter(Boolean).join(', ') || '—'
-                                  const correctLabels = question.correct
-                                    .map((id) => question.options.find((o) => o.id === id)?.label)
-                                    .filter(Boolean)
-                                    .join(', ')
+                                  const isMark = question.type === 'localization'
+                                  const givenLabels = isMark
+                                    ? decodeMark(a.given[0]) ? 'Film üzerinde işaret' : '—'
+                                    : a.given.map((id) => question.options.find((o) => o.id === id)?.label).filter(Boolean).join(', ') || '—'
+                                  const correctLabels = isMark
+                                    ? 'Uzman işaretlemesinin içinde bir nokta'
+                                    : question.correct
+                                        .map((id) => question.options.find((o) => o.id === id)?.label)
+                                        .filter(Boolean)
+                                        .join(', ')
                                   return (
                                     <li key={a.qid} className={a.correct ? 'ok' : 'no'}>
                                       <span className="rd-q">{question.prompt}</span>

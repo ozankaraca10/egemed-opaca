@@ -1,76 +1,35 @@
-import { useMemo } from 'react'
 import { useStore } from '../core/store'
 import { bus } from '../core/events'
-import { resolveCaseSounds } from '../core/resolver'
+import { getImage } from '../core/images'
 import { ALL_CASES } from '../data/pool'
 
-/** Geliştirici teşhis paneli (§38). Üretim öğrenci arayüzünde GÖRÜNMEZ; yalnız dev build + ?dev=1.
- *  wave 2 madde 0: DEV rozeti artık header'ın sağ ucunda gösterilir (bkz. ui/chrome.tsx Header) —
- *  footer'a binen eski sabit-konumlu rozet kaldırıldı. */
+/** Geliştirici teşhis paneli — yalnız dev build + ?dev=1. */
 export function DevPanel() {
   const { state, runtime } = useStore()
-  // D8: caseIndex havuz sıralamasına değil, tek doğruluk kaynağı currentCaseId'ye göre çözülür.
-  const current = ALL_CASES.find((c) => c.id === state.currentCaseId)
-  const resolved = useMemo(
-    () => (current ? resolveCaseSounds(current.soundAssignments) : {}),
-    [current]
-  )
-  const log = bus.getLog().slice(-8)
-
-  // yalnız dev build + ?dev=1 ile açılır (§38)
   if (!runtime?.flags.dev) return null
   if (typeof window !== 'undefined' && !window.location.search.includes('dev=1')) return null
-
+  const current = ALL_CASES.find((c) => c.id === state.currentCaseId)
+  const img = getImage(current?.imageId)
+  const log = bus.getLog().slice(-8)
   return (
     <aside className="dev-panel" aria-label="Geliştirici teşhisi">
-      <h4>
-        <span>Ausculta DEV</span>
-        <button className="close" title="Kapat">✕</button>
-      </h4>
+      <h4><span>Opaca DEV</span></h4>
       <dl>
-        <dt>Ekran</dt>
-        <dd>{state.screen}</dd>
-        <dt>Mod</dt>
-        <dd>{state.mode}</dd>
-        <dt>Vaka</dt>
-        <dd>{current?.id ?? '-'}</dd>
-        <dt>Adım</dt>
-        <dd>{state.step}</dd>
-        <dt>SCORM</dt>
-        <dd>{runtime.flags.scormVersion} {runtime.flags.scormAvailable ? '(algılandı)' : '(mock)'}</dd>
-        <dt>Head</dt>
-        <dd>{state.head}</dd>
-        <dt>View</dt>
-        <dd>{state.view}</dd>
+        <dt>Ekran</dt><dd>{state.screen}</dd>
+        <dt>Mod</dt><dd>{state.mode}</dd>
+        <dt>Vaka</dt><dd>{current?.id ?? '-'}</dd>
+        <dt>Adım</dt><dd>{state.step}</dd>
+        <dt>SCORM</dt><dd>{runtime.flags.scormVersion} {runtime.flags.scormAvailable ? '(algılandı)' : '(mock)'}</dd>
+        <dt>Görüntü</dt><dd>{img ? `${img.id} · ${img.viewPosition} · ${img.width}×${img.height}` : '-'}</dd>
+        <dt>Kutular</dt><dd>{img?.annotations.length ?? 0}</dd>
+        <dt>Bölgeler</dt><dd>{state.telemetry.order.join(' › ') || '-'}</dd>
+        <dt>Vaka süresi</dt><dd>{Math.round(state.caseElapsed / 1000)} sn</dd>
       </dl>
       <div className="scroller">
         {log.map((e, i) => (
-          <div key={i}>· {e.type}{(e as { caseId?: string }).caseId ? ` ${String((e as { caseId?: string }).caseId)}` : ''}</div>
+          <div key={i}>· {e.type}</div>
         ))}
       </div>
-      {current && (
-        <div className="dev-panel-sounds">
-          <strong className="dev-accent">Ses haritası</strong>
-          {current.soundAssignments.map((a) => {
-            const rec = resolved[a.pointId]
-            return (
-              <div key={a.pointId} className="dev-panel-row">
-                <div className="dev-warn">{a.pointId}</div>
-                {rec ? (
-                  <>
-                    <div>→ {rec.id}</div>
-                    <div className="dev-muted">
-                      src: {rec.sourceFile} | lok: {rec.recordedLocation} | dur: {rec.durationSec}s
-                    </div>
-                  </>
-                ) : (
-                  <div className="dev-err">→ kayıt yok (eksik)</div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      )}
     </aside>
   )
 }

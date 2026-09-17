@@ -51,7 +51,7 @@ export function sampleSession(pool: CaseDef[], seed: number, count = SESSION_SIZ
   const rnd = mulberry32(seed)
   const byFinding = new Map<string, CaseDef[]>()
   for (const c of pool) {
-    const key = c.primaryAcousticFinding
+    const key = c.primaryFinding
     if (!byFinding.has(key)) byFinding.set(key, [])
     byFinding.get(key)!.push(c)
   }

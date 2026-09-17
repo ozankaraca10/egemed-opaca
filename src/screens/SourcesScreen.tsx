@@ -2,6 +2,7 @@ import { useStore } from '../core/store'
 import { Footer, EcgDeco } from '../ui/chrome'
 import sourcesData from '../data/sources.json'
 import { IconInfo, IconBook, IconHeart, IconDoc } from '../ui/icons'
+import { datasetCounts } from '../core/images'
 
 /** Kaynaklar ve Katkıda Bulunanlar (§33). Tüm metinler makine okunur `sources.json`'dan gelir:
  *  geliştiriciler (`credits`, Ünisis bağlantılı), kurum (`module`), veri setleri (`datasets`),
@@ -19,8 +20,9 @@ interface Dataset {
   id: string
   title: string
   authors: string[]
-  datasetDoi: string
+  datasetUrl: string
   articleDoi?: string
+  articleUrl?: string
   license: string
   licenseUrl?: string
   usage?: string
@@ -45,7 +47,7 @@ const data = sourcesData as unknown as {
   credits: CreditGroup[]
   datasets: Dataset[]
   assets?: Asset[]
-  inventory: { id: string; status: string; recordings: number; population: string }[]
+  inventory: { id: string; title: string; status: string; population: string; licenseVerified: boolean; notes: string; labelTypes: string[] }[]
   disclaimer: string
 }
 
@@ -58,6 +60,12 @@ function initials(name: string): string {
   return parts.map((p) => p[0]).join('').slice(0, 2).toUpperCase()
 }
 
+const STATUS_TEXT: Record<string, string> = {
+  importer_ready: 'İçe aktarıcı hazır',
+  license_review: 'Lisans incelemesinde',
+  inventory_only: 'Yalnız envanter (dağıtılamaz)',
+}
+
 /** DOI kısaltması → tam bağlantı; zaten URL ise dokunmaz */
 function doiHref(v: string): string {
   return /^https?:\/\//i.test(v) ? v : `https://doi.org/${v}`
@@ -66,23 +74,24 @@ function doiHref(v: string): string {
 /** Lisans metninden kısa çip etiketi ("CC BY 4.0", "ODC-BY 1.0", "CC0 1.0") */
 function licenseShort(license: string): string {
   const m = license.match(/CC BY(?:-SA)? \d\.\d|ODC-BY \d\.\d|CC0 \d\.\d/i)
-  return m ? m[0] : license
+  return m ? m[0] : license.split(/[;(]/)[0].trim()
 }
 
 export function SourcesScreen() {
   const { dispatch } = useStore()
   const invById = new Map(data.inventory.map((i) => [i.id, i]))
+  const counts = datasetCounts()
 
   return (
     <>
       <EcgDeco />
       <div className="screen" style={{ position: 'relative', zIndex: 1 }}>
         <div className="src-wrap screen-body">
-          <h1 className="src-title">EGEMED Ausculta<sup className="tm">™</sup> Hakkında</h1>
+          <h1 className="src-title">EGEMED Opaca<sup className="tm">™</sup> Hakkında</h1>
           <p className="src-sub">
             {data.module.product}
             <sup className="tm">™</sup> {data.module.subtitle}'nü geliştiren ekip, kurum bilgisi ve modülde kullanılan
-            klinik ses kayıtlarının atıf ve lisans bilgileri.
+            görüntü veri setlerinin atıf ve lisans bilgileri.
           </p>
 
           {/* ---- Geliştiriciler ---- */}
@@ -127,13 +136,13 @@ export function SourcesScreen() {
                   {data.module.product}<sup className="tm">™</sup> — {data.module.subtitle}
                 </h3>
                 <p>
-                  {data.module.developedBy} tarafından, tıp fakültesi öğrencilerinin kardiyopulmoner oskültasyon
-                  becerilerini geliştirmek amacıyla hazırlanmıştır. {data.module.copyright}.
+                  {data.module.developedBy} tarafından, mezuniyet öncesi tıp öğrencilerinin akciğer grafisini sistematik
+                  okuma becerilerini geliştirmek amacıyla hazırlanmıştır. {data.module.copyright}.
                 </p>
                 {data.module.evidence && (
                   <p className="inst-evidence">
                     {data.module.evidence.statement}
-                    <sup><a href={data.module.evidence.url} target="_blank" rel="noreferrer" aria-label="Kaynak: McKinney ve ark., 2013">[1]</a></sup>
+                    <sup><a href={data.module.evidence.url} target="_blank" rel="noreferrer" aria-label="Kaynak">[1]</a></sup>
                     <br />
                     <span className="inst-cite">
                       [1] {data.module.evidence.citation}{' '}
@@ -147,10 +156,10 @@ export function SourcesScreen() {
 
           {/* ---- Veri setleri ---- */}
           <section className="src-section" aria-labelledby="ds-h">
-            <h2 id="ds-h"><IconBook /> Ses Veri Setleri</h2>
+            <h2 id="ds-h"><IconBook /> Görüntü Veri Setleri</h2>
             <p className="src-sub">
-              Yalnız lisansı doğrulanmış ve etiketleri oskültasyon taksonomisine birebir eşlenen açık veri setleri
-              kullanılır; uymayan etiketler uydurulmaz.
+              Her bulgu etiketinin kaynağı (radyolog paneli, radyolog işaretlemesi ya da rapor metni) ayrı tutulur;
+              rapor metninden otomatik çıkarılan etiketler değerlendirmede kullanılmaz.
             </p>
             <div className="ds-grid">
               {data.datasets.map((d) => {
@@ -161,16 +170,13 @@ export function SourcesScreen() {
                     <div className="auth">{d.authors.join(', ')}</div>
                     <div className="ds-chips">
                       <span className="ds-chip lic">{licenseShort(d.license)}</span>
-                      {inv && (
-                        <span className="ds-chip">
-                          {inv.status === 'bundled' ? 'pakete dahil' : 'örnek kayıtlar'} · {inv.recordings.toLocaleString('tr-TR')} kayıt
-                        </span>
-                      )}
-                      {inv?.population && <span className={`ds-chip ${/pediatrik|gerçek/i.test(inv.population) ? 'real' : ''}`}>{inv.population}</span>}
+                      <span className="ds-chip">{(counts[d.id] ?? 0).toLocaleString('tr-TR')} film pakette</span>
+                      {inv && !inv.licenseVerified && <span className="ds-chip warn">lisans incelemede</span>}
+                      {inv?.labelTypes.map((t) => <span className="ds-chip" key={t}>{t}</span>)}
                     </div>
                     <div className="src-kv">
                       <span className="k">Veri seti</span>
-                      <span className="v"><a href={doiHref(d.datasetDoi)} target="_blank" rel="noreferrer">{d.datasetDoi}</a></span>
+                      <span className="v"><a href={d.datasetUrl} target="_blank" rel="noreferrer">{d.datasetUrl.replace(/^https?:\/\//, '')}</a></span>
                       {d.articleDoi && (
                         <>
                           <span className="k">Makale</span>
@@ -192,6 +198,27 @@ export function SourcesScreen() {
                   </article>
                 )
               })}
+            </div>
+          </section>
+
+          {/* ---- İncelenen veri setleri ---- */}
+          <section className="src-section" aria-labelledby="inv-h">
+            <h2 id="inv-h"><IconDoc /> İncelenen diğer veri setleri</h2>
+            <p className="src-sub">Aşağıdakiler değerlendirildi ancak lisans ya da paylaşım koşulları nedeniyle pakete alınmadı.</p>
+            <div className="table-scroll">
+              <table className="report-table inv-table">
+                <thead><tr><th>Veri seti</th><th>Durum</th><th>Etiket türü</th><th>Not</th></tr></thead>
+                <tbody>
+                  {data.inventory.filter((i) => !data.datasets.some((d) => d.id === i.id)).map((i) => (
+                    <tr key={i.id}>
+                      <td>{i.title}</td>
+                      <td>{STATUS_TEXT[i.status] ?? i.status}</td>
+                      <td>{i.labelTypes.join(', ')}</td>
+                      <td>{i.notes}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </section>
 

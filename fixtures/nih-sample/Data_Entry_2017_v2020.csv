@@ -1,0 +1,3 @@
+Image Index,Finding Labels,Follow-up #,Patient ID,Patient Age,Patient Gender,View Position,OriginalImage[Width,Height],OriginalImagePixelSpacing[x,y]
+00000001_000.png,Cardiomegaly,0,1,57,M,PA,2682,2749,0.14300000000000002,0.14300000000000002
+00027426_000.png,No Finding,0,27426,53,M,PA,2992,2991,0.14300000000000002,0.14300000000000002

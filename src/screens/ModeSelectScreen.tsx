@@ -1,73 +1,66 @@
 import { useStore } from '../core/store'
 import { Footer, EcgDeco } from '../ui/chrome'
-import { IconGraduation, IconStethoscope, IconChart, IconCheck, IconHeadphones } from '../ui/icons'
+import { IconGraduation, IconFilm, IconChart, IconCheck } from '../ui/icons'
 import type { Mode } from '../core/types'
-import libraryData from '../data/library.json'
 import { poolFor } from '../data/pool'
+import { LIBRARY_ITEMS } from '../data/terminology'
 import { sampleSession, SESSION_SIZE } from '../core/session'
 
-const practiceCases = poolFor('practice')
-const assessmentCases = poolFor('assessment')
-const libraryCount = libraryData.groups.reduce((s2, g) => s2 + g.items.length, 0)
-
-/** Mod seçim ekranı (§44): Öğrenme / Uygulama / Değerlendirme kartları + adım göstergesi. */
-
+/** Mod seçim ekranı: Öğrenme / Uygulama / Değerlendirme. */
 export function ModeSelectScreen() {
-  const { state, dispatch } = useStore()
+  const { dispatch } = useStore()
+  const practiceCount = poolFor('practice').length
+  const assessmentCount = poolFor('assessment').length
   const pick = (mode: Mode) => {
-    // oturum başına rastgele 10 vaka: tohum oturum başında üretilir, suspend ile korunur
     if (mode !== 'learn') {
       const seed = (Date.now() % 2147483647) | 0
-      const practiceIds = sampleSession(poolFor('practice'), seed, SESSION_SIZE)
-      const assessmentIds = sampleSession(poolFor('assessment'), seed + 1, SESSION_SIZE)
-      dispatch({ type: 'startSession', practiceIds, assessmentIds, seed })
+      dispatch({
+        type: 'startSession',
+        practiceIds: sampleSession(poolFor('practice'), seed, SESSION_SIZE),
+        assessmentIds: sampleSession(poolFor('assessment'), seed + 1, SESSION_SIZE),
+        seed,
+      })
     }
     dispatch({ type: 'startMode', mode })
     if (mode === 'learn') dispatch({ type: 'goto', screen: 'learn' })
   }
-  void state
   return (
     <>
       <EcgDeco />
       <div className="screen" style={{ position: 'relative', zIndex: 1 }}>
         <div className="container screen-body">
-          <Stepper active={1} labels={['Mod Seçimi', 'Çalışma', 'Tamamla']} />
-          <h1 className="mode-title">Çalışma Modunu Seçin</h1>
-          <p className="mode-sub">Hangi modda çalışmak istersiniz?</p>
-          <div className="mode-note">
-            <div className="headphone-banner thin">
-              <IconHeadphones />
-              <span className="vsep" />
-              <span>Tüm modlarda gerçek hasta sesleri kullanılır — <span className="muted">kulaklıkla çalışmanız önerilir.</span></span>
-            </div>
-          </div>
+          <Stepper active={1} labels={['Mod seçimi', 'Çalışma', 'Tamamla']} />
+          <h1 className="mode-title">Çalışma modunu seçin</h1>
+          <p className="mode-sub">Önce öğrenme modunda okuma sırasını oturtmanız önerilir.</p>
           <div className="mode-cards">
             <ModeCard
               kind="learn"
               icon={<IconGraduation />}
               title="Öğrenme Modu"
-              text={`${libraryCount} ses sınıfını metafor, dalga formu ve klinik bilgiyle sınırsız dinleyerek keşfedin.`}
-              items={['Rehberli öğrenme', 'Ses metaforları', 'Sınırsız dinleme']}
+              text={`${LIBRARY_ITEMS.length} konuyu örnek filmler, okuma bölgeleri ve uzman işaretlemeleriyle inceleyin.`}
+              items={['ABCDE okuma rehberi', 'Uzman işaretlemesi açılıp kapanır', 'Süre ve puan yok']}
               cta="Öğrenmeye başla"
               onPick={() => pick('learn')}
             />
             <ModeCard
               kind="practice"
-              icon={<IconStethoscope />}
+              icon={<IconFilm />}
               title="Uygulama Modu"
-              text={`${practiceCases.length} vakalık havuzdan her oturumda rastgele ${SESSION_SIZE} vaka sunulur; ipucu ve geri bildirimle çalışın.`}
-              items={['Rastgele 10 vaka', 'İpucu desteği', 'Detaylı geri bildirim']}
+              text={practiceCount ? `${practiceCount} vakalık havuzdan her oturumda rastgele ${Math.min(SESSION_SIZE, practiceCount)} vaka; ipucu ve geri bildirimle.` : 'Uygulama havuzu boş: önce veri setini içe aktarın.'}
+              items={['Görüntü üzerinde işaretleme', 'İpucu desteği', 'Yanıttan sonra uzman işaretlemesi']}
               cta="Vakaları çöz"
+              disabled={!practiceCount}
               onPick={() => pick('practice')}
             />
             <ModeCard
               kind="assessment"
               icon={<IconChart />}
               title="Değerlendirme Modu"
-              text={`${assessmentCases.length} doğrulanmış vakalık havuzdan rastgele ${SESSION_SIZE} vaka ile maksimum zorlukta ölçülün.`}
-              items={['Rastgele 10 vaka', 'İpuçsuz + tek dinleme', 'SCORM puanı']}
-              rules="İpucu yok · tek dinleme · SCORM'a puan yazılır"
+              text={assessmentCount ? `${assessmentCount} radyolog etiketli vakalık havuzdan rastgele ${Math.min(SESSION_SIZE, assessmentCount)} vaka.` : 'Değerlendirme havuzu boş: radyolog etiketli veri seti içe aktarılmalı.'}
+              items={['Okuma bölgesi ve uzman katmanı yok', 'Vaka başına süre sınırı', 'SCORM puanı']}
+              rules="İpucu yok · geri bildirim yalnız sonunda · puan LMS'e yazılır"
               cta="Değerlendirmeye gir"
+              disabled={!assessmentCount}
               onPick={() => pick('assessment')}
             />
           </div>
@@ -92,11 +85,7 @@ export function Stepper({ active, labels }: { active: number; labels: string[] }
   )
 }
 
-const ArrowRight = () => (
-  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 12h15" /><path d="m13 6 6 6-6 6" /></svg>
-)
-
-function ModeCard({ kind, icon, title, text, items, cta, onPick, rules }: {
+function ModeCard({ kind, icon, title, text, items, cta, onPick, rules, disabled }: {
   kind: Mode
   icon: React.ReactNode
   title: string
@@ -104,8 +93,8 @@ function ModeCard({ kind, icon, title, text, items, cta, onPick, rules }: {
   items: string[]
   cta: string
   onPick: () => void
-  /** yalnız Değerlendirme kartında: kısa "Kurallar" satırı */
   rules?: string
+  disabled?: boolean
 }) {
   return (
     <div className={`mode-card ${kind}`}>
@@ -121,8 +110,8 @@ function ModeCard({ kind, icon, title, text, items, cta, onPick, rules }: {
         ))}
       </ul>
       {rules && <p className="mode-rules">{rules}</p>}
-      <button className={`btn ${kind === 'learn' ? 'green' : kind === 'assessment' ? 'purple' : 'primary'}`} onClick={onPick}>
-        {cta} <ArrowRight />
+      <button className={`btn ${kind === 'learn' ? 'green' : kind === 'assessment' ? 'purple' : 'primary'}`} onClick={onPick} disabled={disabled}>
+        {cta}
       </button>
     </div>
   )

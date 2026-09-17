@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "note": "Bulgu taksonomisi — uygulama ve import betiklerinin ortak tek doğruluk kaynağı. 'teaching: false' olan etiketler yalnız meta veri olarak tutulur; vaka/soru üretmez.",
+  "findings": {
+    "normal": { "label": "Normal akciğer grafisi", "short": "Normal", "group": "technique", "teaching": true },
+    "cardiomegaly": { "label": "Kardiyomegali", "short": "Kardiyomegali", "group": "cardiac", "teaching": true },
+    "pleural_effusion": { "label": "Plevral efüzyon", "short": "Efüzyon", "group": "pleura", "teaching": true },
+    "pneumothorax": { "label": "Pnömotoraks", "short": "Pnömotoraks", "group": "pleura", "teaching": true },
+    "airspace_opacity": { "label": "Havalı alan opasitesi (konsolidasyon)", "short": "Havalı alan opasitesi", "group": "parenchyma", "teaching": true },
+    "nodule_mass": { "label": "Nodül / kitle", "short": "Nodül / kitle", "group": "parenchyma", "teaching": true },
+    "atelectasis": { "label": "Atelektazi", "short": "Atelektazi", "group": "parenchyma", "teaching": true },
+    "edema": { "label": "Pulmoner ödem", "short": "Ödem", "group": "parenchyma", "teaching": true },
+    "emphysema": { "label": "Amfizem", "short": "Amfizem", "group": "parenchyma", "teaching": true },
+    "fracture": { "label": "Kemik kırığı", "short": "Kırık", "group": "bone", "teaching": true },
+    "infiltration": { "label": "İnfiltrasyon (NIH rapor etiketi)", "short": "İnfiltrasyon", "group": "parenchyma", "teaching": false },
+    "consolidation": { "label": "Konsolidasyon (NIH rapor etiketi)", "short": "Konsolidasyon", "group": "parenchyma", "teaching": false },
+    "pneumonia_report": { "label": "Pnömoni (NIH rapor etiketi)", "short": "Pnömoni", "group": "parenchyma", "teaching": false },
+    "fibrosis": { "label": "Fibrozis (NIH rapor etiketi)", "short": "Fibrozis", "group": "parenchyma", "teaching": false },
+    "pleural_thickening": { "label": "Plevral kalınlaşma (NIH rapor etiketi)", "short": "Plevral kalınlaşma", "group": "pleura", "teaching": false },
+    "hernia": { "label": "Herni (NIH rapor etiketi)", "short": "Herni", "group": "other", "teaching": false },
+    "no_finding_report": { "label": "Raporda bulgu yok (NIH rapor etiketi — 'normal' anlamına gelmez)", "short": "Rapor: bulgu yok", "group": "other", "teaching": false }
+  },
+  "nihLabelMap": {
+    "Atelectasis": "atelectasis",
+    "Cardiomegaly": "cardiomegaly",
+    "Effusion": "pleural_effusion",
+    "Infiltration": "infiltration",
+    "Mass": "nodule_mass",
+    "Nodule": "nodule_mass",
+    "Pneumonia": "pneumonia_report",
+    "Pneumothorax": "pneumothorax",
+    "Consolidation": "consolidation",
+    "Edema": "edema",
+    "Emphysema": "emphysema",
+    "Fibrosis": "fibrosis",
+    "Pleural_Thickening": "pleural_thickening",
+    "Hernia": "hernia",
+    "No Finding": "no_finding_report",
+    "Infiltrate": "infiltration"
+  },
+  "googleFourFindingsColumns": {
+    "Fracture": "fracture",
+    "Pneumothorax": "pneumothorax",
+    "Airspace opacity": "airspace_opacity",
+    "Nodule or mass": "nodule_mass"
+  }
+}
