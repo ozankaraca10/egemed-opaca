@@ -109,29 +109,54 @@
 .gami-domains .dr-lbl { display: inline-flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
 .gami-domains .badge { font-size: var(--fs-xs); padding: 1px 8px; }
 
-/* ---------- rozetler ---------- */
-.gami-badge-ic { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--orange-100); color: var(--amber-700); border: 2px solid transparent; }
-.gami-badge-ic svg { width: 26px; height: 26px; }
-.gami-badge-ic.tier-bronze { border-color: color-mix(in srgb, var(--amber-700) 70%, transparent); }
-.gami-badge-ic.tier-silver { border-color: var(--ink-300); background: var(--blue-50); color: var(--ink-600); }
-.gami-badge-ic.tier-gold { border-color: var(--orange-500); }
-.gami-badge-ic.locked { background: var(--blue-50); color: var(--ink-400); border-color: transparent; }
+/* ---------- rozetler ----------
+   Kategori → renk (yalnız token çiftleri):
+   konu (bulgu tanıma) mavi · beceri (okuma/lokalizasyon/yorum) mor · seri (devamlılık) turuncu/amber ·
+   öğrenme (keşif/uygulama) yeşil · kilometre taşı (eşik, zirve) lacivert.
+   Kazanılmış: kategori gradyanlı dolu madalyon + beyaz ikon + kartta kategori tonlu üst zemin.
+   Devam eden: kategori açık tonu + kategori renkli ikon + kategori renkli ilerleme çubuğu.
+   Kilitli: gri, kilit rozetçiği. Kademe (bronz/gümüş/altın) madalyonun dış halkasıdır. */
+.gami-badge-ic { --c1: var(--blue-500); --c2: var(--blue-700); --tint: var(--blue-50); --fg: var(--blue-600);
+  position: relative; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  background: linear-gradient(145deg, var(--c1), var(--c2)); color: var(--card); box-shadow: 0 6px 16px color-mix(in srgb, var(--c2) 28%, transparent); }
+.gami-badge-ic svg { width: 28px; height: 28px; }
+.c-topic { --c1: var(--blue-500); --c2: var(--blue-700); --tint: var(--blue-50); --fg: var(--blue-600); }
+.c-skill { --c1: var(--purple-600); --c2: var(--purple-700); --tint: var(--purple-50); --fg: var(--purple-600); }
+.c-streak { --c1: var(--orange-500); --c2: var(--amber-700); --tint: var(--orange-100); --fg: var(--amber-700); }
+.c-learn { --c1: var(--green-500); --c2: var(--green-600); --tint: var(--green-50); --fg: var(--green-600); }
+.c-milestone { --c1: var(--navy-600); --c2: var(--navy-900); --tint: var(--card-soft); --fg: var(--navy-700); }
+/* kademe halkası: beyaz boşluk + madalya rengi */
+.gami-badge-ic.tier-bronze { box-shadow: 0 0 0 3px var(--card), 0 0 0 6px color-mix(in srgb, var(--amber-700) 70%, transparent), 0 6px 16px color-mix(in srgb, var(--c2) 28%, transparent); }
+.gami-badge-ic.tier-silver { box-shadow: 0 0 0 3px var(--card), 0 0 0 6px var(--ink-300), 0 6px 16px color-mix(in srgb, var(--c2) 28%, transparent); }
+.gami-badge-ic.tier-gold { box-shadow: 0 0 0 3px var(--card), 0 0 0 6px var(--orange-500), 0 6px 16px color-mix(in srgb, var(--c2) 28%, transparent); }
+.gami-badge-ic.progress { background: var(--tint); color: var(--fg); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--fg) 25%, transparent); }
+.gami-badge-ic.locked { background: var(--blue-50); color: var(--ink-300); box-shadow: inset 0 0 0 1.5px var(--border); }
+.gami-badge-ic .lock { position: absolute; right: -2px; bottom: -2px; width: 22px; height: 22px; border-radius: 50%; background: var(--card); color: var(--ink-400); display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(13, 52, 111, .18); }
+.gami-badge-ic .lock svg { width: 12px; height: 12px; }
 .gami-badge-ic.sm { width: 44px; height: 44px; }
 .gami-badge-ic.sm svg { width: 22px; height: 22px; }
 .gami-badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--sp-3); }
-.gami-badge { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: var(--sp-4) var(--sp-3) var(--sp-3); font: inherit; color: inherit; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.gami-badge { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: var(--sp-4) var(--sp-3) var(--sp-3); font: inherit; color: inherit; cursor: pointer; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.gami-badge.is-earned { background: linear-gradient(180deg, var(--tint), var(--card) 58%); border-color: color-mix(in srgb, var(--fg) 22%, var(--border)); }
 .gami-badge:hover { border-color: var(--border-strong); box-shadow: var(--shadow-card); }
+.gami-badge.is-earned:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--fg) 45%, var(--border)); }
+.gami-badge .gami-badge-ic { margin-bottom: 4px; }
+.gami-badge .cat { font-size: 11px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: var(--fg); }
 .gami-badge .nm { font-size: var(--fs-md); font-weight: 700; color: var(--ink-900); line-height: 1.25; }
 .gami-badge .ds { font-size: var(--fs-xs); color: var(--ink-600); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.7em; }
 .gami-badge .ft { margin-top: auto; width: 100%; font-size: var(--fs-xs); color: var(--ink-500); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.gami-badge.is-earned .ft { color: var(--fg); }
 .gami-badge .ft svg { width: 13px; height: 13px; }
-.gami-badge .ft .domain-bar { flex: 1; height: 6px; }
-.gami-badge .ft .domain-bar > i { background: var(--orange-500); }
-.gami-badge.is-locked { opacity: .55; }
-.gami-badge.is-locked .nm { color: var(--ink-600); }
+.gami-badge .ft .domain-bar { flex: 1; height: 6px; background: color-mix(in srgb, var(--fg) 14%, var(--card)); }
+.gami-badge .ft .domain-bar > i { background: var(--fg); }
+.gami-badge.is-locked .nm, .gami-badge.is-locked .cat { color: var(--ink-400); }
+.gami-badge.is-locked .ds { color: var(--ink-400); }
 .gami-recent { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-3); }
 .gami-recent .gami-badge { padding: var(--sp-3); }
 .gami-count { font-size: var(--fs-sm); color: var(--ink-600); font-weight: 700; font-variant-numeric: tabular-nums; }
+.gami-cat-legend { display: flex; flex-wrap: wrap; gap: var(--sp-3); font-size: var(--fs-xs); color: var(--ink-600); font-weight: 600; margin: calc(var(--sp-1) * -1) 0 var(--sp-3); }
+.gami-cat-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.gami-cat-legend i { width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(145deg, var(--c1), var(--c2)); }
 
 /* ---------- boş durum ---------- */
 .gami-empty { text-align: center; padding: var(--sp-6) var(--sp-5); }
@@ -150,13 +175,13 @@
 
 /* ---------- tebrik kartı (ay kazananı) ---------- */
 .gami-congrats { display: flex; align-items: center; gap: var(--sp-4); background: var(--green-50); border-color: var(--green-100); }
-.gami-congrats .gami-badge-ic { background: var(--card); color: var(--green-600); }
+.gami-congrats .gami-badge-ic { --c1: var(--green-500); --c2: var(--green-600); }
 .gami-congrats b { display: block; color: var(--ink-900); font-size: var(--fs-lg); }
 .gami-congrats span { color: var(--ink-600); }
 
 /* ---------- Ayın Ödülü ---------- */
 .gami-reward { position: relative; display: grid; grid-template-columns: 64px 1fr; gap: var(--sp-2) var(--sp-4); border-left: 4px solid var(--orange-500); background: linear-gradient(90deg, var(--orange-100), var(--card) 55%); padding: var(--sp-4) var(--sp-5); }
-.gami-reward .gami-badge-ic { width: 64px; height: 64px; border-color: var(--orange-500); background: var(--card); }
+.gami-reward .gami-badge-ic { width: 64px; height: 64px; }
 .gami-reward .gami-badge-ic svg { width: 30px; height: 30px; }
 .gami-reward .rs-lbl { color: var(--amber-700); }
 .gami-reward h2 { margin: 2px 0 4px; font-size: var(--fs-xl); font-weight: 800; color: var(--navy-900); line-height: 1.25; }
@@ -167,7 +192,7 @@
 .gami-chip-purple { background: var(--purple-100); color: var(--purple-700); }
 .gami-chip-green { background: var(--green-100); color: var(--green-600); }
 .gami-reward.compact { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2) var(--sp-4); }
-.gami-reward.compact .gami-badge-ic { width: 32px; height: 32px; border-width: 1.5px; }
+.gami-reward.compact .gami-badge-ic { width: 32px; height: 32px; box-shadow: none; }
 .gami-reward.compact .gami-badge-ic svg { width: 16px; height: 16px; }
 .gami-reward.compact .txt { font-size: var(--fs-sm); color: var(--ink-700); }
 .gami-reward.compact .txt b { color: var(--ink-900); }
@@ -241,8 +266,8 @@
 .gami-history[open] summary svg { transform: rotate(90deg); }
 .gami-history-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--sp-3); margin-top: var(--sp-3); }
 .gami-history-month { border: 1px solid var(--border); border-radius: var(--r-md); padding: var(--sp-3); }
-.gami-history-month b { display: block; color: var(--ink-900); font-size: var(--fs-sm); }
-.gami-history-month span { display: block; font-size: var(--fs-xs); color: var(--ink-500); margin-bottom: var(--sp-2); }
+.gami-history-month > b { display: block; color: var(--ink-900); font-size: var(--fs-sm); }
+.gami-history-month > span { display: block; font-size: var(--fs-xs); color: var(--ink-500); margin-bottom: var(--sp-2); }
 .gami-history-month ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .gami-history-month li { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-sm); color: var(--ink-700); }
 .gami-history-month .gami-medal { width: 24px; height: 24px; font-size: var(--fs-xs); }
@@ -269,12 +294,14 @@
 
 /* ---------- rozet detay penceresi (modal-* kalıbı) ---------- */
 .gami-badge-detail { text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
-.gami-badge-detail .gami-badge-ic { width: 88px; height: 88px; border-width: 3px; }
+.gami-badge-detail .gami-badge-ic { width: 88px; height: 88px; }
 .gami-badge-detail .gami-badge-ic svg { width: 40px; height: 40px; }
 .gami-badge-detail h4 { margin: 0; font-size: var(--fs-xl); color: var(--navy-900); }
 .gami-badge-detail .rule { margin: 0; color: var(--ink-600); max-width: 460px; }
 .gami-badge-detail .domain-bar { width: min(320px, 100%); }
-.gami-badge-detail .domain-bar > i { background: var(--orange-500); }
+.gami-badge-detail .domain-bar { background: color-mix(in srgb, var(--fg) 14%, var(--card)); }
+.gami-badge-detail .domain-bar > i { background: var(--fg); }
+.gami-badge-detail .cat { font-size: var(--fs-xs); font-weight: 800; letter-spacing: .5px; text-transform: uppercase; color: var(--fg); }
 
 /* ---------- iskelet (yükleniyor) ---------- */
 .gami-skel { height: 14px; border-radius: var(--r-sm); background: var(--blue-50); animation: gami-pulse 1.2s ease-in-out infinite alternate; }

@@ -76,7 +76,7 @@ const levelRing = (pct, who) => {
 const profileStrip = () => {
   const m = D.me
   return `<div class="results-summary-strip gami-profile">
-  <div class="rs-box"><div class="gami-level">${levelRing(m.levelXp / m.levelXpMax, avatar({ id: m.id, name: m.nickname, public: true }))}
+  <div class="rs-box"><div class="gami-level">${levelRing(m.levelXp / m.levelXpMax, avatar({ id: m.id, name: m.name, public: true }))}
     <div><b>Seviye ${m.level}</b><small>${trInt(m.levelXp)} / ${trInt(m.levelXpMax)} XP</small></div></div>
     <span class="rs-lbl">Sonraki seviyeye ${trInt(m.levelXpMax - m.levelXp)} XP</span></div>
   <div class="rs-box gami-streak"><div class="rs-num">${I('Flame', 20)} ${m.streakDays} gün</div><span class="gami-sub">En uzun seri ${m.bestStreak} gün</span><span class="rs-lbl">Günlük seri</span></div>
@@ -128,15 +128,18 @@ const badgeCard = (b) => {
     ? `${I('Check', 13)} ${b.date}`
     : b.state === 'progress' ? `${bar((b.value / b.max) * 100)}<span>${b.value}/${b.max}</span>` : `${I('Lock', 13)} ${b.rule}`
   const name = b.tier ? `${b.name} · ${TIER[b.tier]}` : b.name
-  return `<button class="gami-badge${locked ? ' is-locked' : ''}" type="button" aria-label="${name} — ${b.state === 'earned' ? `kazanıldı ${b.date}` : b.state === 'progress' ? `ilerleme ${b.value}/${b.max}` : `kilitli, koşul: ${b.rule}`}">
-  <span class="gami-badge-ic${locked ? ' locked' : ''}${b.tier && !locked ? ` tier-${b.tier}` : ''}">${I(locked ? b.icon : b.icon, 26)}</span>
-  <span class="nm">${name}</span><span class="ds">${b.desc}</span><span class="ft">${ft}</span></button>`
+  const stateCls = b.state === 'earned' ? 'is-earned' : b.state === 'progress' ? 'is-progress' : 'is-locked'
+  const icCls = b.state === 'earned' ? (b.tier ? ` tier-${b.tier}` : '') : b.state === 'progress' ? ' progress' : ' locked'
+  return `<button class="gami-badge c-${b.cat} ${stateCls}" type="button" aria-label="${name} (${D.CATEGORIES[b.cat]}) — ${b.state === 'earned' ? `kazanıldı ${b.date}` : b.state === 'progress' ? `ilerleme ${b.value}/${b.max}` : `kilitli, koşul: ${b.rule}`}">
+  <span class="gami-badge-ic c-${b.cat}${icCls}">${I(b.icon, 28)}${locked ? `<span class="lock">${I('Lock', 12)}</span>` : ''}</span>
+  <span class="cat">${D.CATEGORIES[b.cat]}</span><span class="nm">${name}</span><span class="ds">${b.desc}</span><span class="ft">${ft}</span></button>`
 }
 const earned = D.badges.filter((b) => b.state === 'earned')
 const badgeGrid = (all = D.badges, filter = 'Tümü') => `<div class="card">
   <div class="gami-card-head"><h3>Rozet koleksiyonu</h3>
     <div class="gami-seg" role="group" aria-label="Rozet filtresi">${['Tümü', 'Kazanılanlar', 'Devam edenler', 'Kilitli'].map((f) => `<button type="button" aria-pressed="${f === filter}">${f}</button>`).join('')}</div>
     <span class="gami-count">${all.filter((b) => b.state === 'earned').length} / ${all.length} kazanıldı</span></div>
+  <div class="gami-cat-legend" aria-label="Rozet kategorileri">${Object.entries(D.CATEGORIES).map(([k, v]) => `<span class="c-${k}"><i></i>${v}</span>`).join('')}</div>
   <div class="gami-badge-grid">${all.map(badgeCard).join('')}</div></div>`
 const recent = () => `<div class="gami-recent">${earned.slice(0, 3).map(badgeCard).join('')}</div>
   <p class="gami-note"><button class="gami-link" type="button">Tümünü gör ${I('ChevronRight', 14)}</button></p>`
@@ -173,8 +176,8 @@ const badgeDetail = () => {
   return `${achievements()}
   <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="gami-bd-t"><div class="modal-card">
     <div class="modal-head"><h3 id="gami-bd-t">Rozet</h3><button class="modal-close" type="button" aria-label="Kapat">${I('Close')}</button></div>
-    <div class="modal-body"><div class="gami-badge-detail">
-      <span class="gami-badge-ic">${I(b.icon, 40)}</span><h4>${b.name}</h4>
+    <div class="modal-body"><div class="gami-badge-detail c-${b.cat}">
+      <span class="gami-badge-ic c-${b.cat} progress">${I(b.icon, 40)}</span><span class="cat">${D.CATEGORIES[b.cat]} rozeti</span><h4>${b.name}</h4>
       <p class="rule">${b.desc} Yalnız değerlendirme modundaki doğru yanıtlar sayılır.</p>
       ${bar((b.value / b.max) * 100)}<span class="gami-count">${b.value} / ${b.max} — ${b.max - b.value} vaka kaldı</span>
       <button class="btn green small" type="button">${I('Book', 16)} Bu konuyu öğrenme modunda çalış</button>
@@ -187,7 +190,7 @@ const meRow = standings.rows.find((r) => r.id === D.ME_ID)
 const rewardFull = () => {
   const gap = standings.cutoff - meRow.score
   return `<section class="card gami-reward" aria-labelledby="gami-rw-t">
-  <span class="gami-badge-ic">${I('Gift', 30)}</span>
+  <span class="gami-badge-ic c-streak">${I('Gift', 30)}</span>
   <div><span class="rs-lbl">${D.reward.monthLabel.toLocaleUpperCase('tr-TR')} ÖDÜLÜ · ${D.reward.sponsor}</span>
     <h2 id="gami-rw-t">${D.reward.title}</h2><p>${D.reward.description}</p></div>
   <div class="gami-reward-meta">
@@ -195,7 +198,7 @@ const rewardFull = () => {
     <span class="badge gami-chip-purple">Senin durumun: ${D.monthly.indexOf(D.monthly.find((r) => r.id === D.ME_ID)) + 1}. sıra · ödül sırasına ${tr1(gap)} puan</span>
     <button class="btn outline small" type="button">Katılım koşulları</button></div></section>`
 }
-const rewardCompact = () => `<div class="card gami-reward compact"><span class="gami-badge-ic">${I('Gift', 16)}</span>
+const rewardCompact = () => `<div class="card gami-reward compact"><span class="gami-badge-ic c-streak">${I('Gift', 16)}</span>
   <span class="txt">Bu ayın ödülü: <b>${D.reward.title}</b> · 8 gün kaldı</span><button class="gami-link" type="button">Aylık sıralamayı gör ${I('ChevronRight', 14)}</button></div>`
 const periodRow = (sel) => `<div class="gami-period-row">
   <div class="gami-seg purple" role="tablist" aria-label="Dönem">${['Bugün', 'Bu hafta', 'Bu ay', 'Akademik yıl'].map((p) => `<button role="tab" type="button" aria-selected="${p === sel}">${p}</button>`).join('')}</div>
@@ -233,12 +236,9 @@ const table = (rows, showCandidates) => `<div class="card">
   <ol class="gami-lb-cards" aria-label="Liderlik tablosu">${cardRows(rows)}</ol>
   <p class="gami-note">Puan: dönemdeki en iyi 3 değerlendirmenin ortalaması · sıralamaya girmek için en az 2 deneme.</p></div>`
 const privacy = (on) => `<div class="card gami-privacy">${I('Lock', 22)}
-  <div class="txt"><b>${on ? 'Sıralamada takma adınla görünüyorsun.' : 'Sıralamada "Anonim öğrenci" olarak görünüyorsun.'}</b>
-  <span>Gerçek adın hiçbir yerde gösterilmez. Ayın ödülüne aday olmak için takma adla görünmelisin.</span></div>
-  <div class="form"><label>Takma ad <input class="gami-input" value="özgür_kartal" aria-describedby="gami-nick-h"></label>
-  <label><button class="gami-switch" role="switch" type="button" aria-checked="${on}" aria-label="Sıralamada takma adımla görün"></button> Sıralamada takma adımla görün</label>
-  <button class="btn outline small" type="button">Kaydet</button></div>
-  <span id="gami-nick-h" class="sr-only">2–24 karakter.</span></div>`
+  <div class="txt"><b>${on ? 'Sıralamada adınla görünüyorsun.' : 'Sıralamada "Anonim öğrenci" olarak görünüyorsun.'}</b>
+  <span>Adın Moodle kaydından alınır (Selin Çelik). İstersen sıralamada anonim görünebilirsin; ayın ödülüne aday olmak için adınla görünmelisin.</span></div>
+  <div class="form"><label><button class="gami-switch" role="switch" type="button" aria-checked="${on}" aria-label="Sıralamada adımı göster"></button> Sıralamada adımı göster</label></div></div>`
 const historyBlock = () => `<details class="card gami-history" open><summary>${I('ChevronRight', 16)} Önceki ayların kazananları</summary>
   <div class="gami-history-list">${D.history.map((h) => `<div class="gami-history-month"><b>${h.month}</b><span>${h.title}</span>
   <ol>${h.winners.map((w, i) => `<li><span class="gami-medal m${i + 1}" aria-label="${i + 1}.">${i + 1}</span>${w}</li>`).join('')}</ol></div>`).join('')}</div></details>`
@@ -259,10 +259,10 @@ const results = () => `<h1 class="results-title-v2 results-title">Değerlendirme
   <div class="rs-box"><div class="rs-num">10</div><span class="rs-lbl">Vaka sayısı</span></div></div>
   <section class="card gami-gains" aria-labelledby="gami-gains-t"><div class="gami-card-head"><h3 id="gami-gains-t">Bu oturumda kazandıkların</h3><span class="badge orange">Demo verisi</span></div>
     <div class="gami-gains-row">
-      <div class="gami-gain"><span class="gami-badge-ic sm tier-bronze">${I('Target', 22)}</span><div><b>Keskin Göz</b><span>Yeni rozet · Bronz</span></div></div>
-      <div class="gami-gain"><span class="gami-badge-ic sm gami-tone-blue" style="border-color:transparent">${I('Star', 22)}</span><div><b class="xp">+120 XP</b><span>+20 başarı bonusu dahil</span></div></div>
+      <div class="gami-gain"><span class="gami-badge-ic sm c-skill tier-bronze">${I('Target', 22)}</span><div><b>Keskin Göz</b><span>Yeni rozet · Bronz</span></div></div>
+      <div class="gami-gain"><span class="gami-badge-ic sm c-topic progress">${I('Star', 22)}</span><div><b class="xp">+120 XP</b><span>+20 başarı bonusu dahil</span></div></div>
       <div class="gami-gain"><div class="grow"><b>Seviye 5</b><span>320 / 500 XP · sonrakine 180</span>${bar(64)}</div></div>
-      <div class="gami-gain"><span class="gami-badge-ic sm gami-tone-purple" style="border-color:transparent">${I('Chart', 22)}</span><div><b class="rank">Bu hafta 12. <span class="gami-delta up">${I('ArrowUp', 12)}3</span></b><span>84 kişi arasında</span></div></div>
+      <div class="gami-gain"><span class="gami-badge-ic sm c-skill progress">${I('Chart', 22)}</span><div><b class="rank">Bu hafta 12. <span class="gami-delta up">${I('ArrowUp', 12)}3</span></b><span>84 kişi arasında</span></div></div>
     </div>
     <div class="gami-gains-actions"><button class="btn outline small" type="button">Sıralamaya bak</button><button class="btn primary small" type="button">Başarılarımı gör ${I('ArrowRight', 14)}</button></div></section>
   <div class="card"><h3 style="margin-top:0">Alan bazlı performans</h3>${domainsPanel()}</div>`

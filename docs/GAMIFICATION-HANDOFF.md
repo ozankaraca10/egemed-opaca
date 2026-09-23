@@ -10,8 +10,8 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 | Paket | İçerik | Durum |
 |---|---|---|
 | P0 | Spesifikasyon repoya, devir notu | ✅ bitti |
-| P1 | Faz T0 — statik tasarım referansı `docs/mockups/gami.html` + ekran görüntüleri | ✅ bitti, kullanıcı onayı bekliyor |
-| — | **Kullanıcı onayı (T0) + yol haritası dosyası** | ⏸ bekleniyor |
+| P1 | Faz T0 — statik tasarım referansı `docs/mockups/gami.html` + ekran görüntüleri | ✅ bitti, **onaylandı** (23 Eyl 2026) |
+| — | Yol haritası dosyası | ⚠ yok — kurallar `src/gamification/` içinde yapılandırma olarak taslak yazılacak |
 | P2 | Yol haritası Faz 1 — saf veri katmanı + testler | ⛔ yol haritası gerekli |
 | P3 | K-A1…K-A6 (Başarılarım) | ⛔ P2 + T0 onayı |
 | P4 | K-B1…K-B7 (Liderlik + Ayın Ödülü) | ⛔ P2 + T0 onayı |
@@ -35,6 +35,20 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 - Görsel dil yalnız `src/styles.css` tokenlarından; yeni sınıflar `src/styles-gami.css` içinde `gami-` önekiyle.
 - Değerlendirme simülasyonu sırasında hiçbir oyunlaştırma öğesi görünmez.
 - Her kart sonunda bu dosyanın "Durum özeti" ve "Paket kayıtları" bölümleri güncellenir.
+
+## Kullanıcı kararları (tasarım promptunu geçersiz kılar)
+
+- **23 Eyl 2026 — T0 onaylandı.** Tek geri bildirim rozet renkleriydi (hepsi aynı renk/zemindeydi) → düzeltildi.
+- **Gerçek isimler gösterilir.** Promptun "takma ad / gerçek ad hiçbir yerde gösterilmez" kuralı kaldırıldı.
+  Ad kaynağı SCORM `cmi.core.student_name` (Moodle biçimi "Soyad, Ad" → "Ad Soyad"). Öğrenci isterse
+  "Anonim öğrenci" olarak görünebilir (gizlilik kartında anahtar; takma ad alanı yok). Ödül koşulu:
+  `MonthlyReward.eligibility.requirePublicName` (eski adı `requirePublicNickname`).
+  Demo verisindeki isimler uydurmadır.
+- **Rozet kategorileri ve renkleri:** konu = mavi, beceri = mor, seri = turuncu/amber, öğrenme = yeşil,
+  kilometre taşı = lacivert (`.c-topic|skill|streak|learn|milestone`, yalnız token çiftleri). Kazanılmış =
+  gradyanlı dolu madalyon + beyaz ikon + kartta kategori tonlu üst zemin; devam eden = açık ton + kategori
+  renkli ikon ve ilerleme çubuğu; kilitli = gri + kilit rozetçiği; kademe (bronz/gümüş/altın) = dış halka.
+  Kartta kategori etiketi ve koleksiyon başlığında kategori lejantı var.
 
 ## Paket kayıtları
 
