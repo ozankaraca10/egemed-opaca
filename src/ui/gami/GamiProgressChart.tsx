@@ -79,11 +79,12 @@ export function GamiProgressChart({ points, rangeLabel }: { points: ChartPoint[]
       <div className="gami-legend">
         <span><i /> Değerlendirme puanı</span><span><i className="xp" /> Toplam XP (sağ eksen)</span><span><i className="th" /> Başarı eşiği</span>
       </div>
-      <table className="sr-only">
+      {/* tablo öğesi width:1px'i yok sayar → görünmez kapsayıcı div (360 px'de taşma yapıyordu) */}
+      <div className="sr-only"><table>
         <caption>Değerlendirme puanı ve toplam XP, {rangeLabel}</caption>
         <thead><tr><th>Tarih</th><th>Puan</th><th>Toplam XP</th></tr></thead>
         <tbody>{points.map((p) => <tr key={p.at}><td>{p.label}</td><td>{tr(p.score)}</td><td>{tr(p.cumulativeXp)}</td></tr>)}</tbody>
-      </table>
+      </table></div>
     </div>
   )
 }

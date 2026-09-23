@@ -11,6 +11,8 @@ import { GamiProgressChart } from '../ui/gami/GamiProgressChart'
 import { GamiWeeklyGoals } from '../ui/gami/GamiWeeklyGoals'
 import { GamiDomainPanel } from '../ui/gami/GamiDomainPanel'
 import { buildChartSeries, trShortDate } from '../gamification/chart'
+import { badgeViews, sortBadgeViews } from '../gamification/badgeView'
+import { GamiBadgeGrid, GamiRecentBadges } from '../ui/gami/GamiBadge'
 import { useGami, useLeaderboard } from '../gamification/useGami'
 import { achievementsRangeTr, type AchievementsPeriod } from '../gamification/time'
 
@@ -39,6 +41,14 @@ export function AchievementsScreen() {
   const assessments = inPeriod.filter((a) => a.mode === 'assessment')
   const practiceCases = inPeriod.filter((a) => a.mode === 'practice').reduce((n, a) => n + a.caseCount, 0)
   const avg = assessments.length ? assessments.reduce((n, a) => n + a.score, 0) / assessments.length : null
+
+  const badges = useMemo(() => sortBadgeViews(badgeViews(view.stats, view.state.earned)), [view])
+  const study = (key: string) => {
+    dispatch({ type: 'setLearnFocus', key })
+    dispatch({ type: 'startMode', mode: 'learn' })
+    dispatch({ type: 'goto', screen: 'learn' })
+  }
+  const scrollToBadges = () => document.getElementById('gami-badges')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   const startAssessment = () => {
     const seed = (Date.now() % 2147483647) | 0
@@ -95,8 +105,13 @@ export function AchievementsScreen() {
                 <div className="gami-card-head"><h3 id="gami-domains-t">Alan bazlı performans</h3><span className="gami-range">Değerlendirme · {PERIODS.find((p) => p.id === period)!.short}</span></div>
                 <GamiDomainPanel assessments={assessments} />
               </section>
+              <section className="card gami-span-6" aria-labelledby="gami-recent-t">
+                <div className="gami-card-head"><h3 id="gami-recent-t">Son kazanılan rozetler</h3></div>
+                <GamiRecentBadges views={badges} onAll={scrollToBadges} onStudy={study} />
+              </section>
             </div>
           )}
+          <GamiBadgeGrid id="gami-badges" views={badges} onStudy={study} />
         </div>
       </div>
       <Footer />

@@ -68,6 +68,20 @@ function isoAtOffset(now: Date, daysAgo: number): string {
   return new Date(now.getTime() - daysAgo * DAY_MS).toISOString()
 }
 
+
+/** Denemeleri kronolojik sırayla "yeniden oynatır": her rozet gerçekten kazanıldığı denemenin tarihini alır
+ *  (gerçek akıştaki LocalRepo.recordAttempt ile aynı mantık). Öğrenme etkinliği ilk denemeden önce sayılır. */
+function replayEarned(state: GamiStateV1): { id: string; at: string }[] {
+  const sorted = [...state.attempts].sort((a, b) => (a.finishedAt < b.finishedAt ? -1 : 1))
+  let earned: { id: string; at: string }[] = []
+  for (let i = 0; i < sorted.length; i++) {
+    const at = new Date(sorted[i].finishedAt)
+    const stats = computeStats(sorted.slice(0, i + 1), state.learn, earned, at)
+    earned = [...earned, ...evaluateBadges(stats, earned, at)]
+  }
+  return earned
+}
+
 /** Boş durum: hiç deneme yok, varsayılan profil (bkz. storage.emptyState). */
 export function demoStateEmpty(): GamiStateV1 {
   return emptyState()
@@ -95,7 +109,7 @@ export function demoStateFull(now: Date): GamiStateV1 {
         mastery: score >= 80,
         caseCount: 5,
         hintsUsed: 0,
-        localizationHits: correct ? 2 : 1,
+        localizationHits: correct ? 1 : 0,
         abcdeComplete: i % 3 === 0 ? 1 : 0,
         qualityCorrect: correct ? 2 : 1,
         interpretationCorrect: correct ? 2 : 1,
@@ -144,9 +158,7 @@ export function demoStateFull(now: Date): GamiStateV1 {
     profile: { displayName: 'Selin Çelik', public: true, cohort: 5 },
   }
 
-  const stats = computeStats(state.attempts, state.learn, [], now)
-  const earned = evaluateBadges(stats, [], now)
-  state.earned = earned
+  state.earned = replayEarned(state)
 
   return state
 }
@@ -192,8 +204,7 @@ export function demoStateWinner(now: Date): GamiStateV1 {
     profile: { displayName: 'Demo Kazanan', public: true, cohort: 4 },
   }
 
-  const stats = computeStats(state.attempts, state.learn, [], now)
-  state.earned = evaluateBadges(stats, [], now)
+  state.earned = replayEarned(state)
 
   return state
 }

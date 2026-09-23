@@ -15,8 +15,8 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 | P1 | Faz T0 — statik tasarım referansı `docs/mockups/gami.html` + ekran görüntüleri | ✅ bitti, **onaylandı** (23 Eyl 2026) |
 | — | Yol haritası | ✅ taslak v0.1 yazıldı (`docs/GAMIFICATION-YOL-HARITASI.md`) |
 | P2 | Yol haritası Faz 1 — saf veri katmanı + testler (`src/gamification/`, `tests/gamification/`) | ✅ bitti (184/184 test) |
-| P3 | K-A1…K-A6 (Başarılarım) | ⏳ K-A1 ✅ · K-A2 sırada |
-| P4 | K-B1…K-B7 (Liderlik + Ayın Ödülü) | ⛔ P2 |
+| P3 | K-A1…K-A6 (Başarılarım) | ✅ bitti |
+| P4 | K-B1…K-B7 (Liderlik + Ayın Ödülü) | ⏳ sırada |
 | P5 | K-C1 (Kazanımlar kartı), K-D1 (e2e görüntüleri) | ⛔ P3/P4 |
 
 ## Engeller / açık kararlar
@@ -109,4 +109,17 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
   tarayıcı denetimi (1440 + 360: çip, aria-current, sekmeler, ok tuşu + odak, taşma 0, uygulama ve değerlendirme
   simülasyonunda çip ve `gami-` öğesi yok); 186 test.
 
-## Sıradaki: K-A2 (GamiAvatar, GamiSeg, domainMeta.ts) — kart: `docs/GAMIFICATION-DEVIR-ASTRA-SOL.md` §4.2
+### K-A2…K-A6 — Başarılarım (bitti)
+- K-A2 `avatar.ts` + `GamiAvatar`, `GamiSeg` (filtre / sekme, ok tuşları), `domainMeta.tsx` (ResultsScreen ile eşitlik testi).
+- K-A3 `useGami` (tek `LocalRepo`; `?demo=` bellek içi durum — gerçek veriye dokunmaz, `stateOverride`), `GamiProfileStrip`,
+  `GamiEmptyCard`, dönem seçici (son 30 gün / 12 hafta / akademik yıl, `achievementsRangeTr`).
+- K-A4 `chart.ts` (saf seri + testler) + `GamiProgressChart` (ResizeObserver ile ölçülen genişlik, odaklanabilir noktalar,
+  sr-only tablo — `table` 1px genişliği yok saydığı için `div.sr-only` içinde).
+- K-A5 `GamiWeeklyGoals`, `GamiDomainPanel` (<%60 "zayıf").
+- K-A6 `badgeView.ts` (durum, kısa koşul, "bu konuyu çalış" anahtarı — hepsi kütüphanede var, testli) + `GamiBadge.tsx`
+  (kart, ızgara + filtre + kategori lejantı, son 3 rozet, detay penceresi: Esc, odak tuzağı, odak karta döner).
+- Demo "full" rozet tarihleri artık denemeler kronolojik yeniden oynatılarak üretiliyor (hepsi "bugün" görünüyordu).
+- Doğrulama: 196 test; bayrak kapalı 6 deterministik görüntü bayt bayt aynı; tarayıcı denetimleri (28 kart, filtre sayaçları,
+  klavye/Esc/odak, "Pediatri" → öğrenme "Steeple işareti", 360 px taşma 0, sayfa hatası 0).
+
+## Sıradaki: P4 — K-B1…K-B7 (Liderlik Tahtası + Ayın Ödülü) — kart: `docs/GAMIFICATION-DEVIR-ASTRA-SOL.md` §4.3
