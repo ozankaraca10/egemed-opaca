@@ -30,6 +30,22 @@ export function Header() {
     else document.exitFullscreen?.().catch(() => undefined)
   }
 
+  // A1: "F" kısayolu tam ekranı açar/kapatır — form alanı, sözleşilebilir içerik ya da
+  // açık bir pencere (dialog) varken devre dışı; odak düğmelerden herhangi birindeyken de çalışır.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.key.toLowerCase() !== 'f') return
+      const t = e.target as HTMLElement | null
+      if (t && (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable)) return
+      if (document.querySelector('.modal-overlay')) return
+      e.preventDefault()
+      toggleFs()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const goStart = () => (inAssessment ? setExitTarget('start') : dispatch({ type: 'goto', screen: 'start' }))
   const goModes = () => (inAssessment ? setExitTarget('modes') : dispatch({ type: 'goto', screen: 'modes' }))
   const confirmExit = () => {
@@ -46,6 +62,8 @@ export function Header() {
           <span className="brand-name">Opaca<sup className="tm">™</sup></span>
         </span>
       </button>
+      <span className="divider-v app-subtitle-sep" aria-hidden="true" />
+      <span className="app-subtitle">Radyolojik Görüntüleme Simülatörü</span>
       <div className="spacer" />
       {/* madde 3: header'ın ortasında tek bir "bağlam grubu" — mod çipi + (değerlendirmede) zamanlayıcı */}
       {inWorkScreen && (
@@ -79,9 +97,9 @@ export function Header() {
         className="eg-header-chip clickable hide-mobile"
         onClick={toggleFs}
         aria-label={fs ? 'Tam ekrandan çık' : 'Tam ekran'}
-        title={fs ? 'Tam ekrandan çık' : 'Tam ekran'}
+        title={fs ? 'Tam ekrandan çık' : 'Tam ekran (F)'}
       >
-        {fs ? <IconFullscreenExit /> : <IconFullscreen />}
+        {fs ? <IconFullscreenExit /> : <IconFullscreen />} <span className="chip-text">{fs ? 'Tam ekrandan çık' : 'Tam ekran'}</span>
       </button>
       <span className="divider-v" />
       <button className="eg-header-chip clickable" onClick={() => setHelpOpen(true)} aria-label="Yardım" title="Yardım">

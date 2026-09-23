@@ -13,11 +13,21 @@
     "import:sample": "node scripts/import-nih.mjs fixtures/nih-sample --include-nlp --replace && node scripts/generate-cases.mjs",
     "import:nih": "node scripts/import-nih.mjs",
     "import:rsna": "node scripts/import-rsna.mjs",
+    "import:nih-remote": "node scripts/import-nih-remote.mjs",
+    "enrich:nih": "node scripts/enrich-nih-labels.mjs",
+    "import:nlm-tb": "node scripts/import-nlm-tb.mjs",
+    "import:pediatric": "node scripts/import-pediatric.mjs",
+    "import:commons": "node scripts/import-commons.mjs",
+    "import:all": "node scripts/import-nih-remote.mjs && node scripts/enrich-nih-labels.mjs && node scripts/import-nlm-tb.mjs && node scripts/import-pediatric.mjs && node scripts/import-commons.mjs && node scripts/import-tcia.mjs && node scripts/generate-cases.mjs",
     "cases": "node scripts/generate-cases.mjs",
     "validate": "node scripts/validate-images.mjs",
+    "audit:dupes": "node scripts/audit-duplicates.mjs",
+    "import:europepmc": "node scripts/import-europepmc.mjs",
+    "import:tcia": "node scripts/import-tcia.mjs",
     "build:scorm": "npm run validate && tsc -b && vite build && node scripts/build-scorm.mjs",
     "build:html": "npm run validate && tsc -b && vite build && node scripts/build-html.mjs",
-    "e2e": "node scripts/e2e-screens.mjs"
+    "e2e": "node scripts/e2e-screens.mjs",
+    "e2e:click-stability": "node scripts/e2e-click-stability.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",

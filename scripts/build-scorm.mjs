@@ -10,6 +10,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import JSZip from 'jszip'
 import { injectCsp } from './lib/inject-csp.mjs'
+import { obfuscateImagesInDist } from './lib/obfuscate-images.mjs'
 
 // D11: manifest içine gömülen dosya adları XML-escape edilir (&, <, ", ' güvenliği)
 const escXml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -33,6 +34,12 @@ function listFiles(dir, base = '') {
     else out.push(rel)
   }
   return out
+}
+
+// Görüntü dosya adları bulgu ipucu taşır — paketten önce opak adlara çevrilir (scripts/lib/obfuscate-images.mjs).
+{
+  const { renamed, patchedFiles } = obfuscateImagesInDist(DIST)
+  if (renamed) console.log(`Görüntü adları gizlendi: ${renamed} dosya, ${patchedFiles} metin dosyası güncellendi`)
 }
 
 const files = listFiles(DIST).filter((f) => !f.endsWith('.zip'))

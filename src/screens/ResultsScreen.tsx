@@ -47,8 +47,12 @@ export function ResultsScreen() {
     dispatch({ type: 'goto', screen: 'start' })
   }
 
-  // madde 7: aynı modda yeni bir oturum (yeni rastgele 10 vaka)
-  const retry = () => {
+  // A4: "Tekrar dene" — aynı vaka örneklemiyle sıfırdan başlar (oturum kimlikleri değişmez).
+  const retrySame = () => {
+    dispatch({ type: 'startMode', mode: state.mode })
+  }
+  // A4: "Yeni örneklem" — yeni rastgele 10 vaka örneklemi alır.
+  const retryNewSample = () => {
     const seed = (Date.now() % 2147483647) | 0
     const practiceIds = sampleSession(poolFor('practice'), seed, SESSION_SIZE)
     const assessmentIds = sampleSession(poolFor('assessment'), seed + 1, SESSION_SIZE)
@@ -124,7 +128,8 @@ export function ResultsScreen() {
                 </svg>
                 <b>{total}</b>
               </div>
-              <span className="rs-lbl">Toplam puan</span>
+              {/* A4: "En iyi puan" — mod başına kalıcı (localStorage), Yeni örneklem/Tekrar dene ile sıfırlanmaz. */}
+              <span className="rs-lbl">Bu deneme: {total} · En iyi puan: {state.bestScore[isAssessment ? 'assessment' : 'practice']}</span>
             </div>
             <div className="rs-box">
               <div className={`rs-status ${passed ? 'pass' : 'fail'}`}>
@@ -132,12 +137,10 @@ export function ResultsScreen() {
               </div>
               <span className="rs-lbl">Durum (eşik 80)</span>
             </div>
-            {isAssessment && (
-              <div className="rs-box">
-                <div className="rs-num"><IconClock width={16} height={16} /> {fmtTime(state.assessmentTimer)}</div>
-                <span className="rs-lbl">Süre</span>
-              </div>
-            )}
+            <div className="rs-box">
+              <div className="rs-num"><IconClock width={16} height={16} /> {fmtTime(state.assessmentTimer)}</div>
+              <span className="rs-lbl">Toplam öğrenme süresi</span>
+            </div>
             <div className="rs-box">
               <div className="rs-num">{state.caseResults.length}</div>
               <span className="rs-lbl">Vaka sayısı</span>
@@ -235,7 +238,8 @@ export function ResultsScreen() {
             <button className="btn primary" onClick={exit}>
               <IconExit /> Modülden Çık
             </button>
-            <button className="btn outline" onClick={retry}>Tekrar dene</button>
+            <button className="btn outline" onClick={retrySame}>Tekrar dene</button>
+            <button className="btn outline" onClick={retryNewSample}>Yeni örneklem</button>
             <button className="btn outline" onClick={studyLearn}>Öğrenme modunda çalış</button>
           </div>
         </div>

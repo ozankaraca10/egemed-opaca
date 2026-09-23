@@ -11,13 +11,64 @@ export function inBox(p: Point, b: Box, margin = 0): boolean {
   return p.x >= b.x - margin && p.x <= b.x + b.w + margin && p.y >= b.y - margin && p.y <= b.y + b.h + margin
 }
 
-/** Lokalizasyon toleransı: kutu kenarından en fazla %2 dışarı taşan işaret de kabul edilir. */
-export const MARK_TOLERANCE = 0.02
+/** Kutunun görüntü alanına oranı (kutu zaten 0–1 normalize, alan doğrudan w*h). */
+export function boxArea(b: Box): number {
+  return b.w * b.h
+}
+
+/** V3: kutu alanı görüntünün bu oranından büyükse lokalizasyon sorusu üretilmez (bulgu tanıma sorulur). */
+export const MAX_LOCALIZATION_BOX_AREA = 0.35
+
+/** V3: sabit yarıçaplı işaret dairesi — görüntü kısa kenarının %8'i (piksel), normalize (0–1) yarıçapa çevrilir. */
+export const MARK_RADIUS_SHORT_EDGE_FRACTION = 0.08
+
+/** İşaret dairesinin görüntü koordinatındaki (normalize) x/y yarıçapları. Görüntü kare değilse
+ *  eksen başına farklı normalize yarıçap gerekir ki ekranda gerçekten daire görünsün (bkz. FilmViewer). */
+export function markRadiusNorm(image: Pick<ImageRecord, 'width' | 'height'> | undefined): { rx: number; ry: number } {
+  const w = image?.width || 1
+  const h = image?.height || 1
+  const r = MARK_RADIUS_SHORT_EDGE_FRACTION * Math.min(w, h)
+  return { rx: r / w, ry: r / h }
+}
+
+/** V3 isabet ölçütü: merkez kutunun içinde OLMALI ve merkezin kutu merkezine uzaklığı,
+ *  kutunun yarı köşegeninin %60'ını AŞMAMALI. Büyük/geniş kutularda kenardan teğet geçen
+ *  işaretlerin doğru sayılmasını engeller; eski %2 kenar toleransı (MARK_TOLERANCE) kaldırıldı. */
+export const MARK_CENTER_DISTANCE_FRACTION = 0.6
+
+export function markHitsBox(p: Point, b: Box): boolean {
+  if (!inBox(p, b, 0)) return false
+  const cx = b.x + b.w / 2
+  const cy = b.y + b.h / 2
+  const halfDiag = Math.hypot(b.w, b.h) / 2
+  if (halfDiag <= 0) return true
+  const dist = Math.hypot(p.x - cx, p.y - cy)
+  return dist <= halfDiag * MARK_CENTER_DISTANCE_FRACTION
+}
 
 /** İşaretin, görüntüdeki hedef bulgunun uzman kutularından birine düşüp düşmediği. */
 export function markHitsFinding(p: Point, image: ImageRecord | undefined, finding: string): boolean {
   if (!image) return false
-  return image.annotations.some((a) => a.finding === finding && a.source !== 'report_nlp' && inBox(p, a, MARK_TOLERANCE))
+  return image.annotations.some((a) => a.finding === finding && a.source !== 'report_nlp' && markHitsBox(p, a))
+}
+
+/** Görüntüdeki hedef bulgunun kutularından işarete en yakın olanının merkezi (yanlış işaretlerde
+ *  geri bildirim çizgisi/oku için) — kutu yoksa null. */
+export function nearestFindingBoxCenter(p: Point, image: ImageRecord | undefined, finding: string): Point | null {
+  if (!image) return null
+  const boxes = image.annotations.filter((a) => a.finding === finding && a.source !== 'report_nlp')
+  if (!boxes.length) return null
+  let best: Point | null = null
+  let bestDist = Infinity
+  for (const b of boxes) {
+    const c = { x: b.x + b.w / 2, y: b.y + b.h / 2 }
+    const d = Math.hypot(p.x - c.x, p.y - c.y)
+    if (d < bestDist) {
+      bestDist = d
+      best = c
+    }
+  }
+  return best
 }
 
 /** Yanıt kodlaması: "pt:0.4312,0.5521" (suspend ve SCORM ile uyumlu düz metin). */

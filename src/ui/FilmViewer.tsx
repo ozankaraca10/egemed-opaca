@@ -1,7 +1,8 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react'
 import type { ImageRecord, ReadingZone, ViewerTool } from '../core/types'
-import { clamp, ratio, zonesAt, type Point } from '../core/geometry'
+import { clamp, markHitsFinding, markRadiusNorm, nearestFindingBoxCenter, ratio, zonesAt, type Point } from '../core/geometry'
 import { findingShort } from '../data/terminology'
+import { FilmCornerBadge } from './FilmInfoPanel'
 
 /** Film görüntüleyici (Ausculta PatientStage karşılığı).
  *  İlke: imleç/sürükleme hareketinde React ağacı yeniden çizilmez — dönüşüm ref üzerinden DOM'a yazılır.
@@ -50,6 +51,8 @@ interface Props {
   /** kilitli (vaka geçişi / özet kartı) */
   inert?: boolean
   label?: string
+  /** film bilgisi öğretim overlay'i (sentetik taraf işareti rozeti) — yalnız öğrenme modunda açılır */
+  showInfoOverlay?: boolean
 }
 
 const DWELL_TICK_MS = 250
@@ -58,7 +61,7 @@ const MAX_SCALE = 8
 export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewer(
   {
     image, zones, showZones, showAnnotations, annotationFinding, strict = false, markEnabled = false, mark, onMark,
-    onZoneEnter, onZoneDwell, onActiveZones, onTool, onToggleZones, inert = false, label,
+    onZoneEnter, onZoneDwell, onActiveZones, onTool, onToggleZones, inert = false, label, showInfoOverlay = false,
   },
   ref
 ) {
@@ -80,8 +83,23 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
   const [pending, setPending] = useState<Point | null>(null)
   const [activeZoneLabel, setActiveZoneLabel] = useState<string | null>(null)
   const [adjustOpen, setAdjustOpen] = useState(false)
+  // V3: işaret dairesi konum duyurusu (aria-live) — klavye ile ok tuşlarıyla taşırken ekran okuyucuya bildirir
+  const [markAnnounce, setMarkAnnounce] = useState('')
+  // V13: Toraks BT yığın kaydırma — o an gösterilen kesit (0 tabanlı)
+  const [sliceIndex, setSliceIndex] = useState(0)
 
   const aspect = image && image.width > 0 && image.height > 0 ? image.width / image.height : 1
+
+  // V13: Toraks BT yığın — `stack` yoksa (mevcut tekil BT görselleri) tek kareli bir yığın gibi davranır.
+  // Pencere ön ayarı 'mediastinum' seçiliyse mediasten kesitleri, aksi halde (standart/akciğer/kemik)
+  // akciğer penceresi kesitleri kullanılır — CT serisi yalnız iki ön ayarla (akciğer/mediasten) önceden
+  // render edilir (V13 kararı); "Özel" parlaklık/kontrast bu kareler üzerine CSS filtresi olarak uygulanmaya devam eder.
+  const stackWindow: 'lung' | 'mediastinum' = preset === 'mediastinum' ? 'mediastinum' : 'lung'
+  const stackFrames = image?.stack?.find((s) => s.window === stackWindow)?.frames ?? (image ? [image.runtimeUrl] : [])
+  const hasMultiSliceStack = stackFrames.length > 1
+  const clampedSlice = Math.min(sliceIndex, Math.max(0, stackFrames.length - 1))
+  const frameSrc = stackFrames[clampedSlice] ?? image?.runtimeUrl
+  const goToSlice = (next: number) => setSliceIndex(clamp(next, 0, Math.max(0, stackFrames.length - 1)))
 
   // görüntü değişince görünüm sıfırlanır
   useEffect(() => {
@@ -91,8 +109,9 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
     setPending(null)
     setTool('pan')
     setWin(WINDOW_PRESETS[0].w)
-    setPreset('standard')
+    setPreset(image?.stack?.length ? 'lung' : 'standard')
     setInvert(false)
+    setSliceIndex(0)
     view.current = { scale: 1, tx: 0, ty: 0 }
     apply()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -233,7 +252,11 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
     const dx = e.clientX - d.x
     const dy = e.clientY - d.y
     if (Math.abs(dx) + Math.abs(dy) > 4) d.moved = true
-    if (d.moved && (tool === 'pan' || view.current.scale > 1)) {
+    if (d.moved && tool === 'mark' && markEnabled) {
+      // V3: İşaretle aracında sürükleme, görünümü kaydırmak yerine daireyi sürükleyerek taşır.
+      const p = toImage(e.clientX, e.clientY)
+      if (p) onMark?.(p)
+    } else if (d.moved && (tool === 'pan' || view.current.scale > 1)) {
       view.current.tx = d.tx + dx
       view.current.ty = d.ty + dy
       constrain()
@@ -244,10 +267,17 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
   const onPointerUp = (e: React.PointerEvent) => {
     const d = drag.current
     drag.current = null
-    if (!d || d.moved || inert) return
+    if (!d || inert) return
+    // V3: İşaretle aracında hem tek tık ("tıklayınca taşınır") hem sürükleyip bırakma aynı sonucu verir —
+    // bırakma anındaki son konum işaretin merkezi olur.
+    if (tool === 'mark' && markEnabled) {
+      const p = toImage(e.clientX, e.clientY)
+      if (p) onMark?.(p)
+      return
+    }
+    if (d.moved) return
     const p = toImage(e.clientX, e.clientY)
     if (!p) return
-    if (tool === 'mark' && markEnabled) onMark?.(p)
     if (tool === 'measure') {
       if (!pending) setPending(p)
       else {
@@ -270,18 +300,44 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
     const onWheel = (e: WheelEvent) => {
       if (inert) return
       e.preventDefault()
+      // V13: BT yığınında (birden çok kesit) fare tekerleği yakınlaştırma yerine kesit gezinir.
+      if (hasMultiSliceStack) {
+        setSliceIndex((i) => clamp(i + (e.deltaY > 0 ? 1 : -1), 0, stackFrames.length - 1))
+        return
+      }
       zoomBy(e.deltaY < 0 ? 1.15 : 1 / 1.15, { x: e.clientX, y: e.clientY })
     }
     el.addEventListener('wheel', onWheel, { passive: false })
     return () => el.removeEventListener('wheel', onWheel)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inert, base.w, base.h])
+  }, [inert, base.w, base.h, hasMultiSliceStack, stackFrames.length])
 
+  // V3: İşaretle aracı açıkken ok tuşları görünümü kaydırmak yerine işaret dairesini taşır.
+  const MARK_KEY_STEP = 0.02
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (inert) return
-    const step = 40
     const v = view.current
     const handled = true
+    const markArrowMove = markEnabled && tool === 'mark' && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)
+    if (markArrowMove) {
+      const cx = 0.5 - v.tx / (base.w * v.scale)
+      const cy = 0.5 - v.ty / (base.h * v.scale)
+      const from = mark ?? { x: clamp(cx, 0, 1), y: clamp(cy, 0, 1) }
+      const dx = e.key === 'ArrowLeft' ? -MARK_KEY_STEP : e.key === 'ArrowRight' ? MARK_KEY_STEP : 0
+      const dy = e.key === 'ArrowUp' ? -MARK_KEY_STEP : e.key === 'ArrowDown' ? MARK_KEY_STEP : 0
+      const next = { x: clamp(from.x + dx, 0, 1), y: clamp(from.y + dy, 0, 1) }
+      onMark?.(next)
+      setMarkAnnounce(`İşaret konumu: yatay %${Math.round(next.x * 100)}, dikey %${Math.round(next.y * 100)}`)
+      e.preventDefault()
+      return
+    }
+    // V13: BT yığınında ok yukarı/aşağı kesit gezinir (görünümü kaydırmaz).
+    if (hasMultiSliceStack && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+      goToSlice(clampedSlice + (e.key === 'ArrowDown' ? 1 : -1))
+      e.preventDefault()
+      return
+    }
+    const step = 40
     switch (e.key) {
       case '+':
       case '=':
@@ -311,7 +367,9 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
           // görünüm merkezine işaret
           const cx = 0.5 - v.tx / (base.w * v.scale)
           const cy = 0.5 - v.ty / (base.h * v.scale)
-          onMark?.({ x: clamp(cx, 0, 1), y: clamp(cy, 0, 1) })
+          const p = { x: clamp(cx, 0, 1), y: clamp(cy, 0, 1) }
+          onMark?.(p)
+          setMarkAnnounce(`İşaret konumu: yatay %${Math.round(p.x * 100)}, dikey %${Math.round(p.y * 100)}`)
         }
         break
       default:
@@ -330,11 +388,14 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
     }
   }
 
+  // BT yığınları önceden pencerelenmiş kareler taşır: yalnız Akciğer/Mediasten gerçek, diğerleri gösterilmez.
+  const isCtStack = !!image?.stack?.length
+  const presetOptions = isCtStack ? WINDOW_PRESETS.filter((x) => x.id === 'lung' || x.id === 'mediastinum') : WINDOW_PRESETS
   const choosePreset = (id: string) => {
     const p = WINDOW_PRESETS.find((x) => x.id === id)
     if (!p) return
     setPreset(id)
-    setWin(p.w)
+    setWin(isCtStack ? WINDOW_PRESETS[0].w : p.w)
     onTool?.('window')
   }
 
@@ -345,11 +406,29 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
   }
   const measureRatio = measures.length === 2 ? ratio(measureLen(measures[0]), measureLen(measures[1])) : null
 
-  const annotations = (image?.annotations ?? []).filter(
+  const findingAnnotations = (image?.annotations ?? []).filter(
     (a) => a.source !== 'report_nlp' && (!annotationFinding || a.finding === annotationFinding)
   )
+  // BT yığınında her işaret kendi kesitine aittir; kare dizini olmayan (grafi) işaretler her zaman görünür.
+  const annotations = hasMultiSliceStack
+    ? findingAnnotations.filter((a) => a.frameIndex == null || a.frameIndex === clampedSlice)
+    : findingAnnotations
+  const annotatedSlices = hasMultiSliceStack
+    ? [...new Set(findingAnnotations.map((a) => a.frameIndex).filter((f): f is number => f != null))].sort((x, y) => x - y)
+    : []
   const filter = `brightness(${win.brightness}) contrast(${win.contrast})${invert ? ' invert(1)' : ''}`
   const cursor = inert ? 'default' : tool === 'mark' && markEnabled ? 'crosshair' : tool === 'measure' ? 'copy' : 'grab'
+
+  // V3: işaret dairesi (sabit yarıçap, görüntü kısa kenarının %8'i) — normalize eksen başına farklı
+  // rx/ry ile hesaplanır ki kare olmayan görüntülerde de ekranda gerçekten daire görünsün.
+  const markRadius = markRadiusNorm(image)
+  // Geri bildirim: yanıt açıldığında (showAnnotations) işaret hedefin dışındaysa, en yakın uzman
+  // kutusunun merkezine bir çizgi çizilir ve "işaretiniz hedef alanın dışında" mesajı gösterilir
+  // (mm/piksel iddiası yok — yalnız yüzde/konum).
+  const markMissTarget =
+    showAnnotations && !strict && mark && annotationFinding && !markHitsFinding(mark, image, annotationFinding)
+      ? nearestFindingBoxCenter(mark, image, annotationFinding)
+      : null
 
   return (
     <div className={`film-viewer ${strict ? 'is-strict' : ''} ${inert ? 'is-inert' : ''}`}>
@@ -358,7 +437,12 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
         className="film-stage"
         tabIndex={inert ? -1 : 0}
         role="application"
-        aria-label={label ?? 'Akciğer grafisi görüntüleyici. Artı/eksi ile yakınlaştırın, ok tuşlarıyla kaydırın, 0 ile sıfırlayın.'}
+        aria-label={
+          label ??
+          (hasMultiSliceStack
+            ? 'Toraks BT görüntüleyici. Fare tekerleği veya yukarı/aşağı ok tuşlarıyla kesit gezinin, artı/eksi ile yakınlaştırın, 0 ile sıfırlayın.'
+            : 'Akciğer grafisi görüntüleyici. Artı/eksi ile yakınlaştırın, ok tuşlarıyla kaydırın, 0 ile sıfırlayın.')
+        }
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -382,8 +466,8 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
           >
             <img
               key={image.id}
-              src={image.runtimeUrl}
-              alt="Akciğer grafisi"
+              src={frameSrc}
+              alt={hasMultiSliceStack ? `Toraks BT — kesit ${clampedSlice + 1}/${stackFrames.length}` : 'Akciğer grafisi'}
               draggable={false}
               onLoad={() => setLoaded(true)}
               onError={() => setFailed(true)}
@@ -398,16 +482,49 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
                   ))
                 )}
               {showAnnotations && !strict &&
-                annotations.map((a, i) => (
-                  <rect key={`an-${i}`} className="anno-rect" x={a.x} y={a.y} width={a.w} height={a.h} />
-                ))}
+                annotations.map((a, i) =>
+                  a.polygon?.length ? (
+                    <polygon key={`an-${i}`} className="anno-poly" points={a.polygon.map(([x, y]) => `${x},${y}`).join(' ')} />
+                  ) : (
+                    <rect key={`an-${i}`} className="anno-rect" x={a.x} y={a.y} width={a.w} height={a.h} />
+                  )
+                )}
               {measures.map((m, i) => (
                 <line key={`m-${i}`} className={`measure-line m${i}`} x1={m[0].x} y1={m[0].y} x2={m[1].x} y2={m[1].y} />
               ))}
               {pending && <circle className="measure-dot" cx={pending.x} cy={pending.y} r={0.006} />}
+              {markMissTarget && mark && (
+                <line
+                  className="mark-miss-line"
+                  x1={mark.x} y1={mark.y} x2={markMissTarget.x} y2={markMissTarget.y}
+                  markerEnd="url(#mark-miss-arrow)"
+                />
+              )}
+              {markMissTarget && (
+                <defs>
+                  <marker id="mark-miss-arrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" className="mark-miss-arrowhead" />
+                  </marker>
+                </defs>
+              )}
             </svg>
             {mark && (
-              <span className="film-mark" style={{ left: `${mark.x * 100}%`, top: `${mark.y * 100}%` }} aria-hidden="true" />
+              <>
+                {/* V3: sabit yarıçaplı daire — yüzde tabanlı HTML katmanı (film-layer'ın en-boy oranı
+                    görüntüyle birebir aynı olduğundan, eksen başına farklı rx%/ry% kullanılınca ekranda
+                    gerçek bir daire oluşur). */}
+                <span
+                  className={`film-mark-circle ${markMissTarget ? 'is-miss' : ''}`}
+                  style={{
+                    left: `${mark.x * 100}%`,
+                    top: `${mark.y * 100}%`,
+                    width: `${markRadius.rx * 2 * 100}%`,
+                    height: `${markRadius.ry * 2 * 100}%`,
+                  }}
+                  aria-hidden="true"
+                />
+                <span className="film-mark" style={{ left: `${mark.x * 100}%`, top: `${mark.y * 100}%` }} aria-hidden="true" />
+              </>
             )}
             {showAnnotations && !strict && annotations.map((a, i) => (
               <span key={`al-${i}`} className="anno-label" style={{ left: `${a.x * 100}%`, top: `${a.y * 100}%` }}>
@@ -417,11 +534,20 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
           </div>
         )}
         {image && loaded && <div className="film-scan" aria-hidden="true" key={`scan-${image.id}`} />}
+        {showInfoOverlay && image && loaded && !strict && <FilmCornerBadge image={image} />}
         <div className="film-hud" aria-hidden="true">
           <span>{zoomPct}%</span>
+          {hasMultiSliceStack && <span className="film-hud-slice">Kesit {clampedSlice + 1}/{stackFrames.length}</span>}
+          {hasMultiSliceStack && showAnnotations && !strict && annotatedSlices.length > 0 && annotations.length === 0 && (
+            <span className="film-hud-zone">
+              İşaret: kesit {annotatedSlices[0] + 1}–{annotatedSlices[annotatedSlices.length - 1] + 1}
+            </span>
+          )}
           {!strict && activeZoneLabel && <span className="film-hud-zone">{activeZoneLabel}</span>}
         </div>
         {markEnabled && !inert && <div className="film-mark-hint">Bulguyu görüntü üzerinde işaretleyin</div>}
+        {/* V3: klavye ile daireyi taşırken ekran okuyucuya konum bildirimi (görsel olarak gizli) */}
+        {markEnabled && !inert && <div className="sr-only" role="status" aria-live="polite">{markAnnounce}</div>}
       </div>
 
       <div className="film-tools" role="toolbar" aria-label="Görüntüleyici araçları">
@@ -448,10 +574,24 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
           <button type="button" onClick={() => zoomBy(1.25)} aria-label="Yakınlaştır">+</button>
           <button type="button" onClick={reset}>Sığdır</button>
         </div>
+        {/* V13: BT yığını — kesit kaydırıcı (fare tekerleği/ok tuşlarıyla da gezinilebilir) */}
+        {hasMultiSliceStack && (
+          <label className="film-select film-slice-slider">
+            <span>Kesit {clampedSlice + 1}/{stackFrames.length}</span>
+            <input
+              type="range"
+              min={0}
+              max={stackFrames.length - 1}
+              value={clampedSlice}
+              onChange={(e) => goToSlice(Number(e.target.value))}
+              aria-label="BT kesiti"
+            />
+          </label>
+        )}
         <label className="film-select">
           <span>Pencere</span>
           <select value={preset} onChange={(e) => choosePreset(e.target.value)}>
-            {WINDOW_PRESETS.map((p) => (
+            {presetOptions.map((p) => (
               <option key={p.id} value={p.id}>{p.label}</option>
             ))}
             {preset === 'custom' && <option value="custom">Özel</option>}
@@ -479,7 +619,7 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
         <button type="button" className={`tool-btn ${invert ? 'active' : ''}`} aria-pressed={invert} onClick={() => { setInvert((v) => !v); onTool?.('invert') }}>
           Negatif
         </button>
-        {!strict && onToggleZones && (
+        {!strict && onToggleZones && !isCtStack && (
           <button type="button" className={`tool-btn ${showZones ? 'active' : ''}`} aria-pressed={showZones} onClick={() => { onToggleZones(); onTool?.('overlay') }}>
             Okuma bölgeleri
           </button>

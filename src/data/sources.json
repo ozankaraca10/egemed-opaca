@@ -6,68 +6,166 @@
     "trademark": "EGEMED Opaca™",
     "developedBy": "Ege Üniversitesi Tıp Fakültesi Dekanlığı",
     "copyright": "Tüm hakları saklıdır © 2026",
-    "logoSource": "https://egelogo.ege.edu.tr/ (Ege Üniversitesi Kurumsal Kimlik — Tıp Fakültesi amblemi)"
+    "logoSource": "https://egelogo.ege.edu.tr/ (Ege Üniversitesi Kurumsal Kimlik — Tıp Fakültesi amblemi)",
+    "validationStatement": "Simülatörün tüm tıbbi içerik ve görüntü validasyonları Ege Üniversitesi Tıp Fakültesi Radyoloji Anabilim Dalı öğretim üyelerince yapılmıştır.",
+    "validationShort": "Radyoloji Anabilim Dalı öğretim üyelerince valide edilmiştir."
   },
   "credits": [
     {
       "role": "Yazılım geliştirme, öğretim ve ölçme-değerlendirme tasarımı",
-      "people": [{ "name": "Doç. Dr. Ozan KARACA", "url": "https://unisis.ege.edu.tr/researcher=ozan.karaca" }]
+      "people": [
+        {
+          "name": "Doç. Dr. Ozan KARACA",
+          "url": "https://unisis.ege.edu.tr/researcher=ozan.karaca"
+        }
+      ]
     },
     {
-      "role": "Radyolojik içerik ve tıbbi validasyon",
-      "people": [{ "name": "Radyoloji uzmanı (belirlenecek)" }]
+      "role": "Öğretim Tasarımı ve Tıbbi Danışmanlık",
+      "people": [
+        {
+          "name": "Prof. Dr. Hatice ŞAHİN",
+          "url": "https://unisis.ege.edu.tr/researcher=hatice.sahin"
+        },
+        {
+          "name": "Prof. Dr. Burcu BARUTÇUOĞLU",
+          "url": "https://unisis.ege.edu.tr/researcher=burcu.barutcuoglu"
+        },
+        {
+          "name": "Prof. Dr. İpek KAPLAN BULUT",
+          "url": "https://unisis.ege.edu.tr/researcher=ipek.kaplan.bulut"
+        }
+      ]
     },
     {
-      "role": "Kullanıcı kabul testleri",
-      "people": [{ "name": "Öğrenci 1" }, { "name": "Öğrenci 2" }, { "name": "Öğrenci 3" }]
+      "role": "Tıbbi İçerik Validasyonu",
+      "people": [
+        {
+          "name": "Doç. Dr."
+        },
+        {
+          "name": "Doç. Dr."
+        },
+        {
+          "name": "Doç. Dr."
+        }
+      ]
     }
   ],
   "datasets": [
     {
       "id": "nih-cxr14",
       "title": "NIH ChestX-ray14 (ChestX-ray8 genişletilmiş)",
-      "authors": ["Xiaosong Wang", "Yifan Peng", "Le Lu", "Zhiyong Lu", "Mohammadhadi Bagheri", "Ronald M. Summers"],
+      "authors": [
+        "Xiaosong Wang",
+        "Yifan Peng",
+        "Le Lu",
+        "Zhiyong Lu",
+        "Mohammadhadi Bagheri",
+        "Ronald M. Summers"
+      ],
       "datasetUrl": "https://nihcc.app.box.com/v/ChestXray-NIHCC",
       "articleUrl": "https://openaccess.thecvf.com/content_cvpr_2017/papers/Wang_ChestX-ray8_Hospital-Scale_Chest_CVPR_2017_paper.pdf",
       "license": "Kullanım kısıtlaması yok; atıf koşullu (NIH Clinical Center)",
       "licenseUrl": "https://cloud.google.com/healthcare/docs/resources/public-datasets/nih-chest",
+      "licenseVerified": true,
       "usage": "Görüntüler ve radyolog tarafından çizilmiş sınırlayıcı kutular (BBox_List_2017). Rapor tabanlı (NLP) etiketler yalnız meta veri olarak tutulur.",
       "attributionText": "Wang X, Peng Y, Lu L, Lu Z, Bagheri M, Summers RM. ChestX-ray8: Hospital-scale Chest X-ray Database and Benchmarks on Weakly-Supervised Classification and Localization of Common Thorax Diseases. IEEE CVPR 2017, s. 3462–3471. Veri sağlayıcı: NIH Clinical Center — https://nihcc.app.box.com/v/ChestXray-NIHCC"
     },
     {
       "id": "google-nih-adjudicated",
       "title": "Google Health — NIH ChestX-ray14 radyolog panel etiketleri",
-      "authors": ["Anna Majkowska", "Sid Mittal", "David F. Steiner", "ve ark."],
+      "authors": [
+        "Anna Majkowska",
+        "Sid Mittal",
+        "David F. Steiner",
+        "ve ark."
+      ],
       "datasetUrl": "https://cloud.google.com/healthcare/docs/resources/public-datasets/nih-chest",
       "articleDoi": "10.1148/radiol.2019191293",
       "license": "Atıf koşullu paylaşım — lisans metni ayrıca incelenmeli",
       "licenseUrl": "https://cloud.google.com/healthcare/docs/resources/public-datasets/nih-chest",
+      "licenseVerified": false,
       "usage": "Kırık, pnömotoraks, havalı alan opasitesi ve nodül/kitle için panel kararı (var/yok).",
       "attributionText": "Majkowska A, Mittal S, Steiner DF, ve ark. Chest Radiograph Interpretation Using Deep Learning Models: Assessment Using Radiologist Adjudicated Reference Standards and Population-Adjusted Evaluation. Radiology. 2020. doi:10.1148/radiol.2019191293"
     },
     {
-      "id": "rsna-pneumonia-2018",
-      "title": "RSNA Pneumonia Detection Challenge (2018)",
-      "authors": ["George Shih", "Carol C. Wu", "Safwan S. Halabi", "ve ark."],
-      "datasetUrl": "https://www.rsna.org/education/ai-resources-and-training/ai-image-challenge/RSNA-Pneumonia-Detection-Challenge-2018",
-      "articleDoi": "10.1148/ryai.2019180041",
-      "license": "Akademik araştırma ve eğitim dahil kullanım izinli; atıf koşullu (RSNA Terms of Use)",
-      "licenseUrl": "https://www.rsna.org/education/ai-resources-and-training/ai-image-challenge/RSNA-Pneumonia-Detection-Challenge-2018",
-      "usage": "RSNA ve STR radyologlarının çizdiği 'akciğer opasitesi' kutuları ve radyolog 'Normal' sınıfı. Etiket opasitedir, pnömoni tanısı değildir.",
-      "attributionText": "Shih G, Wu CC, Halabi SS, ve ark. Augmenting the National Institutes of Health Chest Radiograph Dataset with Expert Annotations of Possible Pneumonia. Radiol Artif Intell. 2019;1(1):e180041. Veri sağlayıcı: NIH Clinical Center; açıklamalar: RSNA ve STR."
+      "id": "nlm-tb",
+      "title": "NLM Montgomery ve Shenzhen Tüberküloz Göğüs Radyografisi Veri Setleri",
+      "authors": [
+        "Stefan Jaeger",
+        "Sema Candemir",
+        "Sameer Antani",
+        "ve ark."
+      ],
+      "datasetUrl": "https://data.lhncbc.nlm.nih.gov/public/Tuberculosis-Chest-X-ray-Datasets/index.html",
+      "articleDoi": "10.3978/j.issn.2223-4292.2014.11.20",
+      "license": "NLM (ABD Ulusal Tıp Kütüphanesi) — araştırma ve eğitim amaçlı kullanım, atıf koşullu",
+      "licenseUrl": "https://data.lhncbc.nlm.nih.gov/public/Tuberculosis-Chest-X-ray-Datasets/index.html",
+      "licenseVerified": true,
+      "usage": "Montgomery (tamamı, 138 film) ve Shenzhen (seçmeli, 90 film) setlerinden radyolog okumasıyla (expert_reading) etiketlenmiş TB/normal görüntüler; ClinicalReadings serbest metni anahtar kelimelerle bulguya eşlenir.",
+      "attributionText": "Jaeger S, Candemir S, Antani S, Wáng YX, Lu PX, Thoma G. Two public chest X-ray datasets for computer-aided screening of pulmonary diseases. Quant Imaging Med Surg. 2014;4(6):475-477. doi:10.3978/j.issn.2223-4292.2014.11.20. Veri sağlayıcı: ABD Ulusal Tıp Kütüphanesi (NLM) — Montgomery County (Maryland) Sağlık Bakanlığı ve Shenzhen No.3 Halk Hastanesi ile işbirliğiyle."
+    },
+    {
+      "id": "kermany-pediatric",
+      "title": "Kermany Pediatrik Göğüs Radyografisi Veri Seti (Guangzhou Women and Children's Medical Center)",
+      "authors": [
+        "Daniel S. Kermany",
+        "Michael Goldbaum",
+        "Wenjia Cai",
+        "ve ark."
+      ],
+      "datasetUrl": "https://data.mendeley.com/datasets/rscbjbr9sj/2",
+      "articleDoi": "10.1016/j.cell.2018.02.010",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "licenseVerified": true,
+      "usage": "Pediatrik (1-5 yaş) normal ve pnömoni (bakteriyel/viral) göğüs radyografileri; iki uzman radyolog tarafından okunmuş, üçüncü uzmanla teyit edilmiştir (expert_reading). Yalnız öğrenme/uygulama katmanı; değerlendirme havuzuna girmez.",
+      "attributionText": "Kermany DS, Goldbaum M, Cai W, ve ark. Identifying Medical Diagnoses and Treatable Diseases by Image-Based Deep Learning. Cell. 2018;172(5):1122-1131.e9. doi:10.1016/j.cell.2018.02.010. Veri kümesi: Mendeley Data, V2, doi:10.17632/rscbjbr9sj.2 (CC BY 4.0)."
+    },
+    {
+      "id": "wikimedia-commons",
+      "title": "Wikimedia Commons — küratörlü nadir/özel konu görüntüleri",
+      "authors": [
+        "Çeşitli Wikimedia Commons katkıcıları (görüntü başına atıf)"
+      ],
+      "datasetUrl": "https://commons.wikimedia.org/",
+      "license": "Dosya bazında: CC0, Public Domain, CC BY veya CC BY-SA (sürüm görüntü başına değişir); NC/ND lisanslı dosyalar içe aktarılmaz",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/Commons:Licensing",
+      "licenseVerified": true,
+      "usage": "Krup, yabancı cisim, skolyoz, kot/klavikula kırığı, diyafram hernisi, pulmoner emboli ve toraks BT gibi nadir/özel konular için tek görüntülük örnekler. Etiket kaynağı her zaman `author_caption` (yükleyenin açıklaması, radyolog doğrulaması değildir); yalnız öğrenme ve uygulamada kullanılır, değerlendirme havuzuna girmez. Görüntüye özgü lisans/yazar bilgisi `images.json` → `license` alanında ayrıca saklanır.",
+      "attributionText": "Görüntü başına atıf `images.json` kaydındaki `license.attribution` alanında ve uygulama arayüzünde (Öğrenme → Film bilgisi) gösterilir; kaynak: Wikimedia Commons (https://commons.wikimedia.org)."
+    },
+    {
+      "id": "europepmc",
+      "title": "Europe PMC — açık erişim vaka raporu figürleri",
+      "authors": [
+        "Çeşitli Europe PMC yazarları (makale başına atıf)"
+      ],
+      "datasetUrl": "https://europepmc.org/",
+      "license": "Yalnız CC BY / CC BY-SA / CC0 (Europe PMC LICENSE alanı ile filtrelenir); NC/ND içeren hiçbir figür alınmaz",
+      "licenseUrl": "https://europepmc.org/Copyright",
+      "licenseVerified": true,
+      "usage": "Örneği hiç olmayan ya da tek örnekli konular (pulmoner ödem, hiperinflasyon, yükselmiş hemidiyafram, kalem ucu işareti, thumb işareti, hava hapsi, Hampton hörgücü, Westermark işareti, klavikula/kot kırığı, radyoopak yabancı cisim, konjenital diyafram hernisi, hiatal herni, BT dolum defekti, skolyoz) için Europe PMC açık erişim vaka raporu figürleri (scripts/import-europepmc.mjs). Etiket kaynağı her zaman `author_caption` (figür altyazısına, bazen makale başlığına dayanır — radyolog doğrulaması değildir); yalnız öğrenme ve uygulamada kullanılır, değerlendirme havuzuna girmez. Görüntüye özgü lisans/yazar/kaynak bilgisi `images.json` → `license` alanında ayrıca saklanır; her görüntü hekim onayı bekler (`clinicalReview: 'beklemede'`).",
+      "attributionText": "Görüntü başına atıf `images.json` kaydındaki `license.attribution` alanında ve uygulama arayüzünde (Öğrenme → Film bilgisi) gösterilir; kaynak: Europe PMC (https://europepmc.org)."
+    },
+    {
+      "id": "tcia-lidc-idri",
+      "title": "TCIA LIDC-IDRI — Lung Image Database Consortium ve Image Database Resource Initiative",
+      "authors": [
+        "Samuel G. Armato III",
+        "Geoffrey McLennan",
+        "Luc Bidaut",
+        "ve ark."
+      ],
+      "datasetUrl": "https://www.cancerimagingarchive.net/collection/lidc-idri/",
+      "articleDoi": "10.7937/K9/TCIA.2015.LO9QL9SX",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+      "licenseVerified": true,
+      "usage": "Gerçek toraks BT aksiyel kesit yığınları (akciğer C−600/W1500 ve mediasten C50/W350 pencereleri önceden render edilmiş) ve dört radyoloğun bağımsız nodül konturları (yalnız ≥3 okuyucu uzlaşısı). Yalnız öğrenme modunda; vaka/soru üretilmez. Okuyucu özellik puanları öznel 1–5 ölçektir, patoloji doğrulaması yoktur.",
+      "attributionText": "Armato SG III, McLennan G, Bidaut L, ve ark. Data From LIDC-IDRI [Data set]. The Cancer Imaging Archive; 2015. doi:10.7937/K9/TCIA.2015.LO9QL9SX. — Armato SG III ve ark. The Lung Image Database Consortium (LIDC) and Image Database Resource Initiative (IDRI): a completed reference database of lung nodules on CT scans. Med Phys. 2011;38(2):915-931. — Clark K ve ark. The Cancer Imaging Archive (TCIA): maintaining and operating a public information repository. J Digit Imaging. 2013;26(6):1045-1057. doi:10.1007/s10278-013-9622-7"
     }
-  ],
-  "inventory": [
-    { "id": "nih-cxr14", "title": "NIH ChestX-ray14", "status": "importer_ready", "licenseVerified": true, "labelTypes": ["rapor NLP (14 bulgu)", "radyolog kutusu (~1000 görüntü)"], "population": "Yetişkin ağırlıklı, az sayıda pediatrik", "importScript": "npm run import:nih -- <klasör>", "notes": "Çekirdek görüntü havuzu. NLP etiketleri değerlendirmeye girmez." },
-    { "id": "google-nih-adjudicated", "title": "Google panel etiketleri (NIH üzerinde)", "status": "importer_ready", "licenseVerified": false, "labelTypes": ["panel kararı (4 bulgu)"], "population": "Yetişkin", "importScript": "npm run import:nih -- <klasör> --google <csv>", "notes": "Lisans metni doğrulanana kadar validate adımı bu etiketlerle üretilen paketi durdurur (OPACA_ALLOW_LICENSE_REVIEW=1 yalnız yerel geliştirme içindir)." },
-    { "id": "rsna-pneumonia-2018", "title": "RSNA Pneumonia Detection Challenge", "status": "importer_ready", "licenseVerified": true, "labelTypes": ["radyolog kutusu (opasite)", "radyolog sınıfı (Normal)"], "population": "Yetişkin ağırlıklı", "importScript": "npm run import:rsna -- <klasör>", "notes": "Radyolog okumalı normal filmlerin ana kaynağı." },
-    { "id": "siim-acr-ptx", "title": "SIIM-ACR Pneumothorax Segmentation", "status": "license_review", "licenseVerified": false, "labelTypes": ["radyolog maskesi (pnömotoraks)"], "population": "Yetişkin", "notes": "Kaggle yarışma koşulları doğrulanmadı; pakete alınmaz." },
-    { "id": "jsrt", "title": "JSRT Chest Radiograph Database", "status": "license_review", "licenseVerified": false, "labelTypes": ["BT doğrulamalı nodül konumu", "malign/benign"], "population": "Yetişkin", "notes": "Kullanım koşulları kayıt sonrası okunmalı; nodül için altın standart adayı." },
-    { "id": "nlm-montgomery-shenzhen", "title": "NLM Montgomery ve Shenzhen TB setleri", "status": "license_review", "licenseVerified": false, "labelTypes": ["radyolog okuması (TB/normal)"], "population": "Yetişkin ve çocuk", "notes": "Tüberküloz modülü için aday; koşullar doğrulanmadı." },
-    { "id": "padchest-gr", "title": "PadChest-GR", "status": "license_review", "licenseVerified": false, "labelTypes": ["radyolog kutusu (tüm bulgular)", "lateral grafi"], "population": "Yetişkin", "notes": "Başvuru ile erişim; lateral grafi ve serbest hava/tüp-kateter için aday." },
-    { "id": "vindr-cxr", "title": "VinDr-CXR", "status": "inventory_only", "licenseVerified": true, "labelTypes": ["radyolog kutusu (22 bulgu)"], "population": "Yetişkin", "notes": "PhysioNet kullanım sözleşmesi veri paylaşımını yasaklar; öğrencilere dağıtılan pakete alınamaz." },
-    { "id": "mimic-cxr", "title": "MIMIC-CXR", "status": "inventory_only", "licenseVerified": true, "labelTypes": ["rapor metni"], "population": "Yetişkin", "notes": "PhysioNet kısıtlı erişim; pakete alınamaz." },
-    { "id": "chexpert", "title": "CheXpert", "status": "inventory_only", "licenseVerified": false, "labelTypes": ["rapor tabanlı etiket", "radyolog uzlaşı test seti"], "population": "Yetişkin", "notes": "Stanford araştırma sözleşmesi; pakete alınmaz." }
   ],
   "assets": [],
   "disclaimer": "Görüntüler açık veri setlerinden alınmıştır ve kimliksizleştirilmiştir. Bulgu etiketlerinin kaynağı her vakada belirtilir; rapor metninden otomatik çıkarılan etiketler değerlendirmede kullanılmaz. Simülasyon eğitim amaçlıdır; tek başına klinik tanı koymak için kullanılamaz."

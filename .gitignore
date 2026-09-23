@@ -24,7 +24,9 @@ dist-ssr
 *.sw?
 # EGEMED Ausculta eklemeleri
 build/
-reports/
+reports/*
+!reports/tcia/
 public/assets/audio/runtime/
 release
 public/assets/xray/runtime/
+scripts/tcia/.venv/

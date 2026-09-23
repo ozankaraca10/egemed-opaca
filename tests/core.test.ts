@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import type { CaseDef, ImageRecord, Question, SuspendPayload, Telemetry } from '../src/core/types'
 import { DEFAULT_WEIGHTS, EXPERT_SOURCES } from '../src/core/types'
-import { decodeMark, encodeMark, inBox, markHitsFinding, markToScorm, ratio, zonesAt } from '../src/core/geometry'
+import {
+  boxArea, decodeMark, encodeMark, inBox, markHitsBox, markHitsFinding, markRadiusNorm, markToScorm,
+  MAX_LOCALIZATION_BOX_AREA, nearestFindingBoxCenter, ratio, zonesAt,
+} from '../src/core/geometry'
 import { isAnswerCorrect } from '../src/core/answers'
 import { aggregateResults, practiceAdjusted, scoreCase } from '../src/core/scoring'
 import { validateCase } from '../src/core/validation'
@@ -9,7 +12,7 @@ import { deserializeSuspend, serializeSuspend, SUSPEND_LIMIT_12 } from '../src/c
 import {
   firstWeakLibraryKey, isTimedOut, nextActionForSubmit, remainingSec, stepProgress, tutorialProgress, weakDomainKeys, zoneChipState,
 } from '../src/core/flow'
-import { sampleSession, shuffledOptions } from '../src/core/session'
+import { questionSignature, sampleSession, shuffledOptions } from '../src/core/session'
 import { buildSuspend, computeCaseResult, initialState, initialTelemetry, reducer, ScormRuntime, type AppState } from '../src/core/store'
 import { MockAdapter, Scorm12Adapter, type ScormApi } from '../src/core/scorm'
 import { ZONES, ZONE_IDS } from '../src/data/zones'
@@ -113,6 +116,31 @@ describe('geometri', () => {
     const nlp = img({ annotations: [{ finding: 'pneumothorax', source: 'report_nlp', x: 0, y: 0, w: 1, h: 1 }] })
     expect(markHitsFinding({ x: 0.5, y: 0.5 }, nlp, 'pneumothorax')).toBe(false)
     expect(markHitsFinding({ x: 0.5, y: 0.5 }, undefined, 'pneumothorax')).toBe(false)
+  })
+  it('V3 isabet ölçütü: merkez kutu içinde VE kutu merkezine uzaklık yarı köşegenin %60ını aşmamalı', () => {
+    // kutu: x .2 y .2 w .4 h .2 → merkez (.4,.3), yarı köşegen = hypot(.4,.2)/2 ≈ .2236, %60 ≈ .1342
+    const b = { x: 0.2, y: 0.2, w: 0.4, h: 0.2 }
+    expect(markHitsBox({ x: 0.4, y: 0.3 }, b)).toBe(true) // tam merkez
+    expect(markHitsBox({ x: 0.21, y: 0.21 }, b)).toBe(false) // kutu içinde ama köşeye çok yakın (kenardan teğet)
+    expect(markHitsBox({ x: 0.19, y: 0.3 }, b)).toBe(false) // eski %2 kenar toleransı KALDIRILDI — kutu dışı artık asla isabet değil
+    expect(markHitsBox({ x: 0.6, y: 0.2 }, b)).toBe(false) // kutu köşesi: içeride sayılsa da merkeze çok uzak
+  })
+  it('kutu alanı ve maksimum lokalizasyon eşiği', () => {
+    expect(boxArea({ x: 0, y: 0, w: 0.5, h: 0.5 })).toBeCloseTo(0.25)
+    expect(boxArea({ x: 0, y: 0, w: 0.7, h: 0.6 })).toBeGreaterThan(MAX_LOCALIZATION_BOX_AREA)
+    expect(MAX_LOCALIZATION_BOX_AREA).toBe(0.35)
+  })
+  it('işaret dairesi yarıçapı: kare olmayan görüntüde eksene göre farklı normalize yarıçap, gerçekte dairesel', () => {
+    const { rx, ry } = markRadiusNorm({ width: 2000, height: 1000 })
+    // kısa kenar 1000 → R = 80px; rx = 80/2000 = .04, ry = 80/1000 = .08 → piksel olarak rx*2000 === ry*1000
+    expect(rx).toBeCloseTo(0.04)
+    expect(ry).toBeCloseTo(0.08)
+    expect(rx * 2000).toBeCloseTo(ry * 1000)
+  })
+  it('en yakın kutu merkezi (yanlış işaret geri bildirimi için)', () => {
+    const i = img()
+    expect(nearestFindingBoxCenter({ x: 0, y: 0 }, i, 'pneumothorax')).toEqual({ x: 0.7, y: 0.25 })
+    expect(nearestFindingBoxCenter({ x: 0, y: 0 }, i, 'nodule_mass')).toBeNull()
   })
   it('bölge bulma ve oran', () => {
     expect(zonesAt({ x: 0.5, y: 0.05 }, ZONES)).toContain('a_trachea')
@@ -240,12 +268,24 @@ describe('paketlenen veri', () => {
     for (const [f, def] of Object.entries(FINDINGS)) if (def.teaching) expect(LIBRARY_ITEMS.some((it) => it.finding === f)).toBe(true)
     for (const it of LIBRARY_ITEMS) for (const z of it.bestZones) expect(ZONE_IDS).toContain(z)
   })
-  it('kütüphane yorum şablonları tutarlı', () => {
+  it('kütüphane yorum şablonları tutarlı (V2: her biri en az 3 varyant içeren bir dizidir)', () => {
     for (const it of LIBRARY_ITEMS) {
-      if (!it.interpretation) continue
-      const ids = it.interpretation.options.map((o) => o.id)
-      expect(it.interpretation.correct.every((c) => ids.includes(c))).toBe(true)
-      expect(new Set(ids).size).toBe(ids.length)
+      for (const template of [...(it.interpretation ?? []), ...(it.nextStepQuestion ?? [])]) {
+        const ids = template.options.map((o) => o.id)
+        expect(template.correct.every((c) => ids.includes(c))).toBe(true)
+        expect(new Set(ids).size).toBe(ids.length)
+      }
+      if (it.interpretation) expect(it.interpretation.length).toBeGreaterThanOrEqual(3)
+      if (it.nextStepQuestion) expect(it.nextStepQuestion.length).toBeGreaterThanOrEqual(3)
+    }
+  })
+  it('V2: aynı şablon içindeki varyantların prompt metinleri birbirinden farklı (kopya değil)', () => {
+    for (const it of LIBRARY_ITEMS) {
+      for (const variants of [it.interpretation, it.nextStepQuestion]) {
+        if (!variants) continue
+        const prompts = variants.map((v) => v.prompt)
+        expect(new Set(prompts).size).toBe(prompts.length)
+      }
     }
   })
   it('bölge dikdörtgenleri 0–1 aralığında ve her ABCDE adımı temsil ediliyor', () => {
@@ -353,6 +393,33 @@ describe('reducer', () => {
     const assess = computeCaseResult(def, { answers: correct, telemetry: initialTelemetry(), hintsUsed: 1, mode: 'assessment' })
     expect(hinted.total).toBe(Math.max(0, full.total - 5))
     expect(assess.total).toBe(full.total)
+  })
+})
+
+/* ---------------- en iyi puan (bestScore) ---------------- */
+describe('en iyi puan (bestScore)', () => {
+  const c = mkCase()
+  const allRight = { q1: ['a'], q2: [encodeMark({ x: 0.7, y: 0.2 })], q3: ['a'] }
+  const high = scoreCase(c, allRight, tele(REQUIRED), 0, img(), ZONES) // total 100
+  const low = scoreCase(c, {}, initialTelemetry(), 0, img(), ZONES) // total 0
+
+  it('setResults mod başına en iyi puanı yalnız daha yüksekse günceller', () => {
+    const s0: AppState = { ...initialState, mode: 'practice' }
+    let s = reducer(s0, { type: 'setResults', results: [high] })
+    expect(s.bestScore.practice).toBe(100)
+    // daha düşük bir sonraki deneme en iyi puanı düşürmez
+    s = reducer(s, { type: 'setResults', results: [low] })
+    expect(s.bestScore.practice).toBe(100)
+  })
+  it('mod başına ayrı tutulur (practice/assessment birbirini etkilemez)', () => {
+    let s: AppState = { ...initialState, mode: 'practice' }
+    s = reducer(s, { type: 'setResults', results: [high] })
+    s = reducer({ ...s, mode: 'assessment' }, { type: 'setResults', results: [low] })
+    expect(s.bestScore.practice).toBe(100)
+    expect(s.bestScore.assessment).toBe(0)
+  })
+  it('başlangıç değeri sıfırdır', () => {
+    expect(initialState.bestScore).toEqual({ practice: 0, assessment: 0 })
   })
 })
 
@@ -482,7 +549,16 @@ describe('akış', () => {
 
 /* ---------------- oturum ---------------- */
 describe('oturum örnekleme', () => {
-  const pool = Array.from({ length: 30 }, (_, i) => mkCase({ id: `c${i}`, primaryFinding: ['pneumothorax', 'normal', 'cardiomegaly'][i % 3] }))
+  // Gerçek veride her vaka farklı görüntüden türediği için soru metni/seçenekleri vaka başına değişir;
+  // burada da her vakaya benzersiz prompt veren bir soru kümesi üretilir (imza çakışmaması için).
+  // NOT: qMark/qQuality burada KASITLI olarak dahil edilmez — ikisi de sabit (paylaşılan) nesnelerdir ve
+  // dahil edilirse her vaka bu iki soru için de aynı imzayı paylaşır, testin ölçmek istediği şeyi bozar.
+  const uniqueQuestions = (i: number): Question[] => [
+    { ...qChoice, id: 'q1', prompt: `Vaka ${i} bulgusu nedir?`, options: [{ id: 'a', label: `Bulgu ${i}` }, { id: 'b', label: 'Diğer' }], correct: ['a'] },
+  ]
+  const pool = Array.from({ length: 30 }, (_, i) =>
+    mkCase({ id: `c${i}`, primaryFinding: ['pneumothorax', 'normal', 'cardiomegaly'][i % 3], questions: uniqueQuestions(i) })
+  )
   it('deterministik ve katmanlı', () => {
     const a = sampleSession(pool, 7, 10)
     expect(a).toEqual(sampleSession(pool, 7, 10))
@@ -498,5 +574,120 @@ describe('oturum örnekleme', () => {
     const opts = ['a', 'b', 'c', 'd'].map((id) => ({ id, label: id }))
     expect(shuffledOptions('x', 'q', opts)).toEqual(shuffledOptions('x', 'q', opts))
     expect(shuffledOptions('x', 'q', opts).map((o) => o.id).sort()).toEqual(['a', 'b', 'c', 'd'])
+  })
+  it('soru imzası: prompt/seçenek/doğru-yanıt aynıysa aynı imza, biri değişirse farklı', () => {
+    const a = questionSignature(uniqueQuestions(1)[0])
+    const b = questionSignature(uniqueQuestions(1)[0])
+    const c = questionSignature(uniqueQuestions(2)[0])
+    expect(a).toBe(b)
+    expect(a).not.toBe(c)
+    // seçenek id'leri (shuffledOptions ile) farklı olsa da etiketler aynıysa imza aynı kalır
+    const swapped = { ...qChoice, options: [{ id: 'z', label: 'A' }, { id: 'y', label: 'B' }], correct: ['z'] }
+    expect(questionSignature(qChoice)).toBe(questionSignature(swapped))
+  })
+  it('V2 (düzeltilmiş tanım): görüntüye bağlı sorular imgeId+doğru-yanıtla, bilgi soruları prompt+doğru-yanıtla ayrışır', () => {
+    // GÖRÜNTÜYE BAĞLI (finding_identify/localization/film_quality): prompt farklı olsa da AYNI görüntü +
+    // AYNI doğru yanıtsa imza AYNI kalır (görüntüye özgü ama aynı kalıpta sorulan meşru soru — tekrar değil);
+    // AYNI prompt olsa da FARKLI görüntüde imza FARKLI olur.
+    const findingA = { ...qChoice, prompt: 'Bu grafideki ana bulgu hangisidir?', correct: ['a'] }
+    const findingB = { ...qChoice, prompt: 'Bambaşka bir soru kökü, ana bulgu?', correct: ['a'] }
+    expect(questionSignature(findingA, 'img_1')).toBe(questionSignature(findingB, 'img_1'))
+    expect(questionSignature(findingA, 'img_1')).not.toBe(questionSignature(findingA, 'img_2'))
+    // BİLGİ sorusu (interpretation): AYNI görüntüId'ye bakılmaksızın yalnız prompt+doğru-yanıt imzayı belirler.
+    const interp: Question = {
+      id: 'qi', type: 'interpretation', domain: 'interpretation', prompt: 'ABCDE sırası nedir?',
+      options: [{ id: 'a', label: 'X' }], correct: ['a'], feedbackCorrect: '', feedbackIncorrect: '',
+    }
+    expect(questionSignature(interp, 'img_1')).toBe(questionSignature(interp, 'img_2'))
+    expect(questionSignature(interp, 'img_1')).toBe(questionSignature({ ...interp, id: 'other' }))
+    expect(questionSignature(interp)).not.toBe(questionSignature({ ...interp, prompt: 'Başka bir bilgi sorusu' }))
+  })
+  it('V2/§3 oturum içi tekrar yasağı: aynı imzalı sorular olan vakalar aynı oturumda iki kez seçilmez', () => {
+    // 12 farklı bulgudan, her birinde İKİ vaka birebir aynı soru kümesini (kopya içerik) paylaşıyor —
+    // sampleSession bu çiftlerden en fazla birini seçmeli, aksi halde öğrenci aynı soruyu iki kez görür.
+    // Bulgu sayısı (12) oturum boyutundan (10) büyük olduğu için çakışmasız bir 10'luk oturum her zaman mümkün.
+    const collidingPool: CaseDef[] = []
+    let idx = 0
+    const findingList = [
+      'pneumothorax', 'normal', 'cardiomegaly', 'atelectasis', 'nodule_mass', 'pleural_effusion',
+      'tuberculosis', 'emphysema', 'tuberculosis_cavity', 'tuberculosis_fibrosis', 'hyperinflation', 'edema',
+    ]
+    for (const f of findingList) {
+      const qs = uniqueQuestions(idx++)
+      collidingPool.push(mkCase({ id: `${f}_a`, primaryFinding: f, questions: qs }))
+      collidingPool.push(mkCase({ id: `${f}_b`, primaryFinding: f, questions: qs })) // aynı soru imzaları
+    }
+    for (let seed = 0; seed < 25; seed++) {
+      const ids = sampleSession(collidingPool, seed, 10)
+      const seen = new Set<string>()
+      for (const id of ids) {
+        const c = collidingPool.find((cc) => cc.id === id)!
+        for (const q of c.questions) {
+          const sig = questionSignature(q)
+          expect(seen.has(sig)).toBe(false)
+          seen.add(sig)
+        }
+      }
+    }
+  })
+  it('V2/§3 onarım turu: FARKLI bulgu gruplarındaki vakalar aynı soruyu paylaşırsa havuzdan değiştirilir', () => {
+    // Gerçek üretimde saptanan kök neden: iki AYRI bulgunun (ör. 'normal' ve 'miliary_pattern')
+    // birer vakası aynı sabit soruyu (ör. tekil projeksiyon sorusu) paylaşırsa, tur 1'in "grup içinde
+    // çakışmasız aday bul" mantığı bunu YAKALAYAMAZ (grup tek üyeli, çakışma kontrolü yalnız kendi
+    // bulgu grubuna bakar) — onarım turu, TÜM havuzdan (bulgu grubuyla sınırlı kalmadan) bir
+    // değiştirme bulup bu çakışmayı gidermelidir.
+    const shared: Question = { ...qChoice, id: 'q_shared', prompt: 'Ortak/sabit soru', options: [{ id: 'a', label: 'X' }, { id: 'b', label: 'Y' }], correct: ['a'] }
+    const pool: CaseDef[] = []
+    const fillerFindings = ['pneumothorax', 'cardiomegaly', 'atelectasis', 'nodule_mass', 'pleural_effusion', 'tuberculosis', 'tuberculosis_cavity', 'tuberculosis_fibrosis', 'edema']
+    fillerFindings.forEach((f, i) => pool.push(mkCase({ id: `${f}_case`, primaryFinding: f, questions: uniqueQuestions(i) })))
+    // iki AYRI bulgu grubu (tek üyeli), ikisi de yalnız paylaşılan sabit soruyu içeriyor
+    pool.push(mkCase({ id: 'normal_case', primaryFinding: 'normal', questions: [shared] }))
+    pool.push(mkCase({ id: 'miliary_case', primaryFinding: 'miliary_pattern', questions: [shared] }))
+    // yedek: onarım turunun değiştirme için kullanabileceği, benzersiz sorulu ek bir bulgu
+    pool.push(mkCase({ id: 'spare_case', primaryFinding: 'hyperinflation', questions: uniqueQuestions(999) }))
+    for (let seed = 0; seed < 60; seed++) {
+      const ids = sampleSession(pool, seed, 10)
+      const seen = new Set<string>()
+      for (const id of ids) {
+        const c = pool.find((cc) => cc.id === id)!
+        for (const q of c.questions) {
+          const sig = questionSignature(q)
+          expect(seen.has(sig)).toBe(false)
+          seen.add(sig)
+        }
+      }
+    }
+  })
+  it('V2/§2a (koordinatör kararı, 1000 tohum): aynı BİLGİ sorusu (interpretation) FARKLI görüntülerdeki iki vakada da olsa aynı oturumda iki kez çıkmaz', () => {
+    // Gerçek senaryo: iki farklı bulgunun (dolayısıyla farklı görüntülerin) vakaları aynı kütüphane
+    // varyantını (ör. aynı "bir sonraki adım" sorusu) paylaşabilir — görüntüId farklı olduğundan
+    // görüntüye bağlı bir soru olsaydı bu sorun olmazdı, ama BİLGİ sorusu görüntüden bağımsızdır: imza
+    // yalnız prompt+doğru-yanıta bakar, bu yüzden sampleSession'ın çakışma kaçınması burada da çalışmalı.
+    const interpPool: CaseDef[] = []
+    const findingList = [
+      'pneumothorax', 'normal', 'cardiomegaly', 'atelectasis', 'nodule_mass', 'pleural_effusion',
+      'tuberculosis', 'emphysema', 'tuberculosis_cavity', 'tuberculosis_fibrosis', 'hyperinflation', 'edema',
+    ]
+    findingList.forEach((f, idx) => {
+      const q: Question = {
+        id: 'qi', type: 'interpretation', domain: 'interpretation', prompt: `Bilgi sorusu ${idx}`,
+        options: [{ id: 'a', label: `Doğru ${idx}` }, { id: 'b', label: 'Diğer' }], correct: ['a'],
+        feedbackCorrect: '', feedbackIncorrect: '',
+      }
+      interpPool.push(mkCase({ id: `${f}_a`, primaryFinding: f, imageId: `img_${f}_a`, questions: [q] }))
+      interpPool.push(mkCase({ id: `${f}_b`, primaryFinding: f, imageId: `img_${f}_b`, questions: [q] })) // farklı görüntü, AYNI bilgi sorusu
+    })
+    for (let seed = 0; seed < 1000; seed++) {
+      const ids = sampleSession(interpPool, seed, 10)
+      const seen = new Set<string>()
+      for (const id of ids) {
+        const c = interpPool.find((cc) => cc.id === id)!
+        for (const q of c.questions) {
+          const sig = questionSignature(q, c.imageId)
+          expect(seen.has(sig)).toBe(false)
+          seen.add(sig)
+        }
+      }
+    }
   })
 })

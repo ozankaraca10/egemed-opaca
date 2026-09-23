@@ -1,0 +1,101 @@
+{
+  "note": "V9 (BRIEF_OPACA_V3): Europe PMC arama terimleri, konu başına. import-europepmc.mjs bu terimlerle arar, açık erişim (CC BY/CC BY-SA/CC0) vaka raporu figürlerini tarar, altyazıda konu anahtar sözcükleri + genel 'göğüs grafisi' (ya da BT konuları için 'BT') sözcüğü geçen TEK PANELLİ figürleri (birden çok alt-panel — '(A)/(B)/(C)' — içermeyen) indirir.",
+  "topics": {
+    "edema": {
+      "queries": ["pulmonary edema chest radiograph case report", "cardiogenic pulmonary edema chest x-ray"],
+      "captionKeywords": ["pulmonary edema", "cardiogenic edema", "interstitial edema"],
+      "modality": "XR",
+      "targetCount": 3
+    },
+    "hyperinflation": {
+      "queries": ["hyperinflation chest radiograph COPD case report", "hyperinflated lungs chest x-ray flattened diaphragm", "alpha-1 antitrypsin deficiency chest radiograph emphysema"],
+      "captionKeywords": ["hyperinflat", "flattening of the diaphragm", "flattened diaphragm", "diaphragmatic flattening", "flattening of the hemidiaphragm"],
+      "modality": "XR",
+      "targetCount": 3
+    },
+    "elevated_hemidiaphragm": {
+      "queries": ["elevated hemidiaphragm chest radiograph case report", "diaphragmatic eventration chest x-ray", "phrenic nerve palsy chest radiograph case report"],
+      "captionKeywords": ["elevated hemidiaphragm", "elevation of the hemidiaphragm", "elevated hemi-diaphragm", "diaphragmatic eventration", "eventration of the diaphragm", "phrenic nerve palsy", "diaphragmatic paralysis", "raised hemidiaphragm"],
+      "modality": "XR",
+      "targetCount": 3
+    },
+    "fracture": {
+      "queries": ["sternal fracture chest radiograph case report", "bone fracture chest x-ray incidental case report", "vertebral compression fracture chest radiograph case report", "scapula fracture chest x-ray case report"],
+      "captionKeywords": ["fracture"],
+      "modality": "XR",
+      "targetCount": 2
+    },
+    "steeple_sign": {
+      "queries": ["croup steeple sign neck radiograph case report", "subglottic narrowing croup x-ray"],
+      "captionKeywords": ["steeple sign", "subglottic narrowing", "croup"],
+      "modality": "XR",
+      "targetCount": 2
+    },
+    "epiglottitis_thumb_sign": {
+      "queries": ["epiglottitis thumb sign lateral neck radiograph case report", "thumbprint sign epiglottis x-ray"],
+      "captionKeywords": ["thumb sign", "thumbprint sign", "enlarged epiglottis", "epiglottitis"],
+      "modality": "XR",
+      "targetCount": 2
+    },
+    "air_trapping": {
+      "queries": ["foreign body aspiration air trapping chest radiograph child case report", "unilateral hyperlucent lung foreign body aspiration x-ray"],
+      "captionKeywords": ["air trapping", "hyperlucent lung", "hyperinflated lung foreign body"],
+      "modality": "XR",
+      "targetCount": 2
+    },
+    "hampton_hump": {
+      "queries": ["Hampton hump pulmonary embolism chest radiograph case report"],
+      "captionKeywords": ["hampton"],
+      "modality": "XR",
+      "targetCount": 2
+    },
+    "westermark_sign": {
+      "queries": ["Westermark sign pulmonary embolism chest radiograph case report"],
+      "captionKeywords": ["westermark"],
+      "modality": "XR",
+      "targetCount": 2
+    },
+    "clavicle_fracture": {
+      "queries": ["clavicle fracture chest radiograph case report"],
+      "captionKeywords": ["clavicle fracture", "clavicular fracture"],
+      "modality": "XR",
+      "targetCount": 2
+    },
+    "foreign_body_radiopaque": {
+      "queries": ["radiopaque foreign body ingestion chest radiograph case report", "coin ingestion chest x-ray case report"],
+      "captionKeywords": ["radiopaque foreign body", "coin", "foreign body ingestion"],
+      "modality": "XR",
+      "targetCount": 2
+    },
+    "diaphragm_hernia_congenital": {
+      "queries": ["congenital diaphragmatic hernia chest radiograph case report", "Bochdalek hernia chest x-ray case report"],
+      "captionKeywords": ["diaphragmatic hernia", "bochdalek", "morgagni"],
+      "modality": "XR",
+      "targetCount": 2
+    },
+    "hiatal_hernia": {
+      "queries": ["hiatal hernia chest radiograph retrocardiac case report"],
+      "captionKeywords": ["hiatal hernia", "hiatus hernia"],
+      "modality": "XR",
+      "targetCount": 2
+    },
+    "ct_filling_defect": {
+      "queries": ["pulmonary embolism CT pulmonary angiography filling defect case report"],
+      "captionKeywords": ["filling defect", "pulmonary embolism"],
+      "modality": "CT",
+      "targetCount": 2
+    },
+    "rib_fracture": {
+      "queries": ["rib fracture chest radiograph case report"],
+      "captionKeywords": ["rib fracture"],
+      "modality": "XR",
+      "targetCount": 2
+    },
+    "scoliosis": {
+      "queries": ["scoliosis chest radiograph case report"],
+      "captionKeywords": ["scoliosis"],
+      "modality": "XR",
+      "targetCount": 2
+    }
+  }
+}

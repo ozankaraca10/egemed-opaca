@@ -35,6 +35,10 @@ export interface AppState {
   session: { practiceIds: string[]; assessmentIds: string[]; seed: number }
   pendingSummary: CaseResult | null
   learnFocusKey: string | null
+  /** A4: mod başına kalıcı en iyi toplam puan — "Yeni örneklem" onayında "en iyi puan
+   *  korunur" ifadesinin karşılığı; localStorage'da kalıcıdır (StoreProvider ile okunur/
+   *  yazılır), oturum/örneklem sıfırlansa da silinmez. SCORM suspend şemasına dahil değildir. */
+  bestScore: { practice: number; assessment: number }
 }
 
 const emptyToolUse = (): Record<ViewerTool, number> => ({ zoom: 0, window: 0, invert: 0, overlay: 0, measure: 0 })
@@ -61,6 +65,21 @@ export const initialState: AppState = {
   session: { practiceIds: [], assessmentIds: [], seed: 0 },
   pendingSummary: null,
   learnFocusKey: null,
+  bestScore: { practice: 0, assessment: 0 },
+}
+
+const BEST_SCORE_KEY = 'opaca.bestScore'
+
+/** A4: localStorage'dan kalıcı en iyi puanları oku (try/catch — özel pencere/erişim engelinde yut) */
+function loadBestScore(): { practice: number; assessment: number } {
+  try {
+    const raw = localStorage.getItem(BEST_SCORE_KEY)
+    if (!raw) return { practice: 0, assessment: 0 }
+    const parsed = JSON.parse(raw) as { practice?: number; assessment?: number }
+    return { practice: Number(parsed.practice) || 0, assessment: Number(parsed.assessment) || 0 }
+  } catch {
+    return { practice: 0, assessment: 0 }
+  }
 }
 
 export type Action =
@@ -197,8 +216,15 @@ export function reducer(s: AppState, a: Action): AppState {
     }
     case 'resetCase':
       return { ...s, step: 0, answers: {}, revealed: {}, hintsUsed: 0, telemetry: initialTelemetry(), lastFeedback: null, pendingSummary: null }
-    case 'setResults':
-      return { ...s, caseResults: a.results, screen: 'results' }
+    case 'setResults': {
+      // A4: oturum bitince mod başına en iyi toplam puanı güncelle (yalnız practice/assessment;
+      // learn modu setResults dispatch etmez). Yeni örneklem/oturum sıfırlansa da korunur.
+      const modeKey: 'practice' | 'assessment' = s.mode === 'assessment' ? 'assessment' : 'practice'
+      const agg = aggregateResults(a.results)
+      const prevBest = s.bestScore[modeKey] ?? 0
+      const bestScore = agg.total > prevBest ? { ...s.bestScore, [modeKey]: agg.total } : s.bestScore
+      return { ...s, caseResults: a.results, screen: 'results', bestScore }
+    }
     case 'setLearnFocus':
       return { ...s, learnFocusKey: a.key }
     default:
@@ -357,10 +383,19 @@ export function useStore() {
 }
 
 export function StoreProvider({ children, cases }: { children: ReactNode; cases: CaseDef[] }) {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [state, dispatch] = useReducer(reducer, initialState, (init) => ({ ...init, bestScore: loadBestScore() }))
   const stateRef = useRef(state)
   stateRef.current = state
   const runtimeRef = useRef<ScormRuntime | null>(null)
+
+  // A4: en iyi puan localStorage'a kalıcı yazılır (try/catch — özel pencere/erişim engelinde yut)
+  useEffect(() => {
+    try {
+      localStorage.setItem(BEST_SCORE_KEY, JSON.stringify(state.bestScore))
+    } catch {
+      /* yut */
+    }
+  }, [state.bestScore])
 
   useEffect(() => {
     const rt = new ScormRuntime(() => stateRef.current, () => cases.filter((c) => c.modes.includes('assessment')).length)
@@ -384,12 +419,13 @@ export function StoreProvider({ children, cases }: { children: ReactNode; cases:
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.mode, state.caseIndex, state.step, state.attempts, state.tutorialDone])
 
-  // değerlendirme sayaçları (oturum + vaka); vaka sonu özeti açıkken durur
+  // A4: toplam öğrenme süresi hem uygulama hem değerlendirmede birikir (sonuç ekranında
+  // "Toplam öğrenme süresi" kutusu için); vaka süre sınırı yalnız değerlendirmede kullanılır.
   useEffect(() => {
-    if (state.mode !== 'assessment' || state.screen !== 'simulation') return
+    if (state.screen !== 'simulation') return
     const t = window.setInterval(() => dispatch({ type: 'timer', deltaMs: 1000 }), 1000)
     return () => window.clearInterval(t)
-  }, [state.mode, state.screen])
+  }, [state.screen])
 
   return <Ctx.Provider value={{ state, dispatch, runtime: runtimeRef.current }}>{children}</Ctx.Provider>
 }

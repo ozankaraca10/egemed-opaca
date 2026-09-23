@@ -3,11 +3,12 @@ import { useStore } from '../core/store'
 import { examplesFor, isExpertSource } from '../core/images'
 import { ZONES } from '../data/zones'
 import { ALL_CASES, poolFor } from '../data/pool'
-import { LIBRARY_GROUPS, LIBRARY_ITEMS, LABEL_SOURCE_TEXT, VIEW_TEXT, findingShort, type LibraryItem } from '../data/terminology'
+import { LIBRARY_GROUPS, LIBRARY_ITEMS, LABEL_SOURCE_TEXT, findingShort, type LibraryItem } from '../data/terminology'
 import { FilmViewer, type FilmViewerHandle } from '../ui/FilmViewer'
+import { FilmInfoPanel } from '../ui/FilmInfoPanel'
 import { ZoneChips } from '../ui/ZoneChips'
 import { Footer, EcgDeco } from '../ui/chrome'
-import { IconDoc, IconInfo, IconArrowRight, IconLungs, IconHeart, IconBone, IconScan, IconFilm, IconChevronLeft, IconChevronRight } from '../ui/icons'
+import { IconDoc, IconInfo, IconArrowRight, IconLungs, IconHeart, IconBone, IconScan, IconFilm, IconChevronLeft, IconChevronRight, IconDiaphragm, IconUser, IconWave, IconShieldCheck } from '../ui/icons'
 
 /** Öğrenme modu: kütüphane + film görüntüleyici. Skor ve süre yok. */
 
@@ -40,7 +41,16 @@ export function LearnScreen() {
       }
       return out
     }
-    return examplesFor(item.finding).slice(0, 24)
+    if (item.key === 'technique.lateral') return examplesFor(null, 'LAT').slice(0, 24)
+    // Toraks BT'ye giriş: finding: null ama yalnız BT modaliteli görüntüler gösterilmeli
+    if (item.group === 'ct') return examplesFor(item.finding, undefined, { modality: 'CT' }).slice(0, 24)
+    // pediatrik konular: krup, yabancı cisim, epiglottit — pediatrik filmler de öğrenme kütüphanesinde gösterilir
+    const all = examplesFor(item.finding, undefined, { includePediatric: item.group === 'pediatric' })
+    // genel teknik konularda (bulgu belirtilmemiş, "her film" örneği) Commons'ın küratörlü/işaretli
+    // figürleri (bazılarında kaynak makaleden ok/etiket kalabiliyor) çeldirici olmasın diye hariç tutulur;
+    // Commons görüntüleri kendi bulgu konularında (ör. skolyoz, herni) normal şekilde gösterilmeye devam eder
+    const filtered = item.finding === null ? all.filter((r) => r.sourceDataset !== 'wikimedia-commons') : all
+    return filtered.slice(0, 24)
   }, [item])
   const image = examples[exampleIdx] ?? examples[0]
 
@@ -64,7 +74,9 @@ export function LearnScreen() {
 
   const onZoneEnter = useCallback((ids: string[]) => dispatch({ type: 'zoneEnter', zoneIds: ids }), [dispatch])
   const onZoneDwell = useCallback((ids: string[], ms: number) => dispatch({ type: 'zoneDwell', zoneIds: ids, dwellMs: ms }), [dispatch])
-  const annotationFinding = item.finding && item.finding !== 'normal' ? item.finding : null
+  // BT konularının kendi bulgusu yoktur (finding: null) — işaret, serinin kendi uzman konturundan alınır.
+  const ctExpertFinding = image?.modality === 'CT' ? image.annotations.find((a) => isExpertSource(a.source))?.finding ?? null : null
+  const annotationFinding = item.finding && item.finding !== 'normal' ? item.finding : ctExpertFinding
   const hasExpertBox = !!image && !!annotationFinding && image.annotations.some((a) => a.finding === annotationFinding && isExpertSource(a.source))
 
   return (
@@ -123,11 +135,12 @@ export function LearnScreen() {
                   )}
                 </div>
                 {image ? (
+                  // V13: ABCDE bölge şeması BT'ye uymuyor (bilinen sınırlılık) — showZones BT vakalarında kapalı
                   <FilmViewer
                     ref={viewerRef}
                     image={image}
                     zones={ZONES}
-                    showZones={state.showZones}
+                    showZones={state.showZones && image.modality !== 'CT'}
                     showAnnotations={showExpert && hasExpertBox}
                     annotationFinding={annotationFinding}
                     onZoneEnter={onZoneEnter}
@@ -135,6 +148,7 @@ export function LearnScreen() {
                     onActiveZones={setActiveZones}
                     onTool={(tool) => dispatch({ type: 'toolUsed', tool })}
                     onToggleZones={() => dispatch({ type: 'toggleZones' })}
+                    showInfoOverlay={tab === 'film'}
                   />
                 ) : (
                   <div className="film-empty-card">
@@ -143,14 +157,14 @@ export function LearnScreen() {
                     <p className="small">Radyolog etiketli filmler için <code>npm run import:nih</code> ya da <code>npm run import:rsna</code> çalıştırın.</p>
                   </div>
                 )}
-                <ZoneChips
+                {image?.modality !== 'CT' && <ZoneChips
                   zones={ZONES}
                   visits={state.telemetry.visits}
                   activeZones={activeZones}
                   minDwellMs={LEARN_DWELL_MS}
                   highlight={item.bestZones}
                   onSelect={(id) => viewerRef.current?.focusZone(id)}
-                />
+                />}
               </div>
             </div>
 
@@ -184,10 +198,10 @@ export function LearnScreen() {
                 )}
                 {tab === 'film' && (
                   <div className="info-body">
-                    {image ? (
-                      <dl className="film-meta">
+                    <FilmInfoPanel image={image} />
+                    {image && (
+                      <dl className="film-meta mt-12">
                         <dt>Kaynak</dt><dd>{image.sourceDataset} · {image.sourceFile}</dd>
-                        <dt>Projeksiyon</dt><dd>{VIEW_TEXT[image.viewPosition]}</dd>
                         <dt>Hasta</dt><dd>{image.ageYears != null ? `${image.ageYears} yaş` : 'yaş bilinmiyor'}{image.sex ? `, ${image.sex === 'F' ? 'kadın' : 'erkek'}` : ''}</dd>
                         <dt>Etiketler</dt>
                         <dd>
@@ -199,12 +213,16 @@ export function LearnScreen() {
                             ))}
                           </ul>
                         </dd>
+                        {image.license && (
+                          <>
+                            <dt>Lisans</dt>
+                            <dd>{image.license.attribution} (<a href={image.license.sourceUrl} target="_blank" rel="noreferrer">kaynak</a>)</dd>
+                          </>
+                        )}
                         <dt>Hekim onayı</dt><dd>{image.clinicalReview === 'onayli' ? 'Onaylı' : 'Beklemede'}</dd>
                       </dl>
-                    ) : (
-                      <p>Film seçilmedi.</p>
                     )}
-                    <p className="src-line"><IconInfo /> Rapor metninden otomatik çıkarılan etiketler öğrenme amaçlı gösterilir; değerlendirmede kullanılmaz.</p>
+                    <p className="src-line"><IconInfo /> Rapor metninden otomatik çıkarılan ve yükleyen açıklamasına dayanan etiketler öğrenme amaçlı gösterilir; değerlendirmede kullanılmaz.</p>
                   </div>
                 )}
                 {tab === 'clin' && (
@@ -237,12 +255,20 @@ export function LearnScreen() {
 
 function countFor(it: LibraryItem): number {
   if (it.key === 'technique.projection') return examplesFor(null, 'PA').length + examplesFor(null, 'AP').length
-  return examplesFor(it.finding).length
+  if (it.key === 'technique.lateral') return examplesFor(null, 'LAT').length
+  if (it.group === 'ct') return examplesFor(it.finding, undefined, { modality: 'CT' }).length
+  const all = examplesFor(it.finding, undefined, { includePediatric: it.group === 'pediatric' })
+  return it.finding === null ? all.filter((r) => r.sourceDataset !== 'wikimedia-commons').length : all.length
 }
 
 function GroupIcon({ group, size = 17 }: { group: string; size?: number }) {
   if (group === 'cardiac') return <IconHeart width={size} height={size} />
   if (group === 'bone') return <IconBone width={size} height={size} />
   if (group === 'technique') return <IconScan width={size} height={size} />
+  if (group === 'diaphragm') return <IconDiaphragm width={size} height={size} />
+  if (group === 'pediatric') return <IconUser width={size} height={size} />
+  if (group === 'vascular') return <IconWave width={size} height={size} />
+  if (group === 'infection') return <IconShieldCheck width={size} height={size} />
+  if (group === 'ct') return <IconScan width={size} height={size} />
   return <IconLungs width={size} height={size} />
 }

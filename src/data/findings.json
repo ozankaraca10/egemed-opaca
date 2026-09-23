@@ -18,7 +18,31 @@
     "fibrosis": { "label": "Fibrozis (NIH rapor etiketi)", "short": "Fibrozis", "group": "parenchyma", "teaching": false },
     "pleural_thickening": { "label": "Plevral kalınlaşma (NIH rapor etiketi)", "short": "Plevral kalınlaşma", "group": "pleura", "teaching": false },
     "hernia": { "label": "Herni (NIH rapor etiketi)", "short": "Herni", "group": "other", "teaching": false },
-    "no_finding_report": { "label": "Raporda bulgu yok (NIH rapor etiketi — 'normal' anlamına gelmez)", "short": "Rapor: bulgu yok", "group": "other", "teaching": false }
+    "no_finding_report": { "label": "Raporda bulgu yok (NIH rapor etiketi — 'normal' anlamına gelmez)", "short": "Rapor: bulgu yok", "group": "other", "teaching": false },
+
+    "tuberculosis": { "label": "Tüberküloz bulgusu (genel)", "short": "Tüberküloz", "group": "infection", "teaching": true },
+    "tuberculosis_cavity": { "label": "Kaviter tüberküloz", "short": "TB kaviter", "group": "infection", "teaching": true },
+    "tuberculosis_fibrosis": { "label": "Fibrotik/kalsifik TB sekeli", "short": "TB sekel", "group": "infection", "teaching": true },
+    "miliary_pattern": { "label": "Miliyer patern", "short": "Miliyer patern", "group": "infection", "teaching": true },
+
+    "hyperinflation": { "label": "Hiperinflasyon (aşırı havalanma)", "short": "Hiperinflasyon", "group": "parenchyma", "teaching": true },
+
+    "foreign_body_radiopaque": { "label": "Radyoopak yabancı cisim", "short": "Radyoopak cisim", "group": "pediatric", "teaching": true },
+    "air_trapping": { "label": "Tek taraflı hava hapsi (radyolusen yabancı cisim bulgusu)", "short": "Hava hapsi", "group": "pediatric", "teaching": true },
+    "steeple_sign": { "label": "Kalem ucu (steeple) işareti", "short": "Steeple işareti", "group": "pediatric", "teaching": true },
+    "epiglottitis_thumb_sign": { "label": "Başparmak (thumb) işareti", "short": "Thumb işareti", "group": "pediatric", "teaching": true },
+
+    "scoliosis": { "label": "Skolyoz", "short": "Skolyoz", "group": "bone", "teaching": true },
+    "rib_fracture": { "label": "Kot kırığı", "short": "Kot kırığı", "group": "bone", "teaching": true },
+    "clavicle_fracture": { "label": "Klavikula kırığı", "short": "Klavikula kırığı", "group": "bone", "teaching": true },
+
+    "hiatal_hernia": { "label": "Hiatal herni", "short": "Hiatal herni", "group": "diaphragm", "teaching": true },
+    "diaphragm_hernia_congenital": { "label": "Konjenital diyafram hernisi (Bochdalek/Morgagni)", "short": "Konjenital diyafram hernisi", "group": "diaphragm", "teaching": true },
+    "elevated_hemidiaphragm": { "label": "Yükselmiş hemidiyafram (eventrasyon/paralizi)", "short": "Yükselmiş hemidiyafram", "group": "diaphragm", "teaching": true },
+
+    "westermark_sign": { "label": "Westermark işareti", "short": "Westermark işareti", "group": "vascular", "teaching": true },
+    "hampton_hump": { "label": "Hampton hörgücü", "short": "Hampton hörgücü", "group": "vascular", "teaching": true },
+    "ct_filling_defect": { "label": "BT'de dolum defekti (pulmoner emboli)", "short": "BT dolum defekti", "group": "vascular", "teaching": true }
   },
   "nihLabelMap": {
     "Atelectasis": "atelectasis",

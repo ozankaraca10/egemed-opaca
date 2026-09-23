@@ -10,6 +10,16 @@ import { parseCsv, csvObjects, csvEscape } from '../scripts/lib/csv.mjs'
 import { parseDicom, toGray8, dicomAgeYears, writeTestDicom } from '../scripts/lib/dicom.mjs'
 // @ts-expect-error — JS modülü
 import { normBox, setFinding, setNegative, emptyRecord, capPerFinding, safeId } from '../scripts/lib/cxr-common.mjs'
+// @ts-expect-error — JS modülü
+import {
+  patientKey, candidateScore, createVariantAssigner, boxArea, MAX_LOCALIZATION_BOX_AREA,
+  questionSignature, legacyQuestionSignature, createKnowledgeCapTracker, genericQuestionRatio,
+  IMAGE_DEPENDENT_TYPES, KNOWLEDGE_QUESTION_CAP, GENERIC_QUESTION_MAX_RATIO,
+  safeDistractors, orderDistractorsByDifferential, DIFFERENTIALS,
+  hasEnoughOptions, caseSelectableOk, MIN_ASSESSMENT_OPTIONS, seededRng,
+} from '../scripts/lib/case-selection.mjs'
+// @ts-expect-error — JS modülü
+import { findingsFromReadingText, NLM_READING_FINDING_KEYWORDS } from '../scripts/lib/nlm-keywords.mjs'
 
 const ROOT = path.resolve(__dirname, '..')
 
@@ -179,4 +189,289 @@ describe('içe aktarıcılar', () => {
     expect(recs2.map((r: { id: string }) => r.id)).toContain('nih_00000004_000')
     expect(recs2.find((r: { id: string }) => r.id === 'nih_00000003_000').findings.pneumothorax).toBe('report_nlp')
   }, 30000)
+})
+
+/* ---------------- V1/V10/V2/V3: vaka seçimi ve varyant dağıtımı (case-selection.mjs) ---------------- */
+describe('vaka seçimi: hasta anahtarı (V1 kural 4)', () => {
+  it('NIH: aynı hastanın çoklu filmleri aynı anahtarı paylaşır', () => {
+    expect(patientKey({ sourceDataset: 'nih-cxr14', id: 'nih_00000003_000' })).toBe('nih_00000003')
+    expect(patientKey({ sourceDataset: 'nih-cxr14', id: 'nih_00000003_001' })).toBe('nih_00000003')
+    expect(patientKey({ sourceDataset: 'nih-cxr14', id: 'nih_00000004_000' })).toBe('nih_00000004')
+  })
+  it('diğer veri setlerinde her görüntü kendi hastasıdır', () => {
+    expect(patientKey({ sourceDataset: 'wikimedia-commons', id: 'commons_scoliosis' })).toBe('commons_scoliosis')
+    expect(patientKey({ sourceDataset: 'nlm-tb', id: 'nlm_montgomery_mcucxr_0001_0' })).toBe('nlm_montgomery_mcucxr_0001_0')
+  })
+})
+
+describe('vaka seçimi: V10 puanlama', () => {
+  it('kutulu aday en yüksek puanı alır; küçük kutu ek puan alır', () => {
+    const boxed = candidateScore({ hasBox: true, boxAreaOk: true, source: 'expert_bbox', isRepeatPatient: false })
+    const boxedBig = candidateScore({ hasBox: true, boxAreaOk: false, source: 'expert_bbox', isRepeatPatient: false })
+    const panel = candidateScore({ hasBox: false, boxAreaOk: false, source: 'expert_panel', isRepeatPatient: false })
+    const reading = candidateScore({ hasBox: false, boxAreaOk: false, source: 'expert_reading', isRepeatPatient: false })
+    const nlp = candidateScore({ hasBox: false, boxAreaOk: false, source: 'report_nlp', isRepeatPatient: false })
+    const caption = candidateScore({ hasBox: false, boxAreaOk: false, source: 'author_caption', isRepeatPatient: false })
+    expect(boxed).toBe(120)
+    expect(boxedBig).toBe(100)
+    expect([boxed, boxedBig, panel, reading, nlp, caption]).toEqual([...[boxed, boxedBig, panel, reading, nlp, caption]].sort((a, b) => b - a))
+  })
+  it('aynı hastadan ikinci vaka −50 alır (pratikte eler)', () => {
+    const first = candidateScore({ hasBox: false, boxAreaOk: false, source: 'expert_reading', isRepeatPatient: false })
+    const repeat = candidateScore({ hasBox: false, boxAreaOk: false, source: 'expert_reading', isRepeatPatient: true })
+    expect(repeat).toBe(first - 50)
+    expect(repeat).toBeLessThan(candidateScore({ hasBox: false, boxAreaOk: false, source: 'author_caption', isRepeatPatient: false }))
+  })
+  it('kutu alanı eşiği 0.35 ve boxArea hesap doğru', () => {
+    expect(MAX_LOCALIZATION_BOX_AREA).toBe(0.35)
+    expect(boxArea({ w: 0.5, h: 0.5 })).toBeCloseTo(0.25)
+    expect(boxArea({ w: 0.7, h: 0.6 })).toBeGreaterThan(MAX_LOCALIZATION_BOX_AREA)
+  })
+})
+
+describe('V2: deterministik varyant dağıtımı (round-robin + tohum karışımı)', () => {
+  it('aynı bulgudaki ardışık çağrılar her zaman farklı varyant döndürür (tur sınırında da)', () => {
+    const variants = [{ prompt: 'a' }, { prompt: 'b' }, { prompt: 'c' }]
+    const pick = createVariantAssigner()
+    const seen: unknown[] = []
+    for (let i = 0; i < 30; i++) seen.push(pick('finding.x', variants))
+    for (let i = 1; i < seen.length; i++) expect(seen[i]).not.toBe(seen[i - 1])
+    // her varyant makul biçimde kullanılıyor (hiçbiri gözden kaçmıyor)
+    const counts = new Map<unknown, number>()
+    for (const v of seen) counts.set(v, (counts.get(v) ?? 0) + 1)
+    expect(counts.size).toBe(3)
+  })
+  it('tek varyant varsa onu döndürür; iki ayrı bulgu anahtarı bağımsız döngü tutar', () => {
+    const one = [{ prompt: 'solo' }]
+    const pick = createVariantAssigner()
+    expect(pick('finding.solo', one)).toBe(one[0])
+    expect(pick('finding.solo', one)).toBe(one[0])
+    const v2 = [{ prompt: 'x' }, { prompt: 'y' }]
+    const a1 = pick('finding.a', v2)
+    const b1 = pick('finding.b', v2)
+    // bağımsız anahtarlar birbirini etkilemez — ikisi de kendi ilk turunun bir elemanını döndürür
+    expect(v2).toContain(a1)
+    expect(v2).toContain(b1)
+  })
+  it('deterministik: aynı çağrı sırası aynı sonucu verir', () => {
+    const variants = [{ prompt: 'a' }, { prompt: 'b' }, { prompt: 'c' }, { prompt: 'd' }]
+    const run = () => {
+      const pick = createVariantAssigner()
+      return Array.from({ length: 12 }, (_, i) => pick(`f${i % 4}`, variants))
+    }
+    expect(run()).toEqual(run())
+  })
+})
+
+/* ---------------- V2 (düzeltilmiş tanım, koordinatör kararı 23 Eylül): soru imzası + kapak/oran ölçütleri ---------------- */
+describe('V2: soru imzası (görüntüye bağlı vs bilgi sorusu)', () => {
+  const finding = { id: 'q1', type: 'finding_identify', prompt: 'p1', options: [{ id: 'a', label: 'A' }], correct: ['a'] }
+  const localization = { id: 'q2', type: 'localization', prompt: 'p2', options: [], correct: [], targetFinding: 'nodule_mass' }
+  const quality = { id: 'q3', type: 'film_quality', prompt: 'p3', options: [{ id: 'a', label: 'PA' }], correct: ['a'] }
+  const interp = { id: 'q4', type: 'interpretation', prompt: 'ABCDE sırası nedir?', options: [{ id: 'a', label: 'X' }], correct: ['a'] }
+
+  it('IMAGE_DEPENDENT_TYPES: finding_identify/localization/film_quality görüntüye bağlı, interpretation değil', () => {
+    expect(IMAGE_DEPENDENT_TYPES.has('finding_identify')).toBe(true)
+    expect(IMAGE_DEPENDENT_TYPES.has('localization')).toBe(true)
+    expect(IMAGE_DEPENDENT_TYPES.has('film_quality')).toBe(true)
+    expect(IMAGE_DEPENDENT_TYPES.has('interpretation')).toBe(false)
+  })
+
+  it('görüntüye bağlı sorular: prompt değişse de aynı görüntü+doğru-yanıtta imza aynı, görüntü değişince farklı', () => {
+    for (const q of [finding, localization, quality]) {
+      const withDifferentPrompt = { ...q, prompt: 'tamamen farklı bir metin' }
+      expect(questionSignature(q, 'img_1')).toBe(questionSignature(withDifferentPrompt, 'img_1'))
+      expect(questionSignature(q, 'img_1')).not.toBe(questionSignature(q, 'img_2'))
+    }
+  })
+
+  it('bilgi sorusu (interpretation): görüntüId imzayı etkilemez, prompt/doğru-yanıt etkiler', () => {
+    expect(questionSignature(interp, 'img_1')).toBe(questionSignature(interp, 'img_2'))
+    expect(questionSignature(interp)).not.toBe(questionSignature({ ...interp, prompt: 'başka soru' }))
+    expect(questionSignature(interp)).not.toBe(questionSignature({ ...interp, correct: ['b'], options: [...interp.options, { id: 'b', label: 'Y' }] }))
+  })
+
+  it('legacyQuestionSignature: eski tanım görüntüye bağlı sorularda da prompt+seçenekleri imzaya katar (bilgilendirme amaçlı)', () => {
+    const withDifferentPrompt = { ...finding, prompt: 'tamamen farklı bir metin' }
+    expect(legacyQuestionSignature(finding)).not.toBe(legacyQuestionSignature(withDifferentPrompt))
+  })
+})
+
+describe('V2 §2b: bilgi sorusu varyant kullanım tavanı (createKnowledgeCapTracker)', () => {
+  it('aynı imza tavanı (varsayılan 4) aştığında false döner, farklı imzalar birbirini etkilemez', () => {
+    expect(KNOWLEDGE_QUESTION_CAP).toBe(4)
+    const tryUse = createKnowledgeCapTracker()
+    for (let i = 0; i < 4; i++) expect(tryUse('sig-a')).toBe(true)
+    expect(tryUse('sig-a')).toBe(false)
+    expect(tryUse('sig-a')).toBe(false)
+    for (let i = 0; i < 4; i++) expect(tryUse('sig-b')).toBe(true)
+    expect(tryUse('sig-b')).toBe(false)
+  })
+  it('özel tavan parametresi ile çalışır', () => {
+    const tryUse = createKnowledgeCapTracker(2)
+    expect(tryUse('x')).toBe(true)
+    expect(tryUse('x')).toBe(true)
+    expect(tryUse('x')).toBe(false)
+  })
+})
+
+describe('V2 §2d: genericQuestionRatio', () => {
+  it('generic:true soru içeren vaka oranını hesaplar; boş havuzda 0 döner', () => {
+    expect(GENERIC_QUESTION_MAX_RATIO).toBe(0.1)
+    expect(genericQuestionRatio([])).toBe(0)
+    const cases = [
+      { questions: [{ generic: true }] },
+      { questions: [{ generic: false }] },
+      { questions: [{}] },
+      { questions: [{}] },
+    ]
+    expect(genericQuestionRatio(cases)).toBeCloseTo(0.25)
+  })
+})
+
+/* ---------------- BRIEF_OPACA_DISTRACTORS: çeldirici havuzu düzeltmesi ---------------- */
+const TEACHING_SUBSET = [
+  'normal', 'cardiomegaly', 'pleural_effusion', 'pneumothorax', 'airspace_opacity', 'nodule_mass',
+  'atelectasis', 'emphysema', 'tuberculosis', 'tuberculosis_cavity', 'tuberculosis_fibrosis', 'miliary_pattern', 'fracture',
+]
+function mkImg(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'nih_00000001_000',
+    sourceDataset: 'nih-cxr14',
+    findings: {},
+    negatives: {},
+    ...overrides,
+  }
+}
+
+describe('safeDistractors (§1/§2): yalnız güvenli adaylar', () => {
+  it('primary ve zaten pozitif olan (uzman ya da NLP) bulgular asla çeldirici olmaz', () => {
+    const img = mkImg({ findings: { pneumothorax: 'expert_bbox', hernia: 'report_nlp' } })
+    const safe = safeDistractors(img, 'pneumothorax', TEACHING_SUBSET)
+    expect(safe).not.toContain('pneumothorax')
+    expect(safe).not.toContain('hernia')
+  })
+
+  it('uzman kaynaklı açık negatif her zaman güvenlidir', () => {
+    const img = mkImg({ findings: { pneumothorax: 'expert_panel' }, negatives: { fracture: 'expert_panel' } })
+    expect(safeDistractors(img, 'pneumothorax', TEACHING_SUBSET)).toContain('fracture')
+  })
+
+  it('uzman kaynaklı normal film: normal dışındaki her öğretilen bulgu güvenlidir', () => {
+    const img = mkImg({ findings: { normal: 'expert_panel' } })
+    const safe = safeDistractors(img, 'normal', TEACHING_SUBSET)
+    expect(safe).toEqual(expect.arrayContaining(['cardiomegaly', 'pleural_effusion', 'pneumothorax']))
+    expect(safe).not.toContain('normal')
+  })
+
+  it('uzman kaynaklı anormal film: "normal" güvenli çeldiricidir', () => {
+    const img = mkImg({ findings: { cardiomegaly: 'expert_reading' } })
+    expect(safeDistractors(img, 'cardiomegaly', TEACHING_SUBSET)).toContain('normal')
+  })
+
+  it('NIH: report_nlp etiketi varsa, raporda geçmeyen diğer öğretilen bulgular güvenlidir (§1 zenginleştirme yolu)', () => {
+    const img = mkImg({ sourceDataset: 'nih-cxr14', findings: { atelectasis: 'expert_bbox', cardiomegaly: 'report_nlp' } })
+    const safe = safeDistractors(img, 'atelectasis', TEACHING_SUBSET)
+    expect(safe).toContain('pneumothorax') // raporda yok → güvenli
+    expect(safe).not.toContain('cardiomegaly') // raporda pozitif → güvensiz (zaten img.findings'te var, elenir)
+  })
+
+  it('report_nlp yoksa (yalnız bbox) NIH filminde hasNlpReport yolu devreye girmez', () => {
+    const img = mkImg({ sourceDataset: 'nih-cxr14', findings: { cardiomegaly: 'expert_bbox' } })
+    const safe = safeDistractors(img, 'cardiomegaly', TEACHING_SUBSET)
+    // yalnız "normal" (expertAbnormal yolu) güvenli olmalı — rapor yolu yok
+    expect(safe).toEqual(['normal'])
+  })
+
+  it('NLM Montgomery: readingText anahtar sözcüğü geçmeyen bulgular güvenlidir; geçenler değil', () => {
+    const img = mkImg({
+      id: 'nlm_montgomery_mcucxr_0104_1',
+      sourceDataset: 'nlm-tb',
+      findings: { tuberculosis_fibrosis: 'expert_reading', tuberculosis: 'expert_reading' },
+      readingText: 'inactive TB scars LUL, unchanged for 2Y',
+    })
+    const safe = safeDistractors(img, 'tuberculosis_fibrosis', TEACHING_SUBSET)
+    expect(safe).toContain('cardiomegaly') // sözcük yok → güvenli
+    expect(safe).toContain('pneumothorax') // sözcük yok → güvenli
+    const img2 = mkImg({
+      id: 'nlm_montgomery_mcucxr_0113_1',
+      sourceDataset: 'nlm-tb',
+      findings: { miliary_pattern: 'expert_reading', tuberculosis: 'expert_reading' },
+      readingText: 'bilateral miliary nodules diffusely with RML infiltrate and right pleural effusion',
+    })
+    const safe2 = safeDistractors(img2, 'miliary_pattern', TEACHING_SUBSET)
+    // reading'de "effusion" geçiyor → pleural_effusion güvenli DEĞİL
+    expect(safe2).not.toContain('pleural_effusion')
+    // reading'de "infiltrate" geçiyor → airspace_opacity güvenli DEĞİL
+    expect(safe2).not.toContain('airspace_opacity')
+  })
+
+  it('NLM Shenzhen: negatif çıkarım yolu uygulanmaz (okumalar kısa kod, brif §2)', () => {
+    const img = mkImg({
+      id: 'nlm_shenzhen_chncxr_0113_1',
+      sourceDataset: 'nlm-tb',
+      findings: { tuberculosis: 'expert_reading' },
+      readingText: 'active tb',
+    })
+    const safe = safeDistractors(img, 'tuberculosis', TEACHING_SUBSET)
+    // expertAbnormal true olduğundan yalnız "normal" güvenli olmalı; Montgomery yolu tetiklenmemeli
+    expect(safe).toEqual(['normal'])
+  })
+})
+
+describe('findingsFromReadingText (nlm-keywords.mjs) — import-nlm-tb.mjs ile TEK kaynak', () => {
+  it('metinde geçen anahtar sözcüklere göre bulgu listesi döner', () => {
+    expect(findingsFromReadingText('extensive cavitary TB with pleural effusion')).toEqual(
+      expect.arrayContaining(['tuberculosis_cavity', 'pleural_effusion'])
+    )
+    expect(findingsFromReadingText('')).toEqual([])
+    expect(findingsFromReadingText(null)).toEqual([])
+  })
+  it('brifte istenen tüm bulgular haritada var', () => {
+    for (const f of ['pleural_effusion', 'tuberculosis_cavity', 'nodule_mass', 'airspace_opacity', 'pneumothorax', 'cardiomegaly', 'atelectasis', 'emphysema', 'tuberculosis_fibrosis'])
+      expect(Object.keys(NLM_READING_FINDING_KEYWORDS)).toContain(f)
+  })
+})
+
+describe('orderDistractorsByDifferential (§3): önce ayırıcı tanı, sonra rastgele', () => {
+  it('DIFFERENTIALS öncelik sırasını korur, kalanları sona (seed\'li rastgele) ekler', () => {
+    const candidates = ['normal', 'foreign_body_radiopaque', 'nodule_mass', 'atelectasis']
+    const ordered = orderDistractorsByDifferential(candidates, 'airspace_opacity', seededRng('test-seed'))
+    // airspace_opacity önceliği: atelectasis, pleural_effusion, nodule_mass, tuberculosis, normal
+    expect(ordered.slice(0, 3)).toEqual(['atelectasis', 'nodule_mass', 'normal'])
+    expect(ordered).toContain('foreign_body_radiopaque') // öncelik dışı ama listede kalmalı
+  })
+  it('öncelik listesi olmayan primary (ör. tanımsız anahtar): tüm adaylar seed\'li rastgele sırada kalır', () => {
+    const candidates = ['a', 'b', 'c']
+    const ordered = orderDistractorsByDifferential(candidates, 'unknown_primary', seededRng('x'))
+    expect(ordered.sort()).toEqual(candidates.sort())
+  })
+  it('deterministik: aynı tohum aynı sırayı verir', () => {
+    const candidates = ['normal', 'nodule_mass', 'westermark_sign']
+    const a = orderDistractorsByDifferential(candidates, 'cardiomegaly', seededRng('img-1'))
+    const b = orderDistractorsByDifferential(candidates, 'cardiomegaly', seededRng('img-1'))
+    expect(a).toEqual(b)
+  })
+  it('tüberkülozun tüm alt tipleri aynı öncelik listesini paylaşır', () => {
+    expect(DIFFERENTIALS.tuberculosis).toEqual(DIFFERENTIALS.tuberculosis_cavity)
+    expect(DIFFERENTIALS.tuberculosis).toEqual(DIFFERENTIALS.tuberculosis_fibrosis)
+    expect(DIFFERENTIALS.tuberculosis).toEqual(DIFFERENTIALS.miliary_pattern)
+  })
+})
+
+describe('BRIEF_OPACA_DISTRACTORS §5: değerlendirme kapısı (≥3 seçenek)', () => {
+  it('MIN_ASSESSMENT_OPTIONS = 3', () => {
+    expect(MIN_ASSESSMENT_OPTIONS).toBe(3)
+  })
+  it('hasEnoughOptions: options boşsa (localization) her zaman true; 2 seçenekliyse false; ≥3 true', () => {
+    expect(hasEnoughOptions({ options: [] })).toBe(true)
+    expect(hasEnoughOptions({ options: [{ id: 'a' }, { id: 'b' }] })).toBe(false)
+    expect(hasEnoughOptions({ options: [{ id: 'a' }, { id: 'b' }, { id: 'c' }] })).toBe(true)
+  })
+  it('caseSelectableOk: tek bir soru bile <3 seçenekliyse vaka kapıyı geçemez', () => {
+    const ok = [{ options: [{ id: 'a' }, { id: 'b' }, { id: 'c' }] }, { options: [] }]
+    const bad = [{ options: [{ id: 'a' }, { id: 'b' }, { id: 'c' }] }, { options: [{ id: 'a' }, { id: 'b' }] }]
+    expect(caseSelectableOk(ok)).toBe(true)
+    expect(caseSelectableOk(bad)).toBe(false)
+  })
 })

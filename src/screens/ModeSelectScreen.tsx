@@ -8,7 +8,7 @@ import { sampleSession, SESSION_SIZE } from '../core/session'
 
 /** Mod seçim ekranı: Öğrenme / Uygulama / Değerlendirme. */
 export function ModeSelectScreen() {
-  const { dispatch } = useStore()
+  const { state, dispatch } = useStore()
   const practiceCount = poolFor('practice').length
   const assessmentCount = poolFor('assessment').length
   const pick = (mode: Mode) => {
@@ -51,6 +51,7 @@ export function ModeSelectScreen() {
               cta="Vakaları çöz"
               disabled={!practiceCount}
               onPick={() => pick('practice')}
+              bestScore={state.bestScore.practice}
             />
             <ModeCard
               kind="assessment"
@@ -62,6 +63,7 @@ export function ModeSelectScreen() {
               cta="Değerlendirmeye gir"
               disabled={!assessmentCount}
               onPick={() => pick('assessment')}
+              bestScore={state.bestScore.assessment}
             />
           </div>
         </div>
@@ -85,7 +87,7 @@ export function Stepper({ active, labels }: { active: number; labels: string[] }
   )
 }
 
-function ModeCard({ kind, icon, title, text, items, cta, onPick, rules, disabled }: {
+function ModeCard({ kind, icon, title, text, items, cta, onPick, rules, disabled, bestScore }: {
   kind: Mode
   icon: React.ReactNode
   title: string
@@ -95,6 +97,8 @@ function ModeCard({ kind, icon, title, text, items, cta, onPick, rules, disabled
   onPick: () => void
   rules?: string
   disabled?: boolean
+  /** yalnız Uygulama/Değerlendirme kartlarında: mod başına kalıcı en iyi toplam puan (0 = henüz denenmedi) */
+  bestScore?: number
 }) {
   return (
     <div className={`mode-card ${kind}`}>
@@ -110,6 +114,11 @@ function ModeCard({ kind, icon, title, text, items, cta, onPick, rules, disabled
         ))}
       </ul>
       {rules && <p className="mode-rules">{rules}</p>}
+      {typeof bestScore === 'number' && (
+        <p className="mode-rules">
+          {bestScore > 0 ? <>En iyi puan: <b>{bestScore}</b></> : 'Henüz denenmedi'}
+        </p>
+      )}
       <button className={`btn ${kind === 'learn' ? 'green' : kind === 'assessment' ? 'purple' : 'primary'}`} onClick={onPick} disabled={disabled}>
         {cta}
       </button>

@@ -21,11 +21,17 @@ export function expertPositive(img: ImageRecord | undefined, finding: string): b
   return !!img && isExpertSource(img.findings[finding])
 }
 
-/** Öğrenme modu örnekleri: önce uzman kaynaklı ve kutulu, sonra uzman kaynaklı, en son NLP. */
-export function examplesFor(finding: string | null, view?: string): ImageRecord[] {
-  const pool = IMAGES.filter((r) => r.validationStatus === 'validated' && r.population === 'yetiskin')
+/** Öğrenme modu örnekleri: önce uzman kaynaklı ve kutulu, sonra uzman kaynaklı, en son NLP/yazar açıklaması.
+ *  `includePediatric`: pediatrik konular (krup, yabancı cisim, epiglottit) için pediatrik filmler de gösterilir —
+ *  yalnız öğrenme kütüphanesi içindir, uygulama/değerlendirme vaka havuzunu etkilemez.
+ *  `modality`: Toraks BT'ye giriş grubu (finding: null) yalnız BT görüntülerini göstermek için kullanır;
+ *  aksi halde finding: null tüm havuzu döndürür (ör. teknik/ABCDE konuları için istenen davranış budur). */
+export function examplesFor(finding: string | null, view?: string, opts?: { includePediatric?: boolean; modality?: string }): ImageRecord[] {
+  const pool = IMAGES.filter((r) => r.validationStatus === 'validated' && (r.population === 'yetiskin' || opts?.includePediatric))
   const scoped = finding ? pool.filter((r) => r.findings[finding]) : pool
-  const viewScoped = view ? scoped.filter((r) => r.viewPosition === view) : scoped
+  // Varsayılan yöntem grafi (XR): BT yığınları yalnız 'Toraks BT' grubunda, açıkça modality: 'CT' istenince gelir.
+  const modScoped = scoped.filter((r) => (r.modality ?? 'XR') === (opts?.modality ?? 'XR'))
+  const viewScoped = view ? modScoped.filter((r) => r.viewPosition === view) : modScoped
   const rank = (r: ImageRecord) => {
     if (!finding) return 0
     const src = r.findings[finding]

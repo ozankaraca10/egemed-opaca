@@ -13,6 +13,7 @@ import { FilmViewer, type FilmViewerHandle } from '../ui/FilmViewer'
 import { ZoneChips } from '../ui/ZoneChips'
 import { QuestionCard, FeedbackCard } from '../ui/Questions'
 import { Footer, EcgDeco } from '../ui/chrome'
+import { ConfirmModal } from '../ui/ConfirmModal'
 import { IconDoc, IconArrowRight, IconInfo, IconLightbulb, IconClock } from '../ui/icons'
 import { LABEL_SOURCE_TEXT, VIEW_TEXT, findingShort } from '../data/terminology'
 
@@ -87,6 +88,32 @@ function CaseView({ caseDef, total }: { caseDef: CaseDef; total: number }) {
   const [activeZones, setActiveZones] = useState<string[]>([])
   const [hintOpen, setHintOpen] = useState(false)
   const shownAtRef = useRef<Record<string, number>>({})
+  // A4: uygulama modunda oturum içinden yeni örneklem / yeniden başlatma — yanıt verilmişse onay istenir.
+  const [resampleAction, setResampleAction] = useState<'new' | 'retry' | null>(null)
+  const hasProgress = Object.keys(state.answers).length > 0 || state.hintsUsed > 0 || state.caseResults.length > 0
+  const doNewSample = useCallback(() => {
+    const seed = (Date.now() % 2147483647) | 0
+    const practiceIds = sampleSession(poolFor('practice'), seed, SESSION_SIZE)
+    dispatch({ type: 'startSession', practiceIds, assessmentIds: state.session.assessmentIds, seed })
+    dispatch({ type: 'startMode', mode: 'practice' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, state.session.assessmentIds])
+  const doRestartSession = useCallback(() => {
+    dispatch({ type: 'startMode', mode: 'practice' })
+  }, [dispatch])
+  const requestResample = (action: 'new' | 'retry') => {
+    if (!hasProgress) {
+      if (action === 'new') doNewSample()
+      else doRestartSession()
+      return
+    }
+    setResampleAction(action)
+  }
+  const confirmResample = () => {
+    if (resampleAction === 'new') doNewSample()
+    else if (resampleAction === 'retry') doRestartSession()
+    setResampleAction(null)
+  }
   const q: Question | undefined = caseDef.questions[state.step]
   const revealed = q ? !!state.revealed[q.id] : false
   const given = q ? state.answers[q.id] ?? [] : []
@@ -166,11 +193,12 @@ function CaseView({ caseDef, total }: { caseDef: CaseDef; total: number }) {
                 </div>
               )}
               <div className="stage-card film-card">
+                {/* V13: ABCDE bölge şeması BT'ye uymuyor (bilinen sınırlılık) — showZones BT vakalarında kapalı */}
                 <FilmViewer
                   ref={viewerRef}
                   image={image}
                   zones={ZONES}
-                  showZones={!isAssessment && state.showZones}
+                  showZones={!isAssessment && state.showZones && image?.modality !== 'CT' && q?.type !== 'localization'}
                   showAnnotations={revealAnnotations}
                   annotationFinding={annotationFinding}
                   strict={isAssessment}
@@ -225,6 +253,17 @@ function CaseView({ caseDef, total }: { caseDef: CaseDef; total: number }) {
                   {caseDef.vitalSigns.spo2 && <KV k="SpO₂" v={`%${caseDef.vitalSigns.spo2}`} />}
                   {caseDef.vitalSigns.temp && <KV k="Ateş" v={caseDef.vitalSigns.temp} />}
                 </div>
+                {/* A4: uygulama modunda oturum içi örneklem kontrolleri (Pulse case-view paritesi) */}
+                {!isAssessment && (
+                  <div className="sim-resample-row">
+                    <button type="button" className="btn outline small" onClick={() => requestResample('new')}>
+                      Yeni 10 vaka örneklemi
+                    </button>
+                    <button type="button" className="btn outline small" onClick={() => requestResample('retry')}>
+                      Oturumu yeniden başlat
+                    </button>
+                  </div>
+                )}
               </div>
 
               {summaryOpen && !isAssessment && state.pendingSummary ? (
@@ -284,6 +323,15 @@ function CaseView({ caseDef, total }: { caseDef: CaseDef; total: number }) {
         </div>
       </div>
       <Footer />
+      <ConfirmModal
+        open={resampleAction !== null}
+        title="Yeni örneklem alınsın mı?"
+        message="Bu oturumdaki yanıtlar silinir; ilerleme ve en iyi puan korunur."
+        confirmLabel="Evet, devam et"
+        cancelLabel="Vazgeç"
+        onConfirm={confirmResample}
+        onCancel={() => setResampleAction(null)}
+      />
     </>
   )
 }
@@ -363,7 +411,10 @@ function SourcePopover({ text }: { text: string }) {
     }
   }, [open])
   return (
-    <div className="popover-wrap" ref={wrapRef}>
+    // V4: fare popover'ın (buton+metin) tamamından ayrılınca otomatik kapanır — açık kalmış bir popover
+    // altındaki başka bir düğmeyi (ör. "Oturumu yeniden başlat") geometrik olarak örtüp ilk tıklamayı
+    // yutmasın diye. Yalnız popover'ı kapatan bir tıklama fazladan gerekmez.
+    <div className="popover-wrap" ref={wrapRef} onMouseLeave={() => setOpen(false)}>
       <button type="button" className="btn outline small" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         <IconInfo width={14} height={14} /> Görüntü kaynağı
       </button>

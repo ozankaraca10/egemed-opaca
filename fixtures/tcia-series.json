@@ -1,0 +1,17 @@
+[
+  {
+    "id": "ct_intro_01",
+    "seriesUID": "1.3.6.1.4.1.14519.5.2.1.6279.6001.161073793312426102774780216551",
+    "patientId": "LIDC-IDRI-0225",
+    "topic": "ct_intro",
+    "sliceRange": [12, 100],
+    "note": "Normal toraks BT — apeksten diyafram düzeyine dengeli aksiyel anatomi (trakea/karina, büyük damarlar, kalp boşlukları, hilus, plevra). Belirgin patolojik bulgu izlenmedi (radyolog onayı bekliyor). sliceRange, orijinal 133 kesitlik serinin üst abdomeni içeren kuyruğunu (~kesit 100+) dışarıda bırakmak için uygulandı."
+  },
+  {
+    "id": "nodule_mass_01",
+    "seriesUID": "1.3.6.1.4.1.14519.5.2.1.6279.6001.194766721609772924944646251928",
+    "patientId": "LIDC-IDRI-0191",
+    "topic": "nodule_mass",
+    "note": "Sağ alt lob (perihiler) yerleşimli, 4/4 LIDC okuyucusunun işaretlediği, subtlety=5 (belirgin), ortalama malignancy=4.75 (radyoloğun öznel LIDC ölçeği — patoloji doğrulaması YOK) tek nodül. XML işaretlemeleri prepare_ct.py --xml-dir ile ayrıştırılıp nodülü kapsayan kesitler kare setine zorla eklendi."
+  }
+]

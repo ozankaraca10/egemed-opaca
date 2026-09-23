@@ -25,6 +25,8 @@ interface Dataset {
   articleUrl?: string
   license: string
   licenseUrl?: string
+  /** V6/V11: lisans doğrulama durumu artık doğrudan burada (eski ayrı `inventory` listesi kaldırıldı) */
+  licenseVerified?: boolean
   usage?: string
   attributionText: string
 }
@@ -43,11 +45,12 @@ const data = sourcesData as unknown as {
   module: {
     product: string; subtitle: string; developedBy: string; copyright: string
     evidence?: { statement: string; citation: string; doi: string; url: string }
+    validationStatement: string
+    validationShort?: string
   }
   credits: CreditGroup[]
   datasets: Dataset[]
   assets?: Asset[]
-  inventory: { id: string; title: string; status: string; population: string; licenseVerified: boolean; notes: string; labelTypes: string[] }[]
   disclaimer: string
 }
 
@@ -58,12 +61,6 @@ function initials(name: string): string {
     .split(/\s+/)
     .filter((p) => p && !/^(Prof|Doç|Dr|Uzm|Öğr|Gör|Arş)$/i.test(p))
   return parts.map((p) => p[0]).join('').slice(0, 2).toUpperCase()
-}
-
-const STATUS_TEXT: Record<string, string> = {
-  importer_ready: 'İçe aktarıcı hazır',
-  license_review: 'Lisans incelemesinde',
-  inventory_only: 'Yalnız envanter (dağıtılamaz)',
 }
 
 /** DOI kısaltması → tam bağlantı; zaten URL ise dokunmaz */
@@ -79,7 +76,6 @@ function licenseShort(license: string): string {
 
 export function SourcesScreen() {
   const { dispatch } = useStore()
-  const invById = new Map(data.inventory.map((i) => [i.id, i]))
   const counts = datasetCounts()
 
   return (
@@ -102,19 +98,19 @@ export function SourcesScreen() {
                 <div className="credit-group lead" key={g.role}>
                   <div className="credit-role">{g.role}</div>
                   <ul className="credit-people">
-                    {g.people.map((p) =>
+                    {g.people.map((p, i) =>
                       p.url ? (
-                        <li key={p.name}>
+                        <li key={`${g.role}-${i}-${p.name}`}>
                           <a className="credit-person" href={p.url} target="_blank" rel="noreferrer" title={`${p.name} — Ünisis profili`}>
-                            <span className="credit-avatar" aria-hidden="true">{initials(p.name)}</span>
+                            <span className="credit-avatar" aria-hidden="true">{initials(p.name) || '…'}</span>
                             <span>{p.name}</span>
                             <span className="ext" aria-hidden="true">↗</span>
                           </a>
                         </li>
                       ) : (
-                        <li key={p.name}>
+                        <li key={`${g.role}-${i}-${p.name}`}>
                           <span className="credit-person placeholder">
-                            <span className="credit-avatar" aria-hidden="true">{initials(p.name)}</span>
+                            <span className="credit-avatar" aria-hidden="true">{initials(p.name) || '…'}</span>
                             <span>{p.name}</span>
                           </span>
                         </li>
@@ -137,7 +133,7 @@ export function SourcesScreen() {
                 </h3>
                 <p>
                   {data.module.developedBy} tarafından, mezuniyet öncesi tıp öğrencilerinin akciğer grafisini sistematik
-                  okuma becerilerini geliştirmek amacıyla hazırlanmıştır. {data.module.copyright}.
+                  okuma becerilerini geliştirmek amacıyla hazırlanmıştır. {data.module.copyright}. {data.module.validationStatement}
                 </p>
                 {data.module.evidence && (
                   <p className="inst-evidence">
@@ -163,7 +159,6 @@ export function SourcesScreen() {
             </p>
             <div className="ds-grid">
               {data.datasets.map((d) => {
-                const inv = invById.get(d.id)
                 return (
                   <article className="ds-card" key={d.id}>
                     <h3>{d.title}</h3>
@@ -171,8 +166,7 @@ export function SourcesScreen() {
                     <div className="ds-chips">
                       <span className="ds-chip lic">{licenseShort(d.license)}</span>
                       <span className="ds-chip">{(counts[d.id] ?? 0).toLocaleString('tr-TR')} film pakette</span>
-                      {inv && !inv.licenseVerified && <span className="ds-chip warn">lisans incelemede</span>}
-                      {inv?.labelTypes.map((t) => <span className="ds-chip" key={t}>{t}</span>)}
+                      {d.licenseVerified === false && <span className="ds-chip warn">lisans incelemede</span>}
                     </div>
                     <div className="src-kv">
                       <span className="k">Veri seti</span>
@@ -201,27 +195,6 @@ export function SourcesScreen() {
             </div>
           </section>
 
-          {/* ---- İncelenen veri setleri ---- */}
-          <section className="src-section" aria-labelledby="inv-h">
-            <h2 id="inv-h"><IconDoc /> İncelenen diğer veri setleri</h2>
-            <p className="src-sub">Aşağıdakiler değerlendirildi ancak lisans ya da paylaşım koşulları nedeniyle pakete alınmadı.</p>
-            <div className="table-scroll">
-              <table className="report-table inv-table">
-                <thead><tr><th>Veri seti</th><th>Durum</th><th>Etiket türü</th><th>Not</th></tr></thead>
-                <tbody>
-                  {data.inventory.filter((i) => !data.datasets.some((d) => d.id === i.id)).map((i) => (
-                    <tr key={i.id}>
-                      <td>{i.title}</td>
-                      <td>{STATUS_TEXT[i.status] ?? i.status}</td>
-                      <td>{i.labelTypes.join(', ')}</td>
-                      <td>{i.notes}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
           {/* ---- Görsel varlıklar ---- */}
           {data.assets && data.assets.length > 0 && (
             <section className="src-section" aria-labelledby="assets-h">
@@ -245,12 +218,14 @@ export function SourcesScreen() {
             </section>
           )}
 
-          {/* ---- Sorumluluk notu ---- */}
-          <section className="src-section" aria-label="Sorumluluk notu">
+          {/* ---- Validasyon, sınırlılıklar ve sorumluluk ---- */}
+          <section className="src-section" aria-labelledby="disclaimer-h">
+            <h2 id="disclaimer-h"><IconInfo /> Validasyon, sınırlılıklar ve sorumluluk</h2>
             <div className="src-disclaimer">
               <IconInfo />
               <div>
-                <p style={{ margin: 0 }}>{data.disclaimer}</p>
+                <p style={{ margin: 0 }}>{data.module.validationStatement}</p>
+                <p style={{ margin: '8px 0 0' }}>{data.disclaimer}</p>
                 <p className="small" style={{ margin: '6px 0 0' }}>
                   Atıf ve katkı verileri makine okunur biçimde <code>src/data/sources.json</code> dosyasında saklanır.
                 </p>

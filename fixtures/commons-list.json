@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "note": "Wikimedia Commons küratörlü liste (OPACA-V2-ICERIK-PLANI.md §1). 'file' verilen kalemler tam başlıkla aranır; bulunamazsa 'search' ile arama sonucundan lisansı uygun ilk aday alınır. Yalnız CC0/Public domain/CC BY( x.x)/CC BY-SA( x.x) lisansları kabul edilir (NC/ND atlanır).",
+  "items": [
+    { "id": "croup_steeple", "file": "File:Croup steeple sign.jpg", "finding": "steeple_sign", "projection": "NECK_AP", "bodyPart": "boyun", "population": "pediatrik", "topic": "Krup — kalem ucu (steeple) işareti" },
+    { "id": "coin_ap", "file": "File:CoinAP.jpg", "finding": "foreign_body_radiopaque", "projection": "AP", "population": "pediatrik", "topic": "Yutulan radyoopak cisim (bozuk para) — AP" },
+    { "id": "coin_lat", "file": "File:CoinL.jpg", "finding": "foreign_body_radiopaque", "projection": "LAT", "population": "pediatrik", "topic": "Yutulan radyoopak cisim (bozuk para) — lateral" },
+    { "id": "fb_aspiration", "file": "File:Foreign body aspiration.jpg", "finding": "air_trapping", "projection": "AP", "population": "pediatrik", "topic": "Aspire edilen radyolusen yabancı cisim — hava hapsi" },
+    { "id": "clavicle_fx", "file": "File:Clavicle Fracture Left.jpg", "finding": "clavicle_fracture", "projection": "AP", "topic": "Klavikula kırığı" },
+    { "id": "rib_fx_multi", "file": "File:Multiple Rib Fractures.jpg", "finding": "rib_fracture", "projection": "AP", "topic": "Çoklu kot kırığı" },
+    { "id": "rib_fx_2347", "file": "File:Rib fracture 2347.jpg", "finding": "rib_fracture", "projection": "AP", "topic": "Kot kırığı" },
+    { "id": "normal_lat", "file": "File:Normal lateral chest radiograph (X-ray).jpg", "finding": "normal", "projection": "LAT", "topic": "Normal lateral grafi" },
+    { "id": "normal_pa", "file": "File:Normal posteroanterior (PA) chest radiograph (X-ray).jpg", "finding": "normal", "projection": "PA", "topic": "Normal PA grafi" },
+    { "id": "hiatal_pa", "file": "File:07-01-Hiatushernie pa.png", "finding": "hiatal_hernia", "projection": "PA", "topic": "Hiatal herni — PA" },
+    { "id": "hiatal_lat", "file": "File:07-01-Hiatushernie seitlich.png", "finding": "hiatal_hernia", "projection": "LAT", "topic": "Hiatal herni — lateral" },
+    { "id": "diaphragm_hernia", "file": "File:Diaphragmatic hernia.jpg", "finding": "diaphragm_hernia_congenital", "projection": "AP", "topic": "Konjenital diyafram hernisi" },
+    { "id": "morgagni_hernia", "file": "File:Hernia de Morgani.JPG", "finding": "diaphragm_hernia_congenital", "projection": "LAT", "topic": "Morgagni hernisi" },
+    { "id": "pe_ctpa", "file": "File:Pulmonary embolism CTPA.JPEG", "finding": "ct_filling_defect", "projection": "CT_AXIAL", "modality": "CT", "topic": "Pulmoner emboli — BTPA dolum defekti" },
+    { "id": "pe_cta_massive", "search": "CTA Chest With Massive Pulmonary Embolism", "keywords": ["embolism", "pulmonary"], "finding": "ct_filling_defect", "projection": "CT_AXIAL", "modality": "CT", "topic": "Masif pulmoner emboli — BTPA" },
+    { "id": "scoliosis", "file": "File:Scoliosis recklinghausen.jpg", "finding": "scoliosis", "projection": "PA", "topic": "Skolyoz" },
+    { "id": "scoliosis_adams", "file": "File:Initial diagnosis of scoliosis with adams test and x-rays.jpg", "finding": "scoliosis", "projection": "AP", "topic": "Skolyoz — Adams testi ve grafiler" },
+    { "id": "copd_hyperinflation", "search": "hyperinflation emphysema chest radiograph", "keywords": ["hyperinflat", "emphysema", "copd"], "finding": "hyperinflation", "projection": "PA", "topic": "KOAH — hiperinflasyon" },
+    { "id": "westermark", "search": "Westermark sign pulmonary embolism chest x-ray", "keywords": ["westermark"], "finding": "westermark_sign", "projection": "PA", "topic": "Westermark işareti" },
+    { "id": "hampton_hump", "file": "File:Hamptonshump.PNG", "finding": "hampton_hump", "projection": "PA", "topic": "Hampton hörgücü" },
+    { "id": "ct_axial_lung_window", "file": "File:CT-Thorax-5.0-B70f-Lungs.jpg", "finding": null, "projection": "CT_AXIAL", "modality": "CT", "topic": "Toraks BT — akciğer penceresi (aksiyel)" },
+    { "id": "ct_axial_mediastinal_window", "file": "File:CT of a fat containing hamartoma.png", "finding": "nodule_mass", "projection": "CT_AXIAL", "modality": "CT", "topic": "Toraks BT — mediasten penceresi (aksiyel), nodül örneği" },
+    { "id": "pneumothorax_ct", "file": "File:Bronchial rupture.jpg", "finding": "pneumothorax", "projection": "CT_AXIAL", "modality": "CT", "topic": "Pnömotoraks — BT (bronş rüptürü sonrası)" },
+    { "id": "epiglottitis_lateral", "file": "File:Epiglottitis.jpg", "finding": "epiglottitis_thumb_sign", "projection": "LAT", "bodyPart": "boyun", "population": "pediatrik", "topic": "Epiglottit — başparmak (thumb) işareti, lateral boyun" },
+    { "id": "miliary_tb_1", "file": "File:Chest radiograph of miliary tuberculosis 1.jpg", "finding": "miliary_pattern", "projection": "PA", "topic": "Miliyer tüberküloz grafisi — 1 (V9 yan fayda: Commons CC BY 4.0)" },
+    { "id": "miliary_tb_2", "file": "File:Chest radiograph of miliary tuberculosis 2.jpg", "finding": "miliary_pattern", "projection": "PA", "topic": "Miliyer tüberküloz grafisi — 2 (V9 yan fayda: Commons CC BY 4.0)" }
+  ]
+}

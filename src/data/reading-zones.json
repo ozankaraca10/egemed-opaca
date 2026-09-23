@@ -2,6 +2,7 @@
   "version": 1,
   "note": "ABCDE sistematik okuma bölgeleri. Koordinatlar standart PA film üzerinde YAKLAŞIKTIR (şematik); anatomik segmentasyon değildir. Görüntünün solu hastanın sağıdır.",
   "steps": {
+    "0": "Film bilgisi ve kalite",
     "A": "Hava yolu",
     "B": "Akciğerler ve plevra",
     "C": "Kalp ve mediasten",

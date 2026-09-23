@@ -35,16 +35,22 @@ export function ZoneChips({ zones, visits, activeZones, minDwellMs, onSelect, hi
               {list.map((z) => {
                 const st = zoneChipState(z.id, activeZones, visits, minDwellMs)
                 const hl = highlight?.includes(z.id)
+                const done = st === 'inspected'
                 return (
+                  // V12: tamamlanma yalnız RENKLE gösterilir (ikon eklenmez) — ikon çipi genişletip
+                  // satır düzenini bozuyordu. Renk tek başına bilgi taşımasın diye aria-label'a
+                  // " · incelendi" eklenir ve data-done="true" korunur (ör. gelecekte desen/alt simge
+                  // eklenmek istenirse CSS ::before ile sabit genişlikte yapılabilir).
                   <button
                     type="button"
                     key={z.id}
-                    className={`zone-chip ${st === 'active' ? 'is-active' : st === 'inspected' ? 'is-inspected' : ''} ${hl ? 'is-suggested' : ''}`}
+                    className={`zone-chip ${st === 'active' ? 'is-active' : done ? 'is-inspected' : ''} ${hl ? 'is-suggested' : ''}`}
                     aria-pressed={st === 'active'}
+                    aria-label={done ? `${z.label} · incelendi` : undefined}
+                    data-done={done ? 'true' : undefined}
                     title={z.detail}
                     onClick={() => onSelect(z.id)}
                   >
-                    {st === 'inspected' && <span className="zc-check" aria-hidden="true">✓</span>}
                     {z.label}
                   </button>
                 )

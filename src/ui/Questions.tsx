@@ -73,7 +73,7 @@ export function QuestionCard({ q, caseId, value, onChange, revealed, disabled, i
       <p className="q-text">{q.prompt}</p>
       {q.help && <p className="q-help">{q.help}</p>}
       {q.type === 'localization' ? (
-        <MarkStatus value={value} onClear={revealed || disabled ? undefined : () => onChange([])} />
+        <MarkStatus value={value} locked={revealed || disabled} onClear={revealed || disabled ? undefined : () => onChange([])} />
       ) : (
         <div className="opt-list" role={isMulti ? 'group' : 'radiogroup'} aria-label={q.prompt}>
           {options.map((o, i) => {
@@ -105,8 +105,10 @@ export function QuestionCard({ q, caseId, value, onChange, revealed, disabled, i
   )
 }
 
-function MarkStatus({ value, onClear }: { value: string[]; onClear?: () => void }) {
+function MarkStatus({ value, onClear, locked }: { value: string[]; onClear?: () => void; locked?: boolean }) {
   const p = decodeMark(value[0])
+  // Yanıt gönderildikten sonra işaret artık değiştirilemez — yönlendirme metni gösterilmez.
+  if (locked) return p ? <div className="mark-status has-mark" role="status"><span>İşaretiniz kaydedildi.</span></div> : null
   return (
     <div className={`mark-status ${p ? 'has-mark' : ''}`} role="status">
       {p ? (

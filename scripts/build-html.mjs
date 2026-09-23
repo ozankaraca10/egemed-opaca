@@ -8,6 +8,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import JSZip from 'jszip'
 import { injectCsp } from './lib/inject-csp.mjs'
+import { obfuscateImagesInDist } from './lib/obfuscate-images.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const DIST = path.join(ROOT, 'dist')
@@ -27,6 +28,12 @@ function listFiles(dir, base = '') {
     else out.push(rel)
   }
   return out
+}
+
+// Görüntü dosya adları bulgu ipucu taşır — paketten önce opak adlara çevrilir (scripts/lib/obfuscate-images.mjs).
+{
+  const { renamed, patchedFiles } = obfuscateImagesInDist(DIST)
+  if (renamed) console.log(`Görüntü adları gizlendi: ${renamed} dosya, ${patchedFiles} metin dosyası güncellendi`)
 }
 
 fs.rmSync(OUT_DIR, { recursive: true, force: true })

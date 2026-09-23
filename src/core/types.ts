@@ -5,16 +5,19 @@ export type Mode = 'learn' | 'practice' | 'assessment'
 export type Screen = 'start' | 'modes' | 'tutorial' | 'learn' | 'simulation' | 'results' | 'sources'
 export type ValidationStatus = 'validated' | 'educational_mapping' | 'experimental'
 export type Population = 'yetiskin' | 'pediatrik'
-export type ViewPosition = 'PA' | 'AP' | 'LAT' | 'unknown'
+export type ViewPosition = 'PA' | 'AP' | 'LAT' | 'NECK_AP' | 'CT_AXIAL' | 'unknown'
+export type BodyPart = 'toraks' | 'boyun'
+export type Modality = 'XR' | 'CT'
 
 /** Bir bulgu etiketinin nereden geldiği. Değerlendirmeye yalnız EXPERT_SOURCES girer (Ausculta §6 karşılığı). */
 export type LabelSource =
   | 'expert_panel' // birden çok radyoloğun panel kararı (Google adjudicated)
   | 'expert_bbox' // radyoloğun çizdiği sınırlayıcı kutu (NIH BBox, RSNA)
   | 'expert_mask' // radyoloğun piksel maskesi (SIIM-ACR)
-  | 'expert_reading' // radyoloğun görüntü düzeyinde okuması (RSNA "Normal" sınıfı)
+  | 'expert_reading' // radyoloğun görüntü düzeyinde okuması (RSNA "Normal" sınıfı, NLM TB okuması, Kermany)
   | 'ct_confirmed' // BT ile doğrulanmış (JSRT)
   | 'report_nlp' // rapor metninden otomatik çıkarım — değerlendirmeye GİRMEZ
+  | 'author_caption' // Wikimedia Commons yükleyen açıklaması — radyolog doğrulaması değil, değerlendirmeye GİRMEZ
 
 export const EXPERT_SOURCES: readonly LabelSource[] = ['expert_panel', 'expert_bbox', 'expert_mask', 'expert_reading', 'ct_confirmed']
 
@@ -29,6 +32,22 @@ export interface Box {
 export interface Annotation extends Box {
   finding: string
   source: LabelSource
+  /** V13 (TCIA LIDC-IDRI BT nodül işaretlemeleri, reports/tcia/manifest.json): bu işaretin ait
+   *  olduğu pencere ön ayarı ve `ImageRecord.stack[].frames` içindeki kare dizini (0 tabanlı).
+   *  Düz akciğer grafisi kutularında (window/frameIndex yok) dolu değildir — hit-test hâlâ
+   *  yukarıdaki Box (x/y/w/h) alanları üzerinden çalışır, bu alanlar yalnız BT bağlamını taşır. */
+  window?: 'lung' | 'mediastinum'
+  frameIndex?: number
+  /** LIDC-IDRI okuyucu konturu — normalize (0–1) [x,y] nokta dizisi; yalnız daha hassas görsel
+   *  geri bildirim (kontur çizimi) içindir, hit-test bbox (Box) üzerinden yapılmaya devam eder. */
+  polygon?: [number, number][]
+  centroid?: [number, number]
+  /** Kaç LIDC-IDRI okuyucusunun (radyoloğun, ≤4) bu nodülü bağımsız işaretlediği — güven göstergesi. */
+  readerCount?: number
+  readerIds?: string[]
+  /** LIDC-IDRI radyolojik özellik puanları (1–5 öznel ölçek: subtlety, malignancy, ...) — TANI
+   *  İDDİASI DEĞİLDİR, yalnız okuyucunun öznel LIDC ölçek puanıdır (bkz. docs/TCIA-BT.md). */
+  characteristics?: Record<string, number>
 }
 
 /** images.json kaydı (import üretimi) */
@@ -50,12 +69,28 @@ export interface ImageRecord {
   negatives: Record<string, LabelSource>
   annotations: Annotation[]
   /** film kalitesi yalnız radyolog gözden geçirmesiyle doldurulur; veri setlerinde yoktur */
-  quality: { rotation?: 'yok' | 'var'; inspiration?: 'yeterli' | 'yetersiz' } | null
+  quality: { rotation?: 'yok' | 'var'; inspiration?: 'yeterli' | 'yetersiz'; penetration?: 'yeterli' | 'yetersiz' | 'fazla' } | null
   runtimeUrl: string
   bytes: number
   validationStatus: 'validated' | 'missing_asset'
   clinicalReview: 'beklemede' | 'onayli'
   issues: string[]
+  /** vücut bölgesi (varsayılan: toraks) — krup/epiglottit için boyun */
+  bodyPart?: BodyPart
+  /** görüntüleme yöntemi (varsayılan: XR) — Toraks BT'ye giriş grubu için CT */
+  modality?: Modality
+  /** NLM TB veri setlerinde radyoloğun serbest metin okuması */
+  readingText?: string | null
+  /** V13 (BRIEF_OPACA_V3): Toraks BT yığın kaydırmalı görüntüleyici altyapısı. Seri başına aksiyel
+   *  kesitler, her biri önceden render edilmiş bir pencere ön ayarıyla (akciğer C-600/W1500, mediasten
+   *  C50/W350) ayrı görsel dizisi olarak tutulur. `stack` yoksa (mevcut tekil BT görselleri gibi)
+   *  FilmViewer tek kareli (frames: [runtimeUrl]) bir yığın gibi davranır — geriye dönük uyumlu.
+   *  Şekil, reports/tcia/manifest.json (scripts/tcia/prepare_ct.py, TCIA LIDC-IDRI) çıktısıyla
+   *  birebir uyumludur; `label` isteğe bağlıdır (yoksa arayüz `window` değerinden türetir). */
+  stack?: { window: 'lung' | 'mediastinum'; label?: string; frames: string[] }[]
+  /** yalnız dosya bazlı lisanslı kaynaklarda (ör. Wikimedia Commons) dolu — sources.json'daki veri
+   *  seti düzeyindeki atfın yanında, görüntüye özgü lisans/yazar bilgisi */
+  license?: { name: string; url: string; author: string; attribution: string; sourceUrl: string } | null
 }
 
 export interface ImagesManifest {
@@ -106,6 +141,8 @@ export interface Question {
   feedbackCorrect: string
   feedbackIncorrect: string
   hint?: string
+  /** V2 §2d: bulgudan bağımsız genel soru (ör. "ABCDE sırası") — havuzda ≤%10 vakada bulunmalı. */
+  generic?: boolean
 }
 
 export interface TechniqueRubric {
