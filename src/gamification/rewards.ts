@@ -33,8 +33,12 @@ export const MONTHLY_REWARDS: Record<string, MonthlyReward> = {
   '2026-09': SEPTEMBER_2026,
 }
 
+/** Ay için yapılandırılmış ödül; yoksa (yeni ay henüz yapılandırılmadıysa) o aydan önceki en son yapılandırılmış
+ *  ödül aynı koşullarla o ay için geçerli sayılır — ödül ay başında kendiliğinden kaybolmaz. Hiç yoksa null. */
 export function monthlyRewardFor(month: string): MonthlyReward | null {
-  return MONTHLY_REWARDS[month] ?? null
+  if (MONTHLY_REWARDS[month]) return MONTHLY_REWARDS[month]
+  const prev = Object.keys(MONTHLY_REWARDS).filter((m) => m < month).sort().at(-1)
+  return prev ? { ...MONTHLY_REWARDS[prev], month } : null
 }
 
 /** Geçmiş kazananlar (demo verisi — docs/mockups/gami-mock-data.mjs `history` ile aynı isimler). */

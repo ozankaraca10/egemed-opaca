@@ -1,10 +1,12 @@
 import { useStore } from '../core/store'
 import { Footer, EcgDeco } from '../ui/chrome'
-import { IconGraduation, IconFilm, IconChart, IconCheck } from '../ui/icons'
+import { IconGraduation, IconFilm, IconChart, IconCheck, IconGift } from '../ui/icons'
 import type { Mode } from '../core/types'
 import { poolFor } from '../data/pool'
 import { LIBRARY_ITEMS } from '../data/terminology'
 import { sampleSession, SESSION_SIZE } from '../core/session'
+import { GAMI_ENABLED } from '../gamification/flag'
+import { daysLeft } from '../gamification/leaderboardView'
 
 /** Mod seçim ekranı: Öğrenme / Uygulama / Değerlendirme. */
 export function ModeSelectScreen() {
@@ -64,6 +66,13 @@ export function ModeSelectScreen() {
               disabled={!assessmentCount}
               onPick={() => pick('assessment')}
               bestScore={state.bestScore.assessment}
+              extra={GAMI_ENABLED ? (
+                <p className="mode-rules">
+                  <button type="button" className="gami-link" style={{ color: 'var(--amber-700)' }} onClick={() => dispatch({ type: 'goto', screen: 'leaderboard' })}>
+                    <IconGift width={14} height={14} /> Bu ayın ödülü · {daysLeft(new Date())} gün kaldı
+                  </button>
+                </p>
+              ) : undefined}
             />
           </div>
         </div>
@@ -87,7 +96,7 @@ export function Stepper({ active, labels }: { active: number; labels: string[] }
   )
 }
 
-function ModeCard({ kind, icon, title, text, items, cta, onPick, rules, disabled, bestScore }: {
+function ModeCard({ kind, icon, title, text, items, cta, onPick, rules, disabled, bestScore, extra }: {
   kind: Mode
   icon: React.ReactNode
   title: string
@@ -96,6 +105,8 @@ function ModeCard({ kind, icon, title, text, items, cta, onPick, rules, disabled
   cta: string
   onPick: () => void
   rules?: string
+  /** Oyunlaştırma bayrağı açıkken ek satır (ör. ayın ödülü); kapalıyken verilmez. */
+  extra?: React.ReactNode
   disabled?: boolean
   /** yalnız Uygulama/Değerlendirme kartlarında: mod başına kalıcı en iyi toplam puan (0 = henüz denenmedi) */
   bestScore?: number
@@ -114,6 +125,7 @@ function ModeCard({ kind, icon, title, text, items, cta, onPick, rules, disabled
         ))}
       </ul>
       {rules && <p className="mode-rules">{rules}</p>}
+      {extra}
       {typeof bestScore === 'number' && (
         <p className="mode-rules">
           {bestScore > 0 ? <>En iyi puan: <b>{bestScore}</b></> : 'Henüz denenmedi'}

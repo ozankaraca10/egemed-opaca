@@ -35,7 +35,8 @@ export interface GamiView {
   repo: LocalRepo
 }
 
-export function useGami(): GamiView {
+/** `version` artınca (ör. gizlilik ayarı değişti) durum yeniden okunur. */
+export function useGami(version = 0): GamiView {
   const { runtime } = useStore()
   const lmsName = runtime?.api.get('cmi.learner_name') ?? null
   const r = getGamiRepo(lmsName)
@@ -53,16 +54,17 @@ export function useGami(): GamiView {
       hasAttempts: state.attempts.length > 0,
       repo: r,
     }
-  }, [r, now])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [r, now, version])
 }
 
 /** Haftalık/aylık sıralama görünümü (asenkron repo çağrısı). */
-export function useLeaderboard(period: LeaderboardView['period'], cohort: LeaderboardView['cohort'], now: Date, repoArg: LocalRepo) {
+export function useLeaderboard(period: LeaderboardView['period'], cohort: LeaderboardView['cohort'], now: Date, repoArg: LocalRepo, version = 0) {
   const [view, setView] = useState<LeaderboardView | null>(null)
   useEffect(() => {
     let alive = true
     repoArg.getLeaderboard(period, cohort, now).then((v) => { if (alive) setView(v) })
     return () => { alive = false }
-  }, [period, cohort, now, repoArg])
+  }, [period, cohort, now, repoArg, version])
   return view
 }

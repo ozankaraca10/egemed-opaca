@@ -64,7 +64,7 @@ describe('ayın ödülü — uygunlar arasında ilk 3', () => {
   it('kohort reddi: yalnız belirli dönemlere açık bir ödülde dışarıdaki kohort ve kohortu bilinmeyen elenir', () => {
     const narrow: MonthlyReward = { ...reward, eligibility: { ...reward.eligibility, cohorts: [4, 5, 6] } }
     const { rows } = rewardStandings([row('p', 99, { cohort: 3 }), row('q', 98, { cohort: null }), row('r', 90, { cohort: 6 })], narrow)
-    expect(rows.map((r) => r.reason)).toEqual(['cohort', 'cohort', 'eligible'])
+    expect(rows.map((r) => r.reason)).toEqual(['cohort', 'cohort', 'eligible']) // daraltılmış ödül: bilinmeyen dönem de elenir
     expect(rows.find((r) => r.candidate)?.id).toBe('r')
   })
   it('eşitlikte önce ulaşan aday olur', () => {
@@ -78,5 +78,21 @@ describe('ayın ödülü — uygunlar arasında ilk 3', () => {
     expect(monthKeyTr(lastSecond)).toBe('2026-09')
     expect(monthKeyTr(nextMonth)).toBe('2026-10')
     expect(endOfMonthTr(new Date('2026-09-15T12:00:00Z')).toISOString()).toBe('2026-09-30T20:59:59.999Z')
+  })
+})
+
+describe('ödül — dönem bilinmeyen öğrenci ve yapılandırılmamış ay', () => {
+  const reward = monthlyRewardFor('2026-09')!
+  const base = { id: 'x', public: true, periodScore: 90, attemptsCount: 5, reachedAt: '2026-09-10T00:00:00Z' }
+  it('tüm sınıflara açık ödülde dönemi bilinmeyen uygundur; daraltılmış ödülde değildir', () => {
+    expect(rewardStandings([{ ...base, cohort: null }], reward).rows[0].reason).toBe('eligible')
+    const narrow: MonthlyReward = { ...reward, eligibility: { ...reward.eligibility, cohorts: [4, 5, 6] } }
+    expect(rewardStandings([{ ...base, cohort: null }], narrow).rows[0].reason).toBe('cohort')
+  })
+  it('yapılandırılmamış ay son yapılandırılmış ödülü o ay için taşır; daha önceki ay için null', () => {
+    const oct = monthlyRewardFor('2026-10')!
+    expect(oct.month).toBe('2026-10')
+    expect(oct.title).toBe(reward.title)
+    expect(monthlyRewardFor('2026-08')).toBeNull()
   })
 })

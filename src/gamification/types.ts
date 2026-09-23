@@ -66,6 +66,8 @@ export interface LeaderboardRow {
   id: string
   displayName: string // zaten çözümlenmiş; gizli profil için "Anonim öğrenci"
   isMe: boolean
+  /** Adıyla mı görünüyor (false → "Anonim öğrenci"); ödül koşulu requirePublicName için. */
+  isPublic: boolean
   cohort: Cohort | null
   periodScore: number | null
   attemptsCount: number

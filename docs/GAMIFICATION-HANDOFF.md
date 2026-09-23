@@ -16,7 +16,7 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 | — | Yol haritası | ✅ taslak v0.1 yazıldı (`docs/GAMIFICATION-YOL-HARITASI.md`) |
 | P2 | Yol haritası Faz 1 — saf veri katmanı + testler (`src/gamification/`, `tests/gamification/`) | ✅ bitti (184/184 test) |
 | P3 | K-A1…K-A6 (Başarılarım) | ✅ bitti |
-| P4 | K-B1…K-B7 (Liderlik + Ayın Ödülü) | ⏳ sırada |
+| P4 | K-B1…K-B7 (Liderlik + Ayın Ödülü) | ✅ bitti |
 | P5 | K-C1 (Kazanımlar kartı), K-D1 (e2e görüntüleri) | ⛔ P3/P4 |
 
 ## Engeller / açık kararlar
@@ -122,4 +122,17 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 - Doğrulama: 196 test; bayrak kapalı 6 deterministik görüntü bayt bayt aynı; tarayıcı denetimleri (28 kart, filtre sayaçları,
   klavye/Esc/odak, "Pediatri" → öğrenme "Steeple işareti", 360 px taşma 0, sayfa hatası 0).
 
-## Sıradaki: P4 — K-B1…K-B7 (Liderlik Tahtası + Ayın Ödülü) — kart: `docs/GAMIFICATION-DEVIR-ASTRA-SOL.md` §4.3
+### K-B1…K-B7 — Liderlik Tahtası + Ayın Ödülü (bitti)
+- Veri: `LeaderboardRow.isPublic`; **dönemi bilinmeyen öğrenci** (Moodle dönem vermez) yalnız ödül tüm sınıflara açıksa uygun;
+  **yapılandırılmamış ay** son yapılandırılmış ödülü taşır (1 Ekim'de şerit kaybolmasın). Testli.
+- `leaderboardView.ts` (dönem etiketi, önceki dönem anı → değişim oku, tablo dilimi 4–10 + ayırıcı + komşular, geri sayım,
+  "Senin durumun" metinleri) — testli.
+- `GamiModal` (ortak pencere), `GamiLeaderboard.tsx`: ödül şeridi (tam/kompakt, durum çipi eylemli), koşullar penceresi,
+  podyum (DOM 1-2-3, görsel 2-1-3, "Ödül adayı"), tablo + mobil kart listesi, gizlilik kartı (adımı göster + dönemim),
+  geçmiş kazananlar; `LeaderboardScreen` birleştirir. ModeSelect değerlendirme kartına `extra` ile "Bu ayın ödülü · N gün"
+  (bayrak kapalıyken prop verilmez → görüntü aynı). Başarılarım'da `?demo=winner` tebrik kartı.
+- Doğrulama: 205 test; tarayıcı 18/18 (28 dönem×kohort kombinasyonu 0 hata, podyum sırası, ödül adayları, anonim geçiş
+  anında tabloya yansır, Esc/odak, 360 kart listesi ve taşma 0, boş durum); bayrak kapalı 6 görüntü bayt bayt aynı.
+
+## Sıradaki: P5 — K-C1 (Kazanımlar kartı + gerçek kayıt: recordAttempt/recordLearn) ve K-D1 (e2e görüntüleri)
+Kart: `docs/GAMIFICATION-DEVIR-ASTRA-SOL.md` §4.4

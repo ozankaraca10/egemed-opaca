@@ -14,6 +14,10 @@ import { buildChartSeries, trShortDate } from '../gamification/chart'
 import { badgeViews, sortBadgeViews } from '../gamification/badgeView'
 import { GamiBadgeGrid, GamiRecentBadges } from '../ui/gami/GamiBadge'
 import { useGami, useLeaderboard } from '../gamification/useGami'
+import { GAMI_DEMO } from '../gamification/flag'
+import { monthlyRewardFor } from '../gamification/rewards'
+import { monthKeyTr } from '../gamification/time'
+import { IconAward } from '../ui/icons'
 import { achievementsRangeTr, type AchievementsPeriod } from '../gamification/time'
 
 const PERIODS: { id: AchievementsPeriod; label: string; short: string }[] = [
@@ -42,6 +46,16 @@ export function AchievementsScreen() {
   const practiceCases = inPeriod.filter((a) => a.mode === 'practice').reduce((n, a) => n + a.caseCount, 0)
   const avg = assessments.length ? assessments.reduce((n, a) => n + a.score, 0) / assessments.length : null
 
+  // Tebrik kartı: geçen ayın kazananlarından biriysen, yeni ayın ilk 3 günü (v1'de sunucu yok → yalnız ?demo=winner).
+  const congrats = useMemo(() => {
+    // Sunucu gelince: getRewardWinners() içinde isMe olan geçen ay kaydı + ayın ilk 3 günü koşulu buraya.
+    if (GAMI_DEMO !== 'winner') return null
+    const prev = new Date(view.now.getTime() - 31 * 86_400_000)
+    const r = monthlyRewardFor(monthKeyTr(prev)) ?? monthlyRewardFor(monthKeyTr(view.now))
+    if (!r) return null
+    const MONTHS = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
+    return { monthName: `${MONTHS[Number(r.month.slice(5, 7)) - 1]} ${r.month.slice(0, 4)}`, title: r.title, sponsor: r.sponsor }
+  }, [view.now])
   const badges = useMemo(() => sortBadgeViews(badgeViews(view.stats, view.state.earned)), [view])
   const study = (key: string) => {
     dispatch({ type: 'setLearnFocus', key })
@@ -67,6 +81,15 @@ export function AchievementsScreen() {
         <div className="results-wrap-v2 gami-page">
           <GamiDemoBanner />
           <GamiPageTabs active="achievements" />
+          {congrats && (
+            <div className="card gami-congrats" role="status">
+              <span className="gami-badge-ic" aria-hidden="true"><IconAward width={28} height={28} /></span>
+              <div>
+                <b>{congrats.monthName} ödülünü kazandın!</b>
+                <span>{congrats.title} — {congrats.sponsor} seninle fakülte e-postandan iletişime geçecek.</span>
+              </div>
+            </div>
+          )}
           <div className="results-title-row">
             <div>
               <h1 className="results-title-v2">Başarılarım</h1>

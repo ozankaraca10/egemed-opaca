@@ -84,7 +84,9 @@ export function rewardStandings(
   reward: MonthlyReward
 ): { rows: RewardStandingResult[]; cutoff: number } {
   const reasonFor = (r: RewardStandingRow): EligibilityReason => {
-    if (r.cohort === null || !reward.eligibility.cohorts.includes(r.cohort)) return 'cohort'
+    // Dönemi bilinmeyen öğrenci (LMS dönem bilgisi vermez) yalnız ödül TÜM sınıflara açıksa uygundur.
+    const allCohorts = [1, 2, 3, 4, 5, 6].every((c) => reward.eligibility.cohorts.includes(c as Cohort))
+    if (r.cohort === null ? !allCohorts : !reward.eligibility.cohorts.includes(r.cohort)) return 'cohort'
     if (r.attemptsCount < reward.eligibility.minAssessments) return 'min_assessments'
     if (reward.eligibility.requirePublicName && !r.public) return 'private_profile'
     return 'eligible'
