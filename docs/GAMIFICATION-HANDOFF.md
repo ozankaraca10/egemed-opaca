@@ -1,7 +1,7 @@
 # Oyunlaştırma — devir notu (HANDOFF)
 
 > Bu dosya her paket bitiminde güncellenir. Kesinti olursa buradan devam edilir (Claude, Sonnet ya da Codex).
-> Tasarım spesifikasyonu: `docs/GAMIFICATION-TASARIM-PROMPT.md` · Yol haritası: `docs/GAMIFICATION-YOL-HARITASI.md` (**EKSİK**, bkz. Engeller)
+> Tasarım spesifikasyonu: `docs/GAMIFICATION-TASARIM-PROMPT.md` · Yol haritası: `docs/GAMIFICATION-YOL-HARITASI.md` (özgünü bulunamadı; Opus taslağı v0.1)
 
 Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 
@@ -11,17 +11,18 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 |---|---|---|
 | P0 | Spesifikasyon repoya, devir notu | ✅ bitti |
 | P1 | Faz T0 — statik tasarım referansı `docs/mockups/gami.html` + ekran görüntüleri | ✅ bitti, **onaylandı** (23 Eyl 2026) |
-| — | Yol haritası dosyası | ⚠ yok — kurallar `src/gamification/` içinde yapılandırma olarak taslak yazılacak |
-| P2 | Yol haritası Faz 1 — saf veri katmanı + testler | ⛔ yol haritası gerekli |
-| P3 | K-A1…K-A6 (Başarılarım) | ⛔ P2 + T0 onayı |
-| P4 | K-B1…K-B7 (Liderlik + Ayın Ödülü) | ⛔ P2 + T0 onayı |
+| — | Yol haritası | ✅ taslak v0.1 yazıldı (`docs/GAMIFICATION-YOL-HARITASI.md`) |
+| P2 | Yol haritası Faz 1 — saf veri katmanı + testler (`src/gamification/`, `tests/gamification/`) | ⏳ Sonnet'te; Opus denetimi bekliyor |
+| P3 | K-A1…K-A6 (Başarılarım) | ⛔ P2 |
+| P4 | K-B1…K-B7 (Liderlik + Ayın Ödülü) | ⛔ P2 |
 | P5 | K-C1 (Kazanımlar kartı), K-D1 (e2e görüntüleri) | ⛔ P3/P4 |
 
 ## Engeller / açık kararlar
 
-1. `docs/GAMIFICATION-YOL-HARITASI.md` repoda ve bilgisayarda yok (yalnız tasarım promptu `~/Downloads`'taydı).
-   §2 değişmezler, §4 veri katmanı (`xp.ts`, `ranking.ts`, `GamificationRepo`), §5 rozet listesi ve
-   §7–9 çalışma kuralları bu dosyada. P2 ve sonrası buna bağlı.
+1. Özgün `GAMIFICATION-YOL-HARITASI.md` bulunamadı; Opus taslak v0.1 yazdı. Kullanıcı özgün dosyayı verirse
+   `src/gamification/rules.ts` ve rozet listesi ona göre hizalanır.
+   **Önemli sınır:** SCORM paketinde sunucu yok → gerçek sınıf sıralaması yok; v1 liderlik tablosu kendi
+   sonuçların + deterministik demo akranlar ("Demo verisi" etiketli).
 2. `docs/mockups/gami-referans-ai.png` yok. T0 yalnız promptun yazılı bilgi mimarisiyle yapıldı.
 3. Ödül koşulları `KARAR BEKLİYOR`: uygun kohortlar (örn. Dönem 4–6), aylık asgari değerlendirme sayısı (örn. 4).
 4. T0'daki rozet adları/sayısı (28) ve XP değerleri taslak; yol haritası §5 gelince hizalanacak.
