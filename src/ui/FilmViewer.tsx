@@ -111,7 +111,9 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
     setWin(WINDOW_PRESETS[0].w)
     setPreset(image?.stack?.length ? 'lung' : 'standard')
     setInvert(false)
-    setSliceIndex(0)
+    // İşaretli kesit yığını, işaretli kesit aralığının ortasından açılır (BT yalnız öğrenme modunda kullanılır).
+    const marked = (image?.stack?.length ? image.annotations : []).map((a) => a.frameIndex).filter((f): f is number => typeof f === 'number').sort((a, b) => a - b)
+    setSliceIndex(marked.length ? marked[Math.floor(marked.length / 2)] : 0)
     view.current = { scale: 1, tx: 0, ty: 0 }
     apply()
     // eslint-disable-next-line react-hooks/exhaustive-deps

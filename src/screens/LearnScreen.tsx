@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from '../core/store'
 import { examplesFor, isExpertSource } from '../core/images'
+import type { ImageRecord } from '../core/types'
 import { ZONES } from '../data/zones'
 import { ALL_CASES, poolFor } from '../data/pool'
 import { LIBRARY_GROUPS, LIBRARY_ITEMS, LABEL_SOURCE_TEXT, findingShort, type LibraryItem } from '../data/terminology'
@@ -42,15 +43,7 @@ export function LearnScreen() {
       return out
     }
     if (item.key === 'technique.lateral') return examplesFor(null, 'LAT').slice(0, 24)
-    // Toraks BT'ye giriş: finding: null ama yalnız BT modaliteli görüntüler gösterilmeli
-    if (item.group === 'ct') return examplesFor(item.finding, undefined, { modality: 'CT' }).slice(0, 24)
-    // pediatrik konular: krup, yabancı cisim, epiglottit — pediatrik filmler de öğrenme kütüphanesinde gösterilir
-    const all = examplesFor(item.finding, undefined, { includePediatric: item.group === 'pediatric' })
-    // genel teknik konularda (bulgu belirtilmemiş, "her film" örneği) Commons'ın küratörlü/işaretli
-    // figürleri (bazılarında kaynak makaleden ok/etiket kalabiliyor) çeldirici olmasın diye hariç tutulur;
-    // Commons görüntüleri kendi bulgu konularında (ör. skolyoz, herni) normal şekilde gösterilmeye devam eder
-    const filtered = item.finding === null ? all.filter((r) => r.sourceDataset !== 'wikimedia-commons') : all
-    return filtered.slice(0, 24)
+    return topicExamples(item).slice(0, 24)
   }, [item])
   const image = examples[exampleIdx] ?? examples[0]
 
@@ -256,9 +249,38 @@ export function LearnScreen() {
 function countFor(it: LibraryItem): number {
   if (it.key === 'technique.projection') return examplesFor(null, 'PA').length + examplesFor(null, 'AP').length
   if (it.key === 'technique.lateral') return examplesFor(null, 'LAT').length
-  if (it.group === 'ct') return examplesFor(it.finding, undefined, { modality: 'CT' }).length
+  return topicExamples(it).length
+}
+
+/** BT'de öncelik: işaretli kesit yığını → kesit yığını → tek kesit. */
+const ctRank = (r: ImageRecord) => (r.stack?.length ? (r.annotations.length ? 0 : 1) : 2)
+const byCtRank = (list: ImageRecord[]) => [...list].sort((a, b) => ctRank(a) - ctRank(b))
+
+/** Konu örnekleri (sıralı, kesilmemiş). */
+function topicExamples(it: LibraryItem): ImageRecord[] {
+  if (it.group === 'ct') {
+    // Toraks BT'ye giriş: patolojik tek kesitler (emboli, pnömotoraks) kendi bulgu konularında gösterilir.
+    // İki konu da kesit yığınlarıyla başlar (her seri iki pencereyle gelir); anatomi konusu ek olarak akciğer
+    // penceresindeki tek kesiti, pencere konusu aynı kesitin akciğer + mediasten penceresi çiftini alır.
+    const ct = examplesFor(null, undefined, { modality: 'CT' })
+    const stacks = byCtRank(ct.filter((r) => r.stack?.length))
+    const pair = ['commons_ct_axial_lung_window', 'commons_ct_axial_mediastinal_window']
+      .map((id) => ct.find((r) => r.id === id))
+      .filter((r): r is ImageRecord => !!r)
+    return it.key === 'ct.windows' ? [...stacks, ...pair] : [...stacks, ...pair.slice(0, 1)]
+  }
+  // pediatrik konular: krup, yabancı cisim, epiglottit — pediatrik filmler de öğrenme kütüphanesinde gösterilir
   const all = examplesFor(it.finding, undefined, { includePediatric: it.group === 'pediatric' })
-  return it.finding === null ? all.filter((r) => r.sourceDataset !== 'wikimedia-commons').length : all.length
+  // genel teknik konularda (bulgu belirtilmemiş, "her film" örneği) Commons'ın küratörlü/işaretli
+  // figürleri (bazılarında kaynak makaleden ok/etiket kalabiliyor) çeldirici olmasın diye hariç tutulur;
+  // Commons görüntüleri kendi bulgu konularında (ör. skolyoz, herni) normal şekilde gösterilmeye devam eder
+  if (it.finding === null) return all.filter((r) => r.sourceDataset !== 'wikimedia-commons')
+  // Bulgunun BT karşılığı varsa (ör. BTPA dolum defekti, BT'de pnömotoraks, nodül serisi) grafilerden sonra,
+  // 24'lük sınırın içinde kalacak biçimde eklenir; yalnız BT'de görülen bulgularda liste tamamen BT'dir.
+  const ct = byCtRank(examplesFor(it.finding, undefined, { modality: 'CT' }))
+  if (!ct.length) return all
+  const ctShown = all.length ? ct.slice(0, 2) : ct
+  return [...all.slice(0, 24 - ctShown.length), ...ctShown, ...all.slice(24 - ctShown.length)]
 }
 
 function GroupIcon({ group, size = 17 }: { group: string; size?: number }) {
