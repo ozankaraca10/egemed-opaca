@@ -2,7 +2,7 @@
  *  Ausculta şemasından türetildi: ses kaydı → görüntü kaydı, oskültasyon noktası → okuma bölgesi. */
 
 export type Mode = 'learn' | 'practice' | 'assessment'
-export type Screen = 'start' | 'modes' | 'tutorial' | 'learn' | 'simulation' | 'results' | 'sources'
+export type Screen = 'start' | 'modes' | 'tutorial' | 'learn' | 'simulation' | 'results' | 'sources' | 'achievements' | 'leaderboard'
 export type ValidationStatus = 'validated' | 'educational_mapping' | 'experimental'
 export type Population = 'yetiskin' | 'pediatrik'
 export type ViewPosition = 'PA' | 'AP' | 'LAT' | 'NECK_AP' | 'CT_AXIAL' | 'unknown'

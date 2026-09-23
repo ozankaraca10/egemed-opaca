@@ -14,9 +14,12 @@ import { SimulationScreen } from './screens/SimulationScreen'
 import { ResultsScreen } from './screens/ResultsScreen'
 import { SourcesScreen } from './screens/SourcesScreen'
 import { DevPanel } from './screens/DevPanel'
+import { AchievementsScreen } from './screens/AchievementsScreen'
+import { LeaderboardScreen } from './screens/LeaderboardScreen'
+import { GAMI_ENABLED } from './gamification/flag'
 
 /** Doküman ekranları sayfa düzeyinde kaydırılır; çalışma ekranları (learn/simulation) 100dvh kalır. */
-const DOC_SCREENS = new Set(['start', 'modes', 'tutorial', 'results', 'sources'])
+const DOC_SCREENS = new Set(['start', 'modes', 'tutorial', 'results', 'sources', 'achievements', 'leaderboard'])
 
 if (import.meta.env.DEV) {
   const findingIds = new Set(Object.keys(FINDINGS))
@@ -45,6 +48,8 @@ function Shell() {
         {state.screen === 'simulation' && <SimulationScreen />}
         {state.screen === 'results' && <ResultsScreen />}
         {state.screen === 'sources' && <SourcesScreen />}
+        {GAMI_ENABLED && state.screen === 'achievements' && <AchievementsScreen />}
+        {GAMI_ENABLED && state.screen === 'leaderboard' && <LeaderboardScreen />}
       </main>
       <DevPanel />
     </div>

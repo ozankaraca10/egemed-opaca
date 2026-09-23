@@ -100,3 +100,11 @@ export const IconScan = (p: P) => (
 export const IconBone = (p: P) => (
   <svg {...base(p)}><path d="M17 10c.7.7 2 .7 2.8-.2a2 2 0 0 0-1.4-3.3 2 2 0 0 0-3.3-1.4c-.9.8-.9 2.1-.2 2.8L8.1 14.9c-.7-.7-2-.7-2.8.2a2 2 0 0 0 1.4 3.3 2 2 0 0 0 3.3 1.4c.9-.8.9-2.1.2-2.8z" /></svg>
 )
+/* Oyunlaştırma ikonları (T0 maketiyle aynı çizim, aynı base() kalıbı) */
+export const IconFlame = (p: P) => <svg {...base(p)}><path d="M12 3c.5 3 3.5 4.5 3.5 8.5a3.5 3.5 0 0 1-7 0c0-1.5.6-2.6 1.5-3.5.2 1.5 1 2.3 2 2.5-.8-2.5-.5-5 0-7.5z" /><path d="M8.2 13.5A6 6 0 1 0 18 10" /></svg>
+export const IconLock = (p: P) => <svg {...base(p)}><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+export const IconMedal = (p: P) => <svg {...base(p)}><circle cx="12" cy="15" r="6" /><path d="M8.5 10 6 3h4l2 5 2-5h4l-2.5 7" /><path d="M12 12.5v5" /></svg>
+export const IconAward = (p: P) => <svg {...base(p)}><circle cx="12" cy="9" r="6" /><path d="m8.5 14-1.5 7 5-3 5 3-1.5-7" /></svg>
+export const IconStar = (p: P) => <svg {...base(p)}><path d="m12 3 2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.4 6.5 20.3l1-6.2L3 9.7l6.2-.9z" /></svg>
+export const IconGift = (p: P) => <svg {...base(p)}><rect x="3" y="8" width="18" height="4" rx="1" /><path d="M5 12v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8" /><path d="M12 8v13" /><path d="M12 8c-1.5-3-5-3.5-5-1.2C7 8 9 8 12 8zM12 8c1.5-3 5-3.5 5-1.2C17 8 15 8 12 8z" /></svg>
+export const IconArrowUp = (p: P) => <svg {...base(p)}><path d="M12 19V5" /><path d="m6 11 6-6 6 6" /></svg>

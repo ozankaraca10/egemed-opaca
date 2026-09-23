@@ -15,7 +15,7 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 | P1 | Faz T0 — statik tasarım referansı `docs/mockups/gami.html` + ekran görüntüleri | ✅ bitti, **onaylandı** (23 Eyl 2026) |
 | — | Yol haritası | ✅ taslak v0.1 yazıldı (`docs/GAMIFICATION-YOL-HARITASI.md`) |
 | P2 | Yol haritası Faz 1 — saf veri katmanı + testler (`src/gamification/`, `tests/gamification/`) | ✅ bitti (184/184 test) |
-| P3 | K-A1…K-A6 (Başarılarım) | ⛔ P2 |
+| P3 | K-A1…K-A6 (Başarılarım) | ⏳ K-A1 ✅ · K-A2 sırada |
 | P4 | K-B1…K-B7 (Liderlik + Ayın Ödülü) | ⛔ P2 |
 | P5 | K-C1 (Kazanımlar kartı), K-D1 (e2e görüntüleri) | ⛔ P3/P4 |
 
@@ -100,5 +100,13 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 - Bilinen sınırlar: liderlik tablosu demo akranlarla (isDemo); `getRewardWinners` şimdilik yalnız sabit geçmiş listesi.
 - Maket: haftanın doğru aralığı 21–27 Eyl 2026 (21 Eyl Pazartesi) — düzeltildi.
 
-## Sıradaki: P3 — K-A1 (bayrak, ekranlar, header çipi, styles-gami.css, yeni ikonlar)
-Ayrıntılı kart: `docs/GAMIFICATION-DEVIR-ASTRA-SOL.md` §4.2.
+### K-A1 — bayrak, ekranlar, header çipi (bitti)
+- `src/gamification/flag.ts` (`?gami=1` / `VITE_GAMI=1`, `?demo=`), `src/styles-gami.css` (onaylı taslak; kategori
+  sınıfları `gami-cat-*` önekine alındı — maket ve generator da güncel), `Screen` + `DOC_SCREENS` genişletildi,
+  `AchievementsScreen` / `LeaderboardScreen` iskeletleri, `GamiPageTabs` (ok tuşları), `GamiDemoBanner`, header
+  "Başarılarım" çipi (simülasyonda yok), 7 yeni ikon (`icons.tsx`).
+- Doğrulama: bayrak kapalıyken 6 deterministik e2e görüntüsü baz çizgiyle **bayt bayt aynı**; bayrak açık 24/24
+  tarayıcı denetimi (1440 + 360: çip, aria-current, sekmeler, ok tuşu + odak, taşma 0, uygulama ve değerlendirme
+  simülasyonunda çip ve `gami-` öğesi yok); 186 test.
+
+## Sıradaki: K-A2 (GamiAvatar, GamiSeg, domainMeta.ts) — kart: `docs/GAMIFICATION-DEVIR-ASTRA-SOL.md` §4.2

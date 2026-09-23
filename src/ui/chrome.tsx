@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { HelpModal } from './HelpModal'
 import { ConfirmModal } from './ConfirmModal'
 import { useStore } from '../core/store'
-import { IconHelpCircle, IconFullscreen, IconFullscreenExit, IconSwap, IconInfo } from './icons'
+import { IconHelpCircle, IconFullscreen, IconFullscreenExit, IconSwap, IconInfo, IconTrophy } from './icons'
+import { GAMI_ENABLED } from '../gamification/flag'
 
 export function BrandMark({ size = 30 }: { size?: number }) {
   return <img src="brand/logo-icon-white-web.png" alt="" width={size} height={size} className="brand-mark" />
@@ -92,6 +93,21 @@ export function Header() {
         >
           <IconSwap /> <span className="chip-text">Mod Değiştir</span>
         </button>
+      )}
+      {/* Oyunlaştırma: yalnız bayrak açıkken; simülasyon (uygulama/değerlendirme) sırasında hiç render edilmez */}
+      {GAMI_ENABLED && state.screen !== 'simulation' && (
+        <>
+          <button
+            className="eg-header-chip clickable gami-chip"
+            onClick={() => dispatch({ type: 'goto', screen: 'achievements' })}
+            aria-label="Başarılarım"
+            aria-current={state.screen === 'achievements' || state.screen === 'leaderboard' ? 'page' : undefined}
+            title="Başarılarım"
+          >
+            <IconTrophy /> <span className="chip-text">Başarılarım</span>
+          </button>
+          <span className="divider-v" />
+        </>
       )}
       <button
         className="eg-header-chip clickable hide-mobile"
