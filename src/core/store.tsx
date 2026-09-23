@@ -35,6 +35,11 @@ export interface AppState {
   session: { practiceIds: string[]; assessmentIds: string[]; seed: number }
   pendingSummary: CaseResult | null
   learnFocusKey: string | null
+  /** Öğrenmeye odaklı dönüşte açılacak örnek film sırası (tek seferlik; learnFocusKey ile birlikte). */
+  learnFocusIdx: number | null
+  /** "Bu konuda uygulama yap" ile açılan uygulama oturumu: dönülecek konu/örnek. Yeni örneklem, mod
+   *  seçimine dönüş ya da başka moda geçiş bu bağlantıyı kaldırır. SCORM suspend şemasına dahil değildir. */
+  topicReturn: { key: string; exampleIdx: number; title: string } | null
   /** A4: mod başına kalıcı en iyi toplam puan — "Yeni örneklem" onayında "en iyi puan
    *  korunur" ifadesinin karşılığı; localStorage'da kalıcıdır (StoreProvider ile okunur/
    *  yazılır), oturum/örneklem sıfırlansa da silinmez. SCORM suspend şemasına dahil değildir. */
@@ -65,6 +70,8 @@ export const initialState: AppState = {
   session: { practiceIds: [], assessmentIds: [], seed: 0 },
   pendingSummary: null,
   learnFocusKey: null,
+  learnFocusIdx: null,
+  topicReturn: null,
   bestScore: { practice: 0, assessment: 0 },
 }
 
@@ -103,7 +110,9 @@ export type Action =
   | { type: 'restore'; payload: SuspendPayload }
   | { type: 'resetCase' }
   | { type: 'setResults'; results: CaseResult[] }
-  | { type: 'setLearnFocus'; key: string | null }
+  | { type: 'setLearnFocus'; key: string | null; idx?: number | null }
+  | { type: 'startTopicPractice'; key: string; exampleIdx: number; title: string; practiceIds: string[]; seed: number }
+  | { type: 'returnToTopic' }
 
 const findCase = (id: string) => ALL_CASES.find((c) => c.id === id)
 
@@ -120,7 +129,7 @@ export function computeCaseResult(def: CaseDef, s: Pick<AppState, 'answers' | 't
 export function reducer(s: AppState, a: Action): AppState {
   switch (a.type) {
     case 'goto':
-      return { ...s, screen: a.screen }
+      return { ...s, screen: a.screen, topicReturn: a.screen === 'modes' ? null : s.topicReturn }
     case 'caseMount':
       if (a.caseDef.id === s.currentCaseId) return s
       return { ...s, currentCaseId: a.caseDef.id }
@@ -130,9 +139,22 @@ export function reducer(s: AppState, a: Action): AppState {
         ...s, mode: a.mode, screen: 'simulation', caseIndex: 0, step: 0, answers: {}, revealed: {}, hintsUsed: 0,
         telemetry: initialTelemetry(), lastFeedback: null, pendingSummary: null,
         caseResults: [], assessmentTimer: 0, caseElapsed: 0, attempts: s.attempts + 1, currentCaseId: '',
+        topicReturn: a.mode === 'practice' ? s.topicReturn : null,
       }
     case 'startSession':
-      return { ...s, session: { practiceIds: a.practiceIds, assessmentIds: a.assessmentIds, seed: a.seed } }
+      return { ...s, session: { practiceIds: a.practiceIds, assessmentIds: a.assessmentIds, seed: a.seed }, topicReturn: null }
+    case 'startTopicPractice': {
+      const withSession = reducer(s, { type: 'startSession', practiceIds: a.practiceIds, assessmentIds: s.session.assessmentIds, seed: a.seed })
+      const started = reducer(withSession, { type: 'startMode', mode: 'practice' })
+      return { ...started, topicReturn: { key: a.key, exampleIdx: a.exampleIdx, title: a.title } }
+    }
+    case 'returnToTopic': {
+      if (!s.topicReturn) return s
+      // Konu uygulamasının 5 vakalık listesi normal uygulama örneklemi değildir; boşaltılır ki bir sonraki
+      // uygulama girişi (SimulationScreen K3 etkisi) yeni ve tam bir örneklem çeksin.
+      const learn = reducer({ ...s, session: { ...s.session, practiceIds: [] } }, { type: 'startMode', mode: 'learn' })
+      return { ...learn, screen: 'learn', learnFocusKey: s.topicReturn.key, learnFocusIdx: s.topicReturn.exampleIdx, topicReturn: null }
+    }
     case 'toggleZones':
       return { ...s, showZones: a.show ?? !s.showZones }
     case 'zoneEnter': {
@@ -226,7 +248,7 @@ export function reducer(s: AppState, a: Action): AppState {
       return { ...s, caseResults: a.results, screen: 'results', bestScore }
     }
     case 'setLearnFocus':
-      return { ...s, learnFocusKey: a.key }
+      return { ...s, learnFocusKey: a.key, learnFocusIdx: a.idx ?? null }
     default:
       return s
   }

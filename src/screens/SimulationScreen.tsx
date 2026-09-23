@@ -14,7 +14,7 @@ import { ZoneChips } from '../ui/ZoneChips'
 import { QuestionCard, FeedbackCard } from '../ui/Questions'
 import { Footer, EcgDeco } from '../ui/chrome'
 import { ConfirmModal } from '../ui/ConfirmModal'
-import { IconDoc, IconArrowRight, IconInfo, IconLightbulb, IconClock } from '../ui/icons'
+import { IconDoc, IconArrowRight, IconInfo, IconLightbulb, IconClock, IconChevronLeft } from '../ui/icons'
 import { LABEL_SOURCE_TEXT, VIEW_TEXT, findingShort } from '../data/terminology'
 
 /** Uygulama ve Değerlendirme: film solda, olgu/soru sağda. */
@@ -228,6 +228,11 @@ function CaseView({ caseDef, total }: { caseDef: CaseDef; total: number }) {
             </div>
 
             <div className="sim-side">
+              {state.topicReturn && !isAssessment && (
+                <button type="button" className="btn outline small topic-return" onClick={() => dispatch({ type: 'returnToTopic' })}>
+                  <IconChevronLeft width={14} height={14} /> Görüntüye dön: {state.topicReturn.title}
+                </button>
+              )}
               <div className="card case-card">
                 <div className="card-title-row">
                   <div className="ic"><IconDoc /></div>

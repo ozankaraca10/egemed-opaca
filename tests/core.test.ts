@@ -691,3 +691,34 @@ describe('oturum örnekleme', () => {
     }
   })
 })
+
+/* ---------------- konu uygulamasından görüntüye dönüş ---------------- */
+describe('reducer — konu uygulaması dönüşü', () => {
+  const base: AppState = { ...initialState, session: { practiceIds: ['a', 'b'], assessmentIds: ['x'], seed: 1 } }
+  const topic = reducer(base, { type: 'startTopicPractice', key: 'finding.pneumothorax', exampleIdx: 4, title: 'Pnömotoraks', practiceIds: ['p1', 'p2'], seed: 7 })
+
+  it('uygulamayı konu vakalarıyla başlatır ve dönüş hedefini saklar', () => {
+    expect(topic.screen).toBe('simulation')
+    expect(topic.mode).toBe('practice')
+    expect(topic.session.practiceIds).toEqual(['p1', 'p2'])
+    expect(topic.session.assessmentIds).toEqual(['x'])
+    expect(topic.topicReturn).toEqual({ key: 'finding.pneumothorax', exampleIdx: 4, title: 'Pnömotoraks' })
+  })
+
+  it('dönüş aynı konu ve örnek filme öğrenme modunda açar, konu örneklemini bırakır', () => {
+    const back = reducer(topic, { type: 'returnToTopic' })
+    expect(back.screen).toBe('learn')
+    expect(back.mode).toBe('learn')
+    expect(back.learnFocusKey).toBe('finding.pneumothorax')
+    expect(back.learnFocusIdx).toBe(4)
+    expect(back.topicReturn).toBeNull()
+    expect(back.session.practiceIds).toEqual([])
+  })
+
+  it('mod seçimine gitmek, yeni örneklem ya da başka mod bağlantıyı kaldırır', () => {
+    expect(reducer(topic, { type: 'goto', screen: 'modes' }).topicReturn).toBeNull()
+    expect(reducer(topic, { type: 'startSession', practiceIds: ['n'], assessmentIds: [], seed: 2 }).topicReturn).toBeNull()
+    expect(reducer(topic, { type: 'startMode', mode: 'assessment' }).topicReturn).toBeNull()
+    expect(reducer(topic, { type: 'startMode', mode: 'practice' }).topicReturn).not.toBeNull()
+  })
+})

@@ -240,7 +240,11 @@ export function ResultsScreen() {
             </button>
             <button className="btn outline" onClick={retrySame}>Tekrar dene</button>
             <button className="btn outline" onClick={retryNewSample}>Yeni örneklem</button>
-            <button className="btn outline" onClick={studyLearn}>Öğrenme modunda çalış</button>
+            {state.topicReturn ? (
+              <button className="btn outline" onClick={() => dispatch({ type: 'returnToTopic' })}>Görüntüye dön: {state.topicReturn.title}</button>
+            ) : (
+              <button className="btn outline" onClick={studyLearn}>Öğrenme modunda çalış</button>
+            )}
           </div>
         </div>
       </div>

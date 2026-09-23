@@ -19,7 +19,9 @@ export function LearnScreen() {
   const { state, dispatch } = useStore()
   const [selectedKey, setSelectedKey] = useState<string>(() => state.learnFocusKey ?? LIBRARY_ITEMS[0].key)
   const [tab, setTab] = useState<'desc' | 'film' | 'clin'>('desc')
-  const [exampleIdx, setExampleIdx] = useState(0)
+  const [exampleIdx, setExampleIdx] = useState(() => state.learnFocusIdx ?? 0)
+  // Örnek sırası yalnız konu gerçekten değişince sıfırlanır (konu uygulamasından dönüşte korunur).
+  const lastKey = useRef(selectedKey)
   const [showExpert, setShowExpert] = useState(true)
   const [activeZones, setActiveZones] = useState<string[]>([])
   const viewerRef = useRef<FilmViewerHandle>(null)
@@ -48,7 +50,10 @@ export function LearnScreen() {
   const image = examples[exampleIdx] ?? examples[0]
 
   useEffect(() => {
-    setExampleIdx(0)
+    if (lastKey.current !== selectedKey) {
+      lastKey.current = selectedKey
+      setExampleIdx(0)
+    }
     document.querySelector('.lib-item.active')?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
   }, [selectedKey])
 
@@ -61,8 +66,7 @@ export function LearnScreen() {
   const startPractice = () => {
     const ids = poolFor('practice').filter((c) => c.primaryFinding === item.finding).slice(0, 5).map((c) => c.id)
     if (!ids.length) return
-    dispatch({ type: 'startSession', practiceIds: ids, assessmentIds: state.session.assessmentIds, seed: (Date.now() % 2147483647) | 0 })
-    dispatch({ type: 'startMode', mode: 'practice' })
+    dispatch({ type: 'startTopicPractice', key: item.key, exampleIdx, title: item.title, practiceIds: ids, seed: (Date.now() % 2147483647) | 0 })
   }
 
   const onZoneEnter = useCallback((ids: string[]) => dispatch({ type: 'zoneEnter', zoneIds: ids }), [dispatch])
