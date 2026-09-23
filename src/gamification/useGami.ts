@@ -21,6 +21,7 @@ export function getGamiRepo(lmsName?: string | null): LocalRepo {
       stateOverride: GAMI_DEMO ? demoStateFor(GAMI_DEMO, new Date()) : undefined,
     })
   }
+  repo.setLmsStudentName(lmsName)
   return repo
 }
 

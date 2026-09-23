@@ -17,7 +17,7 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 | P2 | Yol haritası Faz 1 — saf veri katmanı + testler (`src/gamification/`, `tests/gamification/`) | ✅ bitti (184/184 test) |
 | P3 | K-A1…K-A6 (Başarılarım) | ✅ bitti |
 | P4 | K-B1…K-B7 (Liderlik + Ayın Ödülü) | ✅ bitti |
-| P5 | K-C1 (Kazanımlar kartı), K-D1 (e2e görüntüleri) | ⛔ P3/P4 |
+| P5 | K-C1 (Kazanımlar kartı), K-D1 (e2e görüntüleri) | ✅ bitti |
 
 ## Engeller / açık kararlar
 
@@ -134,5 +134,22 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 - Doğrulama: 205 test; tarayıcı 18/18 (28 dönem×kohort kombinasyonu 0 hata, podyum sırası, ödül adayları, anonim geçiş
   anında tabloya yansır, Esc/odak, 360 kart listesi ve taşma 0, boş durum); bayrak kapalı 6 görüntü bayt bayt aynı.
 
-## Sıradaki: P5 — K-C1 (Kazanımlar kartı + gerçek kayıt: recordAttempt/recordLearn) ve K-D1 (e2e görüntüleri)
-Kart: `docs/GAMIFICATION-DEVIR-ASTRA-SOL.md` §4.4
+### K-C1 + K-D1 — gerçek kayıt, Kazanımlar kartı, görüntüler (bitti)
+- `attempt.ts` (oturum → AttemptRecord; idempotent kimlik = mod + oturum tohumu + vaka kimlikleri; Hızlı ve Doğru ölçütü) — testli.
+- `GamiGains` (ResultsScreen, özet şeridin altında, yalnız bayrakla): yeni rozet ya da sıradaki rozet, +XP (bonus),
+  seviye çubuğu, değerlendirmede haftalık (ay sonuna <7 gün kala aylık "Ödül sırası") sıra + değişim; 80 ms kademeli
+  giriş; yalnız yeni rozet + ustalıkta CSS konfeti; reduced-motion'da animasyon yok.
+- Öğrenme kaydı: LearnScreen konu seçimi → `recordLearn({topic})`; FilmViewer yeni `onStackEnd` → BT yığını son kesit.
+- `getGamiRepo` LMS adını sonradan da alır (`setLmsStudentName`).
+- `scripts/e2e-gami-screens.mjs` (`npm run e2e:gami`): 6 durum × 1440/768/360, taşma ve sayfa hatası denetimi (18 görüntü, 0 hata).
+- README "Oyunlaştırma (bayrak arkasında, v1)" bölümü.
+- Doğrulama: 209 test; gerçek akış (bayrak kapalı veri yazmaz; öğrenme + BT kaydı; uygulama oturumu bir kez kaydedilir,
+  Kazanımlar kartı, Başarılarım gerçek veriyle); değerlendirme akışı (İlk Adım, +100 XP, "Sıralamada değilsin");
+  e2e + click-stability geçer; `build:scorm` 23,8 MB.
+
+## Durum: tasarım promptu §8'deki tüm kartlar tamam (K-A1…K-D1)
+
+Açık kararlar (kullanıcı): (1) aylık asgari değerlendirme sayısı (taslak 4); (2) oyunlaştırmanın dağıtılan pakette
+açılması (`VITE_GAMI=1` ile derleme) — v1 sıralaması demo akranlarla olduğundan önerim: pilot/tanıtım amaçlı;
+(3) gerçek sınıf sıralaması için sunucu (xAPI/LRS) — `GamificationRepo` arayüzü hazır; (4) özgün yol haritası
+bulunursa `rules.ts` ve rozet listesi hizalanır.

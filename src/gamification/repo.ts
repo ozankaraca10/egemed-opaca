@@ -84,6 +84,11 @@ export class LocalRepo implements GamificationRepo {
     this.override = opts.stateOverride ?? null
   }
 
+  /** LMS adı depo oluşturulduktan sonra öğrenilirse (ilk çağrı adı bilmeyen bir ekrandan gelmiş olabilir). */
+  setLmsStudentName(name: string | null | undefined): void {
+    if (name && !this.lmsStudentName) this.lmsStudentName = name
+  }
+
   private load(): GamiStateV1 {
     return this.override ?? loadState()
   }

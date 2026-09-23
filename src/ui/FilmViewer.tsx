@@ -53,6 +53,8 @@ interface Props {
   label?: string
   /** film bilgisi öğretim overlay'i (sentetik taraf işareti rozeti) — yalnız öğrenme modunda açılır */
   showInfoOverlay?: boolean
+  /** Kesit yığınında son kesite ulaşıldığında (görüntü başına bir kez) — oyunlaştırma "BT Kaşifi" için. */
+  onStackEnd?: () => void
 }
 
 const DWELL_TICK_MS = 250
@@ -61,7 +63,7 @@ const MAX_SCALE = 8
 export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewer(
   {
     image, zones, showZones, showAnnotations, annotationFinding, strict = false, markEnabled = false, mark, onMark,
-    onZoneEnter, onZoneDwell, onActiveZones, onTool, onToggleZones, inert = false, label, showInfoOverlay = false,
+    onZoneEnter, onZoneDwell, onActiveZones, onTool, onToggleZones, inert = false, label, showInfoOverlay = false, onStackEnd,
   },
   ref
 ) {
@@ -98,6 +100,13 @@ export const FilmViewer = forwardRef<FilmViewerHandle, Props>(function FilmViewe
   const stackFrames = image?.stack?.find((s) => s.window === stackWindow)?.frames ?? (image ? [image.runtimeUrl] : [])
   const hasMultiSliceStack = stackFrames.length > 1
   const clampedSlice = Math.min(sliceIndex, Math.max(0, stackFrames.length - 1))
+  const stackEndFired = useRef<string | null>(null)
+  useEffect(() => {
+    if (!onStackEnd || !image || stackFrames.length < 2 || clampedSlice !== stackFrames.length - 1) return
+    if (stackEndFired.current === image.id) return
+    stackEndFired.current = image.id
+    onStackEnd()
+  }, [clampedSlice, stackFrames.length, image, onStackEnd])
   const frameSrc = stackFrames[clampedSlice] ?? image?.runtimeUrl
   const goToSlice = (next: number) => setSliceIndex(clamp(next, 0, Math.max(0, stackFrames.length - 1)))
 

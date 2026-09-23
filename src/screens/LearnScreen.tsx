@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from '../core/store'
+import { GAMI_ENABLED } from '../gamification/flag'
+import { getGamiRepo } from '../gamification/useGami'
 import { examplesFor, isExpertSource } from '../core/images'
 import type { ImageRecord } from '../core/types'
 import { ZONES } from '../data/zones'
@@ -32,6 +34,10 @@ export function LearnScreen() {
   }, [])
 
   const item = LIBRARY_ITEMS.find((it) => it.key === selectedKey) ?? LIBRARY_ITEMS[0]
+  // Oyunlaştırma: incelenen konu (konu başına bir kez sayılır — repo küme semantiği)
+  useEffect(() => {
+    if (GAMI_ENABLED) void getGamiRepo().recordLearn({ topic: item.key }, new Date())
+  }, [item.key])
   const examples = useMemo(() => {
     if (item.key === 'technique.projection') {
       // PA ve AP örneklerini dönüşümlü sun
@@ -146,6 +152,7 @@ export function LearnScreen() {
                     onTool={(tool) => dispatch({ type: 'toolUsed', tool })}
                     onToggleZones={() => dispatch({ type: 'toggleZones' })}
                     showInfoOverlay={tab === 'film'}
+                    onStackEnd={GAMI_ENABLED ? () => { void getGamiRepo().recordLearn({ ctStack: image.id }, new Date()) } : undefined}
                   />
                 ) : (
                   <div className="film-empty-card">

@@ -11,6 +11,9 @@ import {
   IconScan, IconLungs, IconFilm, IconDoc, IconCheckCircle, IconExit, IconClock, IconChevronRight, IconTarget,
 } from '../ui/icons'
 import type { ScoringWeights } from '../core/types'
+import { GAMI_ENABLED } from '../gamification/flag'
+import { getGamiRepo } from '../gamification/useGami'
+import { GamiGains } from '../ui/gami/GamiGains'
 
 /** Sonuç ekranı (§24, madde 7): sola hizalı rapor düzeni — özet şerit, alan bazlı yüzde
  *  performans, genişleyebilir vaka raporu tablosu. */
@@ -146,6 +149,18 @@ export function ResultsScreen() {
               <span className="rs-lbl">Vaka sayısı</span>
             </div>
           </div>
+          {GAMI_ENABLED && state.mode !== 'learn' && state.caseResults.length > 0 && (
+            <GamiGains
+              repo={getGamiRepo(runtime?.api.get('cmi.learner_name'))}
+              mode={state.mode}
+              results={state.caseResults}
+              caseById={(id) => cases.find((c) => c.id === id)}
+              seed={state.session.seed}
+              durationMs={state.assessmentTimer}
+              onAchievements={() => dispatch({ type: 'goto', screen: 'achievements' })}
+              onLeaderboard={() => dispatch({ type: 'goto', screen: 'leaderboard' })}
+            />
+          )}
 
           <div className="card mt-16">
             <h3 style={{ marginTop: 0 }}>Alan bazlı performans</h3>

@@ -213,6 +213,22 @@ doğrulanana kadar `validate` adımında durur (`OPACA_ALLOW_LICENSE_REVIEW=1` y
   devralınan çalışma zamanı; suspend verisi SCORM 1.2'nin 4000 karakterlik sınırına sığacak şekilde
   kademeli küçültülür (K3/K4), tamamlanmış LMS durumu ezilmez (`docs/DENETIM.md`).
 
+## Oyunlaştırma (bayrak arkasında, v1)
+
+Başarılarım (seviye/XP, seri, haftalık hedefler, alan performansı, 28 rozet) ve Liderlik Tahtası (dönem/kohort,
+podyum, Ayın Ödülü) **varsayılan olarak kapalıdır**; kapalıyken arayüz ve SCORM davranışı birebir aynıdır.
+
+- Açmak: tarayıcıda `?gami=1`; pakete gömmek için derlemede `VITE_GAMI=1`
+  (ör. `VITE_GAMI=1 OPACA_ALLOW_LICENSE_REVIEW=1 npm run build:scorm`).
+- Demo durumları: `?gami=1&demo=full|empty|winner` (bellek içinde; gerçek veriye dokunmaz).
+- Veri: kişisel ilerleme tarayıcıda `localStorage` (`opaca.gami.v1`); SCORM'a hiçbir şey yazılmaz. Ad SCORM öğrenci
+  adından ("Soyad, Ad" → "Ad Soyad"), öğrenci anonim görünmeyi seçebilir.
+- **Sınır:** pakette sunucu olmadığından sınıf sıralaması gerçek değildir — kendi sonuçların + deterministik demo akranlar;
+  her ekranda "Demo verisi" etiketi var. Gerçek sıralama için `GamificationRepo`'nun sunucu (ör. xAPI/LRS) uygulaması gerekir.
+- Kod: `src/gamification/` (saf kurallar, `rules.ts` tek sayısal kaynak), `src/ui/gami/`, `src/styles-gami.css`,
+  `src/screens/{Achievements,Leaderboard}Screen.tsx`. Belgeler: `docs/GAMIFICATION-*.md`, onaylı tasarım `docs/mockups/gami.html`.
+- Görüntüler: `npm run e2e:gami` (6 durum × 1440/768/360, taşma denetimi).
+
 ## Test ve kalite güvencesi
 
 ```bash

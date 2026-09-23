@@ -360,3 +360,21 @@
   .gami-reward.compact .txt { flex: 1 1 200px; }
   .gami-reward.compact .gami-link { margin-left: 44px; }
 }
+
+/* ---------- Kazanımlar: konfeti (yalnız yeni rozet + ustalık; CSS, 1,2 sn, kart içinde) ---------- */
+.gami-gains { position: relative; overflow: hidden; }
+.gami-confetti { position: absolute; inset: 0; pointer-events: none; }
+.gami-confetti i { position: absolute; top: -10px; width: 7px; height: 11px; border-radius: 2px; opacity: 0; animation: gami-confetti 1.2s ease-out forwards; }
+.gami-confetti i:nth-child(4n + 1) { background: var(--blue-500); }
+.gami-confetti i:nth-child(4n + 2) { background: var(--purple-600); }
+.gami-confetti i:nth-child(4n + 3) { background: var(--orange-500); }
+.gami-confetti i:nth-child(4n) { background: var(--green-500); }
+.gami-confetti i:nth-child(1) { left: 6%; } .gami-confetti i:nth-child(2) { left: 13%; animation-delay: 60ms; }
+.gami-confetti i:nth-child(3) { left: 21%; animation-delay: 120ms; } .gami-confetti i:nth-child(4) { left: 28%; }
+.gami-confetti i:nth-child(5) { left: 35%; animation-delay: 90ms; } .gami-confetti i:nth-child(6) { left: 42%; animation-delay: 30ms; }
+.gami-confetti i:nth-child(7) { left: 49%; animation-delay: 150ms; } .gami-confetti i:nth-child(8) { left: 56%; }
+.gami-confetti i:nth-child(9) { left: 63%; animation-delay: 60ms; } .gami-confetti i:nth-child(10) { left: 70%; animation-delay: 120ms; }
+.gami-confetti i:nth-child(11) { left: 77%; } .gami-confetti i:nth-child(12) { left: 84%; animation-delay: 90ms; }
+.gami-confetti i:nth-child(13) { left: 90%; animation-delay: 30ms; } .gami-confetti i:nth-child(14) { left: 96%; animation-delay: 150ms; }
+@keyframes gami-confetti { 0% { opacity: 1; transform: translateY(0) rotate(0); } 100% { opacity: 0; transform: translateY(150px) rotate(300deg); } }
+@media (prefers-reduced-motion: reduce) { .gami-confetti { display: none; } }

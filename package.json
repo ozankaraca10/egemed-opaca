@@ -27,7 +27,8 @@
     "build:scorm": "npm run validate && tsc -b && vite build && node scripts/build-scorm.mjs",
     "build:html": "npm run validate && tsc -b && vite build && node scripts/build-html.mjs",
     "e2e": "node scripts/e2e-screens.mjs",
-    "e2e:click-stability": "node scripts/e2e-click-stability.mjs"
+    "e2e:click-stability": "node scripts/e2e-click-stability.mjs",
+    "e2e:gami": "node scripts/e2e-gami-screens.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",
