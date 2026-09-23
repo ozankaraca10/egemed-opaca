@@ -1,5 +1,6 @@
 # Oyunlaştırma — devir notu (HANDOFF)
 
+> **Devir:** P2 bitince iş Astra (yönetici) + Sol 6.0'a (uygulayıcı) devredilir → `docs/GAMIFICATION-DEVIR-ASTRA-SOL.md`.
 > Bu dosya her paket bitiminde güncellenir. Kesinti olursa buradan devam edilir (Claude, Sonnet ya da Codex).
 > Tasarım spesifikasyonu: `docs/GAMIFICATION-TASARIM-PROMPT.md` · Yol haritası: `docs/GAMIFICATION-YOL-HARITASI.md` (özgünü bulunamadı; Opus taslağı v0.1)
 
