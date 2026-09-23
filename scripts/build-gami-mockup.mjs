@@ -153,7 +153,7 @@ const achievements = () => `${achievementsHead()}
   ${profileStrip()}
   <div class="gami-grid">
     <div class="card gami-span-8"><div class="gami-card-head"><h3>İlerleme</h3><span class="gami-range">24 Ağu – 22 Eyl 2026</span></div>${chart()}</div>
-    <div class="card gami-span-4"><div class="gami-card-head"><h3>Bu haftanın hedefleri</h3><span class="gami-range">22–28 Eyl</span></div>${goals()}</div>
+    <div class="card gami-span-4"><div class="gami-card-head"><h3>Bu haftanın hedefleri</h3><span class="gami-range">21–27 Eyl</span></div>${goals()}</div>
     <div class="card gami-span-6"><div class="gami-card-head"><h3>Alan bazlı performans</h3><span class="gami-range">Son 30 gün · değerlendirme</span></div>${domainsPanel()}</div>
     <div class="card gami-span-6"><div class="gami-card-head"><h3>Son kazanılan rozetler</h3></div>${recent()}</div>
     <div class="gami-span-12">${badgeGrid()}</div>
@@ -203,7 +203,7 @@ const rewardCompact = () => `<div class="card gami-reward compact"><span class="
 const periodRow = (sel) => `<div class="gami-period-row">
   <div class="gami-seg purple" role="tablist" aria-label="Dönem">${['Bugün', 'Bu hafta', 'Bu ay', 'Akademik yıl'].map((p) => `<button role="tab" type="button" aria-selected="${p === sel}">${p}</button>`).join('')}</div>
   <select class="gami-select" aria-label="Kohort"><option>Tüm dönemler</option>${[1, 2, 3, 4, 5, 6].map((d) => `<option>Dönem ${d}</option>`).join('')}</select>
-  <span class="gami-range">${sel === 'Bu ay' ? '1–30 Eyl 2026' : '22–28 Eyl 2026'}</span></div>`
+  <span class="gami-range">${sel === 'Bu ay' ? '1–30 Eyl 2026' : '21–27 Eyl 2026'}</span></div>`
 const podium = (rows, showCandidates) => `<div class="gami-podium" aria-label="İlk 3">${rows.slice(0, 3).map((r, i) => `
   <div class="card gami-podium-card r${i + 1}${r.id === D.ME_ID ? ' me' : ''}"><span class="gami-medal m${i + 1}" aria-label="${i + 1}. sıra">${i + 1}</span>
   ${showCandidates && r.candidate ? '<span class="badge orange">Ödül adayı</span>' : ''}

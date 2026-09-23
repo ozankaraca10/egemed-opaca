@@ -1,6 +1,7 @@
 # Oyunlaştırma — devir notu (HANDOFF)
 
-> **Devir:** P2 bitince iş Astra (yönetici) + Sol 6.0'a (uygulayıcı) devredilir → `docs/GAMIFICATION-DEVIR-ASTRA-SOL.md`.
+> **Devir kılavuzu (gerektiğinde):** `docs/GAMIFICATION-DEVIR-ASTRA-SOL.md`. 23 Eyl 2026: Astra'ya devir kullanıcı tarafından
+> iptal edildi; iş Claude Opus 5.5'te sürüyor.
 > Bu dosya her paket bitiminde güncellenir. Kesinti olursa buradan devam edilir (Claude, Sonnet ya da Codex).
 > Tasarım spesifikasyonu: `docs/GAMIFICATION-TASARIM-PROMPT.md` · Yol haritası: `docs/GAMIFICATION-YOL-HARITASI.md` (özgünü bulunamadı; Opus taslağı v0.1)
 
@@ -13,7 +14,7 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 | P0 | Spesifikasyon repoya, devir notu | ✅ bitti |
 | P1 | Faz T0 — statik tasarım referansı `docs/mockups/gami.html` + ekran görüntüleri | ✅ bitti, **onaylandı** (23 Eyl 2026) |
 | — | Yol haritası | ✅ taslak v0.1 yazıldı (`docs/GAMIFICATION-YOL-HARITASI.md`) |
-| P2 | Yol haritası Faz 1 — saf veri katmanı + testler (`src/gamification/`, `tests/gamification/`) | ⏳ Sonnet'te; Opus denetimi bekliyor |
+| P2 | Yol haritası Faz 1 — saf veri katmanı + testler (`src/gamification/`, `tests/gamification/`) | ✅ bitti (184/184 test) |
 | P3 | K-A1…K-A6 (Başarılarım) | ⛔ P2 |
 | P4 | K-B1…K-B7 (Liderlik + Ayın Ödülü) | ⛔ P2 |
 | P5 | K-C1 (Kazanımlar kartı), K-D1 (e2e görüntüleri) | ⛔ P3/P4 |
@@ -87,3 +88,17 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
 2. `docs/GAMIFICATION-YOL-HARITASI.md` gelince P2 (Faz 1 veri katmanı) — `src/gamification/` altında saf
    modüller + vitest; mock üretici `gami-mock-data.mjs` yapısıyla uyumlu olmalı.
 3. Sonra tasarım promptu §8 kart sırası (K-A1 → K-D1); her kartta promptun §9 denetim listesi.
+
+### P2 — Faz 1 veri katmanı (bitti)
+- Sonnet kodu yazdı, testlerin yalnız ilkini yazabildi (haftalık kota doldu, 26 Eyl'de sıfırlanır); Opus kodu satır satır
+  denetleyip düzeltti ve testleri tamamladı. `src/gamification/` 14 modül, `tests/gamification/` 6 dosya + yardımcı.
+- Denetimde düzeltilenler: `periodScore` eşit puanda önce tamamlanan denemeyi seçer; "Kemik Gözü" yalnız kırık
+  (skolyoz sayılmaz); repo'ya `recordLearn()` eklendi (yoksa Öğrenme Kaşifi / BT Kaşifi hiç kazanılamazdı);
+  demo "full" durumunda uygulama günleri seriyi 3 yerine 6 yapıyordu → düzeltildi; Sonnet'in bir zaman testindeki
+  hatalı beklenti düzeltildi.
+- Mevcut hiçbir dosya değişmedi; `npx vitest run` 184/184, `npx tsc -b` temiz.
+- Bilinen sınırlar: liderlik tablosu demo akranlarla (isDemo); `getRewardWinners` şimdilik yalnız sabit geçmiş listesi.
+- Maket: haftanın doğru aralığı 21–27 Eyl 2026 (21 Eyl Pazartesi) — düzeltildi.
+
+## Sıradaki: P3 — K-A1 (bayrak, ekranlar, header çipi, styles-gami.css, yeni ikonlar)
+Ayrıntılı kart: `docs/GAMIFICATION-DEVIR-ASTRA-SOL.md` §4.2.
