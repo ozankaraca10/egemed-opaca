@@ -74,7 +74,7 @@ interface AttemptRecord {
   fastPerfect: boolean       // süre sınırının yarısında ≥90
 }
 interface LearnActivity { topics: string[]; ctStacksCompleted: string[] }
-interface GamiProfile { displayName: string | null; public: boolean; cohort: 3 | 4 | 5 | 6 | null }
+interface GamiProfile { displayName: string | null; public: boolean; cohort: 1 | 2 | 3 | 4 | 5 | 6 | null }
 interface GamiStateV1 { v: 1; attempts: AttemptRecord[]; learn: LearnActivity; earned: { id: string; at: string }[]; profile: GamiProfile }
 ```
 `attempts` en fazla 500 kayıt tutar (en eskiler düşer; kazanılmış rozetler korunur).
@@ -98,9 +98,10 @@ interface GamiStateV1 { v: 1; attempts: AttemptRecord[]; learn: LearnActivity; e
 - Dönem puanı: dönem içindeki en iyi 3 değerlendirmenin ortalaması (1 ondalık). Sıralamaya girmek için en az
   2 değerlendirme.
 - Eşitlik: bu puana önce ulaşan (en iyi 3'ü tamamlayan denemenin zamanı) öne geçer.
-- Dönemler: Bugün · Bu hafta · Bu ay · Akademik yıl (1 Eyl–31 Ağu). Kohort filtresi: Tümü, Dönem 3–6.
+- Dönemler: Bugün · Bu hafta · Bu ay · Akademik yıl (1 Eyl–31 Ağu). Kohort filtresi: Tümü, Dönem 1–6.
 - Ödül: uygun olanlar arasında ilk `winnersCount`; uygunluk sırası: kohort → asgari deneme → adla görünme.
-  Kohort ve asgari deneme **KARAR BEKLİYOR** (taslak: Dönem 4–6, ayda 4 değerlendirme).
+  Kohort: **tüm sınıflar, Dönem 1–6** (kullanıcı kararı, 23 Eyl 2026). Aylık asgari değerlendirme **KARAR BEKLİYOR**
+  (taslak: 4).
 
 ## 5. Rozetler (28 — taslak, `docs/mockups/gami-mock-data.mjs` ile aynı)
 

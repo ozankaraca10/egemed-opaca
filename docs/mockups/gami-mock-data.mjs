@@ -8,7 +8,7 @@
 
 export const ME_ID = 'u-12'
 
-/** Ayın ödülü (MonthlyReward sözleşmesi, tasarım promptu §5.1). Kohort / asgari deneme: KARAR BEKLİYOR. */
+/** Ayın ödülü (MonthlyReward sözleşmesi, tasarım promptu §5.1). Kohort: Dönem 1–6 (kullanıcı kararı). Asgari deneme: taslak 4. */
 export const reward = {
   month: '2026-09',
   monthLabel: 'Eylül 2026',
@@ -16,10 +16,10 @@ export const reward = {
   description: "Ayın ilk 3'ü, Radyoloji AD öğretim üyesi eşliğinde bir girişimsel işlemi gözlemleme fırsatı kazanır.",
   sponsor: 'Radyoloji Anabilim Dalı',
   winnersCount: 3,
-  eligibility: { cohorts: [4, 5, 6], minAssessments: 4, requirePublicName: true },
+  eligibility: { cohorts: [1, 2, 3, 4, 5, 6], minAssessments: 4, requirePublicName: true },
   closesIn: '8 gün 4 saat',
   terms: [
-    'Uygun kohortlar: Dönem 4, 5 ve 6 öğrencileri.',
+    'Tüm sınıflar (Dönem 1–6) katılabilir.',
     'Ay içinde en az 4 değerlendirme oturumu tamamlanmalıdır.',
     'Puan: ay içindeki en iyi 3 değerlendirmenin ortalaması.',
     'Eşitlikte bu puana önce ulaşan öne geçer.',
@@ -33,14 +33,14 @@ export const reward = {
 /** Aylık sıralama (Bu ay). cohort: dönem; public: adıyla görünür mü (false → Anonim öğrenci). */
 export const monthly = [
   { id: 'u-01', name: 'Deniz Kaya', score: 94.3, attempts: 6, level: 12, xp: 3420, cohort: 5, public: true },
-  { id: 'u-02', name: 'Ayşe Yıldız', score: 91.0, attempts: 7, level: 11, xp: 3105, cohort: 3, public: true },
+  { id: 'u-02', name: 'Ayşe Yıldız', score: 91.0, attempts: 3, level: 11, xp: 3105, cohort: 3, public: true },
   { id: 'u-03', name: 'Mert Tunç', score: 89.7, attempts: 5, level: 10, xp: 2710, cohort: 6, public: true },
   { id: 'u-04', name: 'Ece Sarı', score: 88.0, attempts: 5, level: 9, xp: 1780, cohort: 4, public: true },
-  { id: 'u-05', name: 'Can Öztürk', score: 86.4, attempts: 4, level: 9, xp: 1690, cohort: 5, public: true },
+  { id: 'u-05', name: 'Can Öztürk', score: 86.4, attempts: 4, level: 9, xp: 1690, cohort: 2, public: true },
   { id: 'u-06', name: null, score: 85.9, attempts: 6, level: 8, xp: 1540, cohort: 5, public: false },
   { id: 'u-07', name: 'Zeynep Arslan', score: 84.2, attempts: 4, level: 7, xp: 1310, cohort: 4, public: true },
   { id: 'u-08', name: 'Burak Demir', score: 83.0, attempts: 5, level: 7, xp: 1255, cohort: 6, public: true },
-  { id: 'u-09', name: 'Elif Şahin', score: 81.7, attempts: 4, level: 6, xp: 1040, cohort: 4, public: true },
+  { id: 'u-09', name: 'Elif Şahin', score: 81.7, attempts: 4, level: 6, xp: 1040, cohort: 1, public: true },
   { id: 'u-10', name: null, score: 80.1, attempts: 3, level: 4, xp: 680, cohort: 5, public: false },
   { id: 'u-11', name: 'Kerem Aydın', score: 79.9, attempts: 4, level: 6, xp: 990, cohort: 5, public: true },
   { id: 'u-12', name: 'Selin Çelik', score: 79.4, attempts: 4, level: 5, xp: 920, cohort: 5, public: true, delta: 3 },

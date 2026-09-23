@@ -24,7 +24,7 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
    **Önemli sınır:** SCORM paketinde sunucu yok → gerçek sınıf sıralaması yok; v1 liderlik tablosu kendi
    sonuçların + deterministik demo akranlar ("Demo verisi" etiketli).
 2. `docs/mockups/gami-referans-ai.png` yok. T0 yalnız promptun yazılı bilgi mimarisiyle yapıldı.
-3. Ödül koşulları `KARAR BEKLİYOR`: uygun kohortlar (örn. Dönem 4–6), aylık asgari değerlendirme sayısı (örn. 4).
+3. Ödül: kohort kararı verildi (Dönem 1–6). Aylık asgari değerlendirme sayısı hâlâ `KARAR BEKLİYOR` (taslak 4).
 4. T0'daki rozet adları/sayısı (28) ve XP değerleri taslak; yol haritası §5 gelince hizalanacak.
 
 ## Çalışma kuralları (Codex/Sonnet için)
@@ -50,6 +50,8 @@ Son güncelleme: 2026-09-23 · Güncelleyen: Claude Opus 5.5
   gradyanlı dolu madalyon + beyaz ikon + kartta kategori tonlu üst zemin; devam eden = açık ton + kategori
   renkli ikon ve ilerleme çubuğu; kilitli = gri + kilit rozetçiği; kademe (bronz/gümüş/altın) = dış halka.
   Kartta kategori etiketi ve koleksiyon başlığında kategori lejantı var.
+- **Ödül tüm sınıflara açık (Dönem 1–6).** Kohort tipi `1|2|3|4|5|6`; kohort filtresi Tümü + Dönem 1–6.
+  Maketteki "ilk 3'te ama uygun değil" örneği artık kohorttan değil asgari denemeden (2. sıra, 3/4 deneme).
 
 ## Paket kayıtları
 

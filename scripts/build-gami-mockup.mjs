@@ -202,7 +202,7 @@ const rewardCompact = () => `<div class="card gami-reward compact"><span class="
   <span class="txt">Bu ayın ödülü: <b>${D.reward.title}</b> · 8 gün kaldı</span><button class="gami-link" type="button">Aylık sıralamayı gör ${I('ChevronRight', 14)}</button></div>`
 const periodRow = (sel) => `<div class="gami-period-row">
   <div class="gami-seg purple" role="tablist" aria-label="Dönem">${['Bugün', 'Bu hafta', 'Bu ay', 'Akademik yıl'].map((p) => `<button role="tab" type="button" aria-selected="${p === sel}">${p}</button>`).join('')}</div>
-  <select class="gami-select" aria-label="Kohort"><option>Tüm dönemler</option><option>Dönem 3</option><option>Dönem 4</option><option>Dönem 5</option><option>Dönem 6</option></select>
+  <select class="gami-select" aria-label="Kohort"><option>Tüm dönemler</option>${[1, 2, 3, 4, 5, 6].map((d) => `<option>Dönem ${d}</option>`).join('')}</select>
   <span class="gami-range">${sel === 'Bu ay' ? '1–30 Eyl 2026' : '22–28 Eyl 2026'}</span></div>`
 const podium = (rows, showCandidates) => `<div class="gami-podium" aria-label="İlk 3">${rows.slice(0, 3).map((r, i) => `
   <div class="card gami-podium-card r${i + 1}${r.id === D.ME_ID ? ' me' : ''}"><span class="gami-medal m${i + 1}" aria-label="${i + 1}. sıra">${i + 1}</span>
