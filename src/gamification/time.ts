@@ -87,3 +87,11 @@ export function periodRangeTr(period: Period, now: Date): { start: Date; end: Da
       return { start: startOfAcademicYearTr(now), end: now }
   }
 }
+
+/** Başarılarım dönem seçici (tasarım promptu §4): son 30 gün · son 12 hafta · akademik yıl. */
+export type AchievementsPeriod = 'last30' | 'last12w' | 'academic'
+export function achievementsRangeTr(period: AchievementsPeriod, now: Date): { start: Date; end: Date } {
+  if (period === 'academic') return { start: startOfAcademicYearTr(now), end: now }
+  const days = period === 'last30' ? 30 : 84
+  return { start: new Date(startOfDayTr(now).getTime() - (days - 1) * 86_400_000), end: now }
+}

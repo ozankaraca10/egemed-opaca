@@ -5,6 +5,7 @@
 
 import type {
   AttemptRecord,
+  GamiStateV1,
   Cohort,
   CohortFilter,
   GamiProfile,
@@ -67,6 +68,8 @@ export interface LocalRepoOptions {
   /** SCORM `cmi.core.student_name` — profilde henüz bir `displayName` yoksa varsayılan olarak
    *  kullanılır (biçimlendirilerek). LMS dışına gönderilmez; yalnız görünen ad türetimi içindir. */
   lmsStudentName?: string | null
+  /** Demo/test: bellek içi durum. Verilirse localStorage'a HİÇ dokunulmaz (kullanıcının gerçek verisi korunur). */
+  stateOverride?: GamiStateV1
 }
 
 /** v1 depo uygulaması: kendi verisini `localStorage`'dan okur (bkz. storage.ts), liderlik
@@ -74,9 +77,25 @@ export interface LocalRepoOptions {
  *  `isDemo: true` koyar (bkz. yol haritası §1 — sunucu/LRS olmadan gerçek sınıf sıralaması yok). */
 export class LocalRepo implements GamificationRepo {
   private lmsStudentName: string | null
+  private override: GamiStateV1 | null
 
   constructor(opts: LocalRepoOptions = {}) {
     this.lmsStudentName = opts.lmsStudentName ?? null
+    this.override = opts.stateOverride ?? null
+  }
+
+  private load(): GamiStateV1 {
+    return this.override ?? loadState()
+  }
+
+  private save(s: GamiStateV1): void {
+    if (this.override) this.override = s
+    else saveState(s)
+  }
+
+  /** Senkron anlık görüntü (UI hesaplamaları için). */
+  snapshot(): GamiStateV1 {
+    return this.load()
   }
 
   private defaultDisplayName(): string | null {
@@ -84,7 +103,7 @@ export class LocalRepo implements GamificationRepo {
   }
 
   async getMe(): Promise<GamiProfile & { id: string }> {
-    const s = loadState()
+    const s = this.load()
     return {
       id: ME_ID,
       displayName: s.profile.displayName ?? this.defaultDisplayName(),
@@ -94,13 +113,13 @@ export class LocalRepo implements GamificationRepo {
   }
 
   async updateMe(patch: Partial<GamiProfile>): Promise<void> {
-    const s = loadState()
+    const s = this.load()
     s.profile = { ...s.profile, ...patch }
-    saveState(s)
+    this.save(s)
   }
 
   async recordAttempt(attempt: AttemptRecord): Promise<void> {
-    const s = loadState()
+    const s = this.load()
     if (s.attempts.some((a) => a.id === attempt.id)) return // idempotent
 
     s.attempts.push(attempt)
@@ -109,11 +128,11 @@ export class LocalRepo implements GamificationRepo {
     const newlyEarned = evaluateBadges(stats, s.earned, finishedAt)
     s.earned = [...s.earned, ...newlyEarned]
 
-    saveState(s)
+    this.save(s)
   }
 
   async recordLearn(activity: { topic?: string; ctStack?: string }, now: Date): Promise<void> {
-    const s = loadState()
+    const s = this.load()
     let changed = false
     if (activity.topic && !s.learn.topics.includes(activity.topic)) {
       s.learn.topics.push(activity.topic)
@@ -126,15 +145,15 @@ export class LocalRepo implements GamificationRepo {
     if (!changed) return
     const stats = computeStats(s.attempts, s.learn, s.earned, now)
     s.earned = [...s.earned, ...evaluateBadges(stats, s.earned, now)]
-    saveState(s)
+    this.save(s)
   }
 
   async listAttempts(): Promise<AttemptRecord[]> {
-    return loadState().attempts
+    return this.load().attempts
   }
 
   async getLeaderboard(period: Period, cohort: CohortFilter, now: Date): Promise<LeaderboardView> {
-    const s = loadState()
+    const s = this.load()
     const { start, end } = periodRangeTr(period, now)
     const startIso = start.toISOString()
     const endIso = end.toISOString()

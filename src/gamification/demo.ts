@@ -136,7 +136,7 @@ export function demoStateFull(now: Date): GamiStateV1 {
     attempts,
     learn,
     earned: [],
-    profile: { displayName: 'Demo Öğrenci', public: true, cohort: 5 },
+    profile: { displayName: 'Selin Çelik', public: true, cohort: 5 },
   }
 
   const stats = computeStats(state.attempts, state.learn, [], now)
