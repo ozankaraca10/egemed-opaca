@@ -7,6 +7,10 @@ import { GamiDemoBanner } from '../ui/gami/GamiDemoBanner'
 import { GamiPageTabs } from '../ui/gami/GamiPageTabs'
 import { GamiProfileStrip } from '../ui/gami/GamiProfileStrip'
 import { GamiEmptyCard } from '../ui/gami/GamiEmptyCard'
+import { GamiProgressChart } from '../ui/gami/GamiProgressChart'
+import { GamiWeeklyGoals } from '../ui/gami/GamiWeeklyGoals'
+import { GamiDomainPanel } from '../ui/gami/GamiDomainPanel'
+import { buildChartSeries, trShortDate } from '../gamification/chart'
 import { useGami, useLeaderboard } from '../gamification/useGami'
 import { achievementsRangeTr, type AchievementsPeriod } from '../gamification/time'
 
@@ -23,11 +27,15 @@ export function AchievementsScreen() {
   const [period, setPeriod] = useState<AchievementsPeriod>('last30')
   const week = useLeaderboard('week', 'all', view.now, view.repo)
 
-  const inPeriod = useMemo(() => {
+  const range = useMemo(() => {
     const { start, end } = achievementsRangeTr(period, view.now)
-    const s = start.toISOString(), e = end.toISOString()
-    return view.state.attempts.filter((a) => a.finishedAt >= s && a.finishedAt <= e)
-  }, [period, view])
+    return { s: start.toISOString(), e: end.toISOString() }
+  }, [period, view.now])
+  const inPeriod = useMemo(() => view.state.attempts.filter((a) => a.finishedAt >= range.s && a.finishedAt <= range.e), [range, view])
+  const points = useMemo(() => buildChartSeries(view.state.attempts, range.s, range.e), [range, view])
+  const rangeLabel = `${trShortDate(range.s)} – ${trShortDate(range.e)}`
+  const weekStart = view.goals.weekStartTr.toISOString()
+  const weekLabel = `${trShortDate(weekStart)} – ${trShortDate(new Date(view.goals.weekStartTr.getTime() + 6 * 86_400_000).toISOString())}`
   const assessments = inPeriod.filter((a) => a.mode === 'assessment')
   const practiceCases = inPeriod.filter((a) => a.mode === 'practice').reduce((n, a) => n + a.caseCount, 0)
   const avg = assessments.length ? assessments.reduce((n, a) => n + a.score, 0) / assessments.length : null
@@ -72,6 +80,22 @@ export function AchievementsScreen() {
             />
           ) : (
             <GamiEmptyCard onAssessment={startAssessment} />
+          )}
+          {view.hasAttempts && (
+            <div className="gami-grid">
+              <section className="card gami-span-8" aria-labelledby="gami-progress-t">
+                <div className="gami-card-head"><h3 id="gami-progress-t">İlerleme</h3><span className="gami-range">{rangeLabel}</span></div>
+                <GamiProgressChart points={points} rangeLabel={rangeLabel} />
+              </section>
+              <section className="card gami-span-4" aria-labelledby="gami-goals-t">
+                <div className="gami-card-head"><h3 id="gami-goals-t">Bu haftanın hedefleri</h3><span className="gami-range">{weekLabel}</span></div>
+                <GamiWeeklyGoals goals={view.goals} />
+              </section>
+              <section className="card gami-span-6" aria-labelledby="gami-domains-t">
+                <div className="gami-card-head"><h3 id="gami-domains-t">Alan bazlı performans</h3><span className="gami-range">Değerlendirme · {PERIODS.find((p) => p.id === period)!.short}</span></div>
+                <GamiDomainPanel assessments={assessments} />
+              </section>
+            </div>
           )}
         </div>
       </div>

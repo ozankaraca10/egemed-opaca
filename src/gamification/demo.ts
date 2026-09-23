@@ -101,6 +101,11 @@ export function demoStateFull(now: Date): GamiStateV1 {
         interpretationCorrect: correct ? 2 : 1,
         fastPerfect: score >= 90 && i % 4 === 0,
         findings: [{ finding: findingId, correct }],
+        // alan yüzdeleri: puan etrafında sabit sapmalar (klinik yorum bilinçli olarak zayıf)
+        domains: {
+          technique: Math.min(100, Math.round(score + 6)), systematic: Math.round(score - 4), quality: Math.min(100, Math.round(score + 3)),
+          recognition: Math.round(score), localization: Math.round(score - 10), interpretation: Math.round(score - 27), diagnosis: Math.round(score - 18),
+        },
       })
     )
   })
